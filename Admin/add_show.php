@@ -1,7 +1,7 @@
 <?php
 
 require_once '../Includes/db_conn.php';
-
+include '../Includes/sidebar.php';
 $movies = mysqli_query(
     $conn,
     "SELECT * FROM movies WHERE status='ACTIVE'"
@@ -271,5 +271,93 @@ if (isset($_POST['add_show'])) {
             </div>
         </div>
     </div>
+
+<?php
+$query = "
+SELECT 
+    sh.*,
+    m.title,
+    m.duration_minutes,
+    sc.screen_name,
+    TIMESTAMPADD(
+        MINUTE, 
+        m.duration_minutes, 
+        CONCAT(sh.show_date,' ',sh.show_time)
+    ) AS end_time
+FROM shows sh
+INNER JOIN movies m ON sh.movie_id = m.movie_id
+INNER JOIN screens sc ON sh.screen_id = sc.screen_id
+ORDER BY sh.show_date DESC, sh.show_time DESC";
+
+$result = mysqli_query($conn, $query);
+?>
+
+<div class="show-table-card">
+    <table class="show-table">
+        <thead>
+            <tr>
+                <th>S.N</th>
+                <th>Movie</th>
+                <th>Screen</th>
+                <th>Date</th>
+                <th>Start</th>
+                <th>End</th>
+                <th>Price</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+
+        <tbody>
+        <?php 
+        $i = 1;
+        if(mysqli_num_rows($result) > 0):
+            while($row = mysqli_fetch_assoc($result)):
+                /* AUTO STATUS LOGIC */
+                $current = date("Y-m-d H:i:s");
+                $end_dt = date("Y-m-d H:i:s", strtotime($row['end_time']));
+                
+                $status = ($row['show_status'] != 'CANCELLED' && $current > $end_dt) 
+                          ? 'COMPLETED' 
+                          : $row['show_status'];
+
+                $status_low = strtolower($status);
+        ?>
+            <tr>
+                <td><?= $i++ ?></td>
+                <td><strong><?= htmlspecialchars($row['title']) ?></strong></td>
+                <td><?= htmlspecialchars($row['screen_name']) ?></td>
+                <td><?= $row['show_date'] ?></td>
+                <td><?= date("h:i A", strtotime($row['show_time'])) ?></td>
+                <td><?= date("h:i A", strtotime($row['end_time'])) ?></td>
+                <td>Rs. <?= $row['ticket_price'] ?></td>
+                <td>
+                    <span class="status <?= $status_low ?>">
+                        <?= ucfirst(strtolower($status)) ?>
+                    </span>
+                </td>
+                <td>
+                    <div class="action-buttons">
+                        <a href="edit_show.php?id=<?= $row['show_id'] ?>" class="edit-btn">Edit</a>
+
+                        <?php if($status != 'CANCELLED'): ?>
+                            <a href="cancel_show.php?id=<?= $row['show_id'] ?>" class="cancel-btn" onclick="return confirm('Cancel this show?')">Cancel</a>
+                        <?php endif; ?>
+
+                        <a href="show_analytics.php?id=<?= $row['show_id'] ?>" class="view-btn">View</a>
+                    </div>
+                </td>
+            </tr>
+        <?php 
+            endwhile;
+        else: 
+        ?>
+            <tr>
+                <td colspan="9" class="no-data">No shows available</td>
+            </tr>
+        <?php endif; ?>
+        </tbody>
+    </table>
+</div>
 </body>
 </html>
