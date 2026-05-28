@@ -185,3 +185,97 @@ select:focus{
         gap:15px;
     }
 }
+
+/* 1. LAYOUT WRAPPER (Add this to your main container) */
+/* Assuming your sidebar is roughly 250px-300px wide */
+.main-body-container {
+    margin-left: 260px; /* Adjust this to match your Sidebar width */
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* Space between the Add Card and the Table Card */
+}
+
+/* 2. SHOW TABLE CARD (Updated for alignment) */
+.show-table-card {
+    background: white;
+    border-radius: 24px;
+    padding: 25px;
+    box-shadow: 0 5px 25px rgba(0,0,0,0.05);
+    overflow-x: auto;
+    /* Remove margin-top if using the gap in container above */
+    margin-top: 20px; 
+    width: 100%; /* Ensures it stays within the parent container */
+    box-sizing: border-box;
+}
+
+/* 3. TABLE STYLES (Kept as per your previous design) */
+.show-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 1000px;
+}
+
+.show-table thead {
+    background: #fafafa;
+}
+
+.show-table th {
+    padding: 18px 16px;
+    text-align: left;
+    font-size: 14px;
+    font-weight: 700;
+    color: #444;
+    border-bottom: 1px solid #eee;
+}
+
+.show-table td {
+    padding: 18px 16px;
+    font-size: 14px;
+    border-bottom: 1px solid #f1f1f1;
+    color: #555;
+    vertical-align: middle;
+}
+
+.show-table tbody tr:hover {
+    background: #fcfcfc;
+    transition: 0.3s;
+}
+
+/* 4. STATUS & BUTTONS (Kept as per your previous design) */
+.status {
+    padding: 8px 14px;
+    border-radius: 30px;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.status.active { background: #e8fff1; color: #14a44d; }
+.status.completed { background: #eef2ff; color: #3b5bdb; }
+.status.cancelled { background: #ffe8e3; color: #ff4d2d; }
+
+.action-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.action-buttons a {
+    text-decoration: none;
+    padding: 8px 14px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    transition: 0.3s;
+}
+
+.edit-btn { background: #fff4e8; color: #ff9500; }
+.cancel-btn { background: #ffe8e3; color: #ff4d2d; }
+.view-btn { background: #eef2ff; color: #3b5bdb; }
+
+/* 5. RESPONSIVE */
+@media(max-width: 1100px) {
+    .main-body-container {
+        margin-left: 0; /* Stack on top of each other for smaller screens */
+    }
+}
