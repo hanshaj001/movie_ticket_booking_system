@@ -186,30 +186,28 @@ select:focus{
     }
 }
 
-/* 1. LAYOUT WRAPPER (Add this to your main container) */
-/* Assuming your sidebar is roughly 250px-300px wide */
+
 .main-body-container {
-    margin-left: 260px; /* Adjust this to match your Sidebar width */
+  
     padding: 20px;
     display: flex;
     flex-direction: column;
     gap: 20px; /* Space between the Add Card and the Table Card */
 }
-
-/* 2. SHOW TABLE CARD (Updated for alignment) */
 .show-table-card {
     background: white;
     border-radius: 24px;
     padding: 25px;
     box-shadow: 0 5px 25px rgba(0,0,0,0.05);
     overflow-x: auto;
-    /* Remove margin-top if using the gap in container above */
-    margin-top: 20px; 
-    width: 100%; /* Ensures it stays within the parent container */
+
     box-sizing: border-box;
+      flex:1;
+    padding:40px;
+
+    transition:0.3s;
 }
 
-/* 3. TABLE STYLES (Kept as per your previous design) */
 .show-table {
     width: 100%;
     border-collapse: collapse;
@@ -276,6 +274,6 @@ select:focus{
 /* 5. RESPONSIVE */
 @media(max-width: 1100px) {
     .main-body-container {
-        margin-left: 0; /* Stack on top of each other for smaller screens */
+        margin-left: 0; 
     }
 }
