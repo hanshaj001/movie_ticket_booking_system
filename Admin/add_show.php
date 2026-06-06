@@ -1,20 +1,34 @@
 <?php
 
 require_once '../Includes/db_conn.php';
-include '../Includes/sidebar.php';
-$movies = mysqli_query(
-    $conn,
-    "SELECT * FROM movies WHERE status='ACTIVE'"
-);
 
-$screens = mysqli_query(
+// to change status of completed shows 
+mysqli_query(
     $conn,
-    "SELECT * FROM screens WHERE screen_status='ACTIVE'"
-);
+    "
+    UPDATE shows sh
+    INNER JOIN movies m
+        ON sh.movie_id = m.movie_id
 
-/* ================================
+    SET sh.show_status='COMPLETED'
+
+    WHERE sh.show_status='ACTIVE'
+
+    AND NOW() >
+        TIMESTAMPADD(
+            MINUTE,
+            m.duration_minutes,
+            CONCAT(sh.show_date,' ',sh.show_time)
+        )
+    "
+);
+$movies = mysqli_query($conn,"SELECT * FROM movies WHERE status='ACTIVE'");
+
+$screens = mysqli_query($conn,"SELECT * FROM screens WHERE screen_status='ACTIVE'");
+
+/* 
    VARIABLES
-================================ */
+*/
 
 $message = "";
 $errors = [];
@@ -74,7 +88,14 @@ if (isset($_POST['add_show'])) {
 
     if (empty($show_time)) {
         $errors['show_time'] = "Please select show time.";
-    }
+    }elseif(
+    $show_date == date("Y-m-d")
+    &&
+    strtotime($show_time) <= strtotime(date("H:i"))
+){
+    $errors['show_time'] =
+        "Past time not allowed for today.";
+}
 
     /* ================================
        PRICE VALIDATION
@@ -92,20 +113,74 @@ if (isset($_POST['add_show'])) {
        DUPLICATE SHOW CHECK
     ================================ */
 
-    if (empty($errors)) {
-        $check_query = mysqli_query(
-            $conn,
-            "SELECT *
-             FROM shows
-             WHERE screen_id='$screen_id'
-             AND show_date='$show_date'
-             AND show_time='$show_time'"
+    if(empty($errors))
+{
+    $movie_query = mysqli_query(
+        $conn,
+        "SELECT duration_minutes
+         FROM movies
+         WHERE movie_id='$movie_id'"
+    );
+
+    $movie_data =
+        mysqli_fetch_assoc($movie_query);
+
+    $duration =
+        $movie_data['duration_minutes'];
+
+    $new_start =
+        strtotime(
+            $show_date.' '.$show_time
         );
 
-        if (mysqli_num_rows($check_query) > 0) {
-            $errors['show_time'] = "Another show already exists at this time.";
+    $new_end =
+        $new_start + ($duration * 60);
+
+    $existing_shows =
+        mysqli_query(
+            $conn,
+            "
+            SELECT
+                sh.show_time,
+                m.duration_minutes
+            FROM shows sh
+            INNER JOIN movies m
+                ON sh.movie_id=m.movie_id
+            WHERE
+                sh.screen_id='$screen_id'
+                AND sh.show_date='$show_date'
+                AND sh.show_status='ACTIVE'
+            "
+        );
+
+    while(
+        $existing =
+        mysqli_fetch_assoc($existing_shows)
+    )
+    {
+        $existing_start =
+            strtotime(
+                $show_date.' '.
+                $existing['show_time']
+            );
+
+        $existing_end =
+            $existing_start +
+            ($existing['duration_minutes'] * 60);
+
+        if(
+            $new_start < $existing_end
+            &&
+            $new_end > $existing_start
+        )
+        {
+            $errors['show_time'] =
+                "Show overlaps another show on this screen.";
+
+            break;
         }
     }
+}
 
     /* ================================
        INSERT SHOW
@@ -120,7 +195,8 @@ if (isset($_POST['add_show'])) {
                 screen_id,
                 show_date,
                 show_time,
-                ticket_price
+                ticket_price,
+                show_status
             )
             VALUES
             (
@@ -128,7 +204,8 @@ if (isset($_POST['add_show'])) {
                 '$screen_id',
                 '$show_date',
                 '$show_time',
-                '$ticket_price'
+                '$ticket_price',
+                'ACTIVE'
             )"
         );
 
@@ -213,7 +290,8 @@ if (isset($_POST['add_show'])) {
                             <select name="movie_id">
                                 <option value="">Choose Movie</option>
                                 <?php while ($movie = mysqli_fetch_assoc($movies)) { ?>
-                                    <option value="<?php echo $movie['movie_id']; ?>" <?php if ($movie_id == $movie['movie_id']) { echo "selected"; } ?>>
+                                    <option value="<?php echo $movie['movie_id']; ?>" 
+                                    <?php if ($movie_id == $movie['movie_id']) { echo "selected"; } ?>>
                                         <?php echo $movie['title']; ?>
                                     </option>
                                 <?php } ?>
@@ -314,12 +392,7 @@ $result = mysqli_query($conn, $query);
         if(mysqli_num_rows($result) > 0):
             while($row = mysqli_fetch_assoc($result)):
                 /* AUTO STATUS LOGIC */
-                $current = date("Y-m-d H:i:s");
-                $end_dt = date("Y-m-d H:i:s", strtotime($row['end_time']));
-                
-                $status = ($row['show_status'] != 'CANCELLED' && $current > $end_dt) 
-                          ? 'COMPLETED' 
-                          : $row['show_status'];
+                    $status = $row['show_status'];
 
                 $status_low = strtolower($status);
         ?>
@@ -337,15 +410,37 @@ $result = mysqli_query($conn, $query);
                     </span>
                 </td>
                 <td>
-                    <div class="action-buttons">
-                        <a href="edit_show.php?id=<?= $row['show_id'] ?>" class="edit-btn">Edit</a>
 
-                        <?php if($status != 'CANCELLED'): ?>
-                            <a href="cancel_show.php?id=<?= $row['show_id'] ?>" class="cancel-btn" onclick="return confirm('Cancel this show?')">Cancel</a>
+                    <div class="action-buttons">
+
+                        <?php if($status == 'ACTIVE'): ?>
+
+                            <a
+                                href="edit_show.php?id=<?= $row['show_id'] ?>"
+                                class="edit-btn"
+                            >
+                                Edit
+                            </a>
+
+                            <a
+                                href="cancel_show.php?id=<?= $row['show_id'] ?>"
+                                class="cancel-btn"
+                                onclick="return confirm('Cancel this show?')"
+                            >
+                                Cancel
+                            </a>
+
                         <?php endif; ?>
 
-                        <a href="show_analytics.php?id=<?= $row['show_id'] ?>" class="view-btn">View</a>
+                        <a
+                            href="show_analytics.php?id=<?= $row['show_id'] ?>"
+                            class="view-btn"
+                        >
+                            View
+                        </a>
+
                     </div>
+
                 </td>
             </tr>
         <?php 
