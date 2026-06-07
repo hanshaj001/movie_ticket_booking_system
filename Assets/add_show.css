@@ -30,7 +30,6 @@ body{
 
 
 /* HEADER */
-
 .page-header{
     display:flex;
     justify-content:space-between;
@@ -38,15 +37,37 @@ body{
     margin-bottom:30px;
 }
 
-.page-header h1{
+.page-title{
+    display:flex;
+    align-items:center;
+    gap:16px;
+}
+
+.title-icon{
+    width:60px;
+    height:60px;
+    background:#ff6136;
+    border-radius:18px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.title-icon h1 i{
+    font-size:24px;
+    color:#ff4d2d;
+}
+
+.page-title h1{
     font-size:32px;
-    margin-bottom:5px;
+    margin-bottom:4px;
+    font-weight:700;
 }
 
-.page-header p{
+.page-title p{
     color:#777;
+    font-size:14px;
 }
-
 .header-btn{
     background:#ff4d2d;
     color:white;
@@ -162,30 +183,41 @@ select:focus{
     font-weight:500;
 }
 
-/* RESPONSIVE */
 
-@media(max-width:900px)
-{
-    .content-area{
-        margin-left:0;
-        padding:20px;
-    }
-
-    .form-grid{
-        grid-template-columns:1fr;
-    }
-
-    .full-width{
-        grid-column:auto;
-    }
-
-    .page-header{
-        flex-direction:column;
-        align-items:flex-start;
-        gap:15px;
-    }
+/* Heading for the show list */
+.show-list-header{
+    margin:30px 0 15px;
+    padding:0 40px;
 }
 
+.show-list-title{
+    display:flex;
+    align-items:center;
+    gap:15px;
+}
+
+.show-list-title i{
+    width:50px;
+    height:50px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:#fff4f1;
+    color:#ff4d2d;
+    border-radius:14px;
+    font-size:20px;
+}
+
+.show-list-title h2{
+    font-size:26px;
+    margin-bottom:4px;
+    color:#222;
+}
+
+.show-list-title p{
+    font-size:14px;
+    color:#777;
+}
 
 .main-body-container {
   
@@ -194,25 +226,23 @@ select:focus{
     flex-direction: column;
     gap: 20px; /* Space between the Add Card and the Table Card */
 }
-.show-table-card {
-    background: white;
-    border-radius: 24px;
-    padding: 25px;
-    box-shadow: 0 5px 25px rgba(0,0,0,0.05);
-    overflow-x: auto;
-
-    box-sizing: border-box;
-      flex:1;
-    padding:40px;
-
+.show-table-card{
+    background:white;
+    border-radius:24px;
+    padding:25px;
+    box-shadow:0 5px 25px rgba(0,0,0,0.05);
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+    flex:1;
     transition:0.3s;
 }
 
 .show-table {
-    width: 100%;
-    border-collapse: collapse;
-    min-width: 1000px;
+    width:100%;
+    border-collapse:collapse;
+    min-width:900px;
 }
+
 
 .show-table thead {
     background: #fafafa;
@@ -271,9 +301,128 @@ select:focus{
 .cancel-btn { background: #ffe8e3; color: #ff4d2d; }
 .view-btn { background: #eef2ff; color: #3b5bdb; }
 
-/* 5. RESPONSIVE */
-@media(max-width: 1100px) {
-    .main-body-container {
-        margin-left: 0; 
+
+
+/*Show filter*/
+
+.show-filter-bar{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin:25px 0;
+    padding:0 40px;
+}
+
+.date-tab{
+    text-decoration:none;
+    padding:10px 18px;
+    background:white;
+    border-radius:12px;
+    color:#555;
+    font-size:14px;
+    font-weight:600;
+    box-shadow:0 3px 12px rgba(0,0,0,0.05);
+    transition:0.3s;
+}
+
+.date-tab:hover{
+    background:#ff4d2d;
+    color:white;
+}
+
+.active-date{
+    background:#ff4d2d;
+    color:white;
+}
+
+
+/* PAGINATION */
+.pagination{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-top:25px;
+}
+
+.pagination a{
+    text-decoration:none;
+    padding:10px 16px;
+    background:#f5f5f5;
+    border-radius:10px;
+    color:#444;
+    font-weight:600;
+    transition:0.3s;
+}
+
+.pagination a:hover{
+    background:#ff4d2d;
+    color:white;
+}
+
+.active-page{
+    background:#ff4d2d !important;
+    color:white !important;
+}
+
+/* NO DATA */
+.no-data{
+    text-align:center;
+    padding:25px;
+    font-weight:600;
+    color:#888;
+}
+
+
+/* Responsive */
+@media(max-width:768px){
+
+    .content-area{
+        margin-left:0;
+        padding:15px;
+    }
+
+    .page-header{
+        flex-direction:column;
+        align-items:flex-start;
+        gap:15px;
+    }
+
+    .page-title h1{
+        font-size:26px;
+    }
+
+    .show-filter-bar{
+        padding:0;
+        gap:8px;
+    }
+
+    .date-tab{
+        padding:8px 14px;
+        font-size:13px;
+    }
+
+    .show-table th,
+    .show-table td{
+        padding:12px;
+        font-size:13px;
+    }
+
+    .action-buttons{
+        flex-direction:column;
+    }
+
+    .action-buttons a{
+        text-align:center;
+    }
+
+    .pagination{
+        gap:6px;
+    }
+
+    .pagination a{
+        padding:8px 12px;
+        font-size:13px;
     }
 }
