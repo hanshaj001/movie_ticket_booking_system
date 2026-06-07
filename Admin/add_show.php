@@ -2,6 +2,21 @@
 
 require_once '../Includes/db_conn.php';
 
+//
+$page = $_GET['page'] ?? 1;
+
+$page = max(1, $page);
+
+$limit = 10;
+
+$offset = ($page - 1) * $limit;
+
+
+// for the Date 
+$selected_date = $_GET['date'] ?? 'ALL';
+
+
+
 // to change status of completed shows 
 mysqli_query(
     $conn,
@@ -22,12 +37,11 @@ mysqli_query(
         )
     "
 );
-$movies = mysqli_query($conn,"SELECT * FROM movies WHERE status='ACTIVE'");
+$movies = mysqli_query($conn, "SELECT * FROM movies WHERE status='ACTIVE'");
 
-$screens = mysqli_query($conn,"SELECT * FROM screens WHERE screen_status='ACTIVE'");
+$screens = mysqli_query($conn, "SELECT * FROM screens WHERE screen_status='ACTIVE'");
 
-/* 
-   VARIABLES
+/* VARIABLES
 */
 
 $message = "";
@@ -55,7 +69,7 @@ if (isset($_POST['add_show'])) {
     $max_date = date("Y-m-d", strtotime("+7 days"));
 
     /* ================================
-       MOVIE VALIDATION
+        MOVIE VALIDATION
     ================================ */
 
     if (empty($movie_id)) {
@@ -63,7 +77,7 @@ if (isset($_POST['add_show'])) {
     }
 
     /* ================================
-       SCREEN VALIDATION
+        SCREEN VALIDATION
     ================================ */
 
     if (empty($screen_id)) {
@@ -71,7 +85,7 @@ if (isset($_POST['add_show'])) {
     }
 
     /* ================================
-       DATE VALIDATION
+        DATE VALIDATION
     ================================ */
 
     if (empty($show_date)) {
@@ -83,22 +97,21 @@ if (isset($_POST['add_show'])) {
     }
 
     /* ================================
-       TIME VALIDATION
+        TIME VALIDATION
     ================================ */
 
     if (empty($show_time)) {
         $errors['show_time'] = "Please select show time.";
-    }elseif(
-    $show_date == date("Y-m-d")
-    &&
-    strtotime($show_time) <= strtotime(date("H:i"))
-){
-    $errors['show_time'] =
-        "Past time not allowed for today.";
-}
+    } elseif (
+        $show_date == date("Y-m-d")
+        &&
+        strtotime($show_time) <= strtotime(date("H:i"))
+    ) {
+        $errors['show_time'] = "Past time not allowed for today.";
+    }
 
     /* ================================
-       PRICE VALIDATION
+        PRICE VALIDATION
     ================================ */
 
     if (empty($ticket_price)) {
@@ -110,34 +123,26 @@ if (isset($_POST['add_show'])) {
     }
 
     /* ================================
-       DUPLICATE SHOW CHECK
+        DUPLICATE SHOW CHECK
     ================================ */
 
-    if(empty($errors))
-{
-    $movie_query = mysqli_query(
-        $conn,
-        "SELECT duration_minutes
-         FROM movies
-         WHERE movie_id='$movie_id'"
-    );
-
-    $movie_data =
-        mysqli_fetch_assoc($movie_query);
-
-    $duration =
-        $movie_data['duration_minutes'];
-
-    $new_start =
-        strtotime(
-            $show_date.' '.$show_time
+    if (empty($errors)) {
+        $movie_query = mysqli_query(
+            $conn,
+            "SELECT duration_minutes
+             FROM movies
+             WHERE movie_id='$movie_id'"
         );
 
-    $new_end =
-        $new_start + ($duration * 60);
+        $movie_data = mysqli_fetch_assoc($movie_query);
 
-    $existing_shows =
-        mysqli_query(
+        $duration = $movie_data['duration_minutes'];
+
+        $new_start = strtotime($show_date . ' ' . $show_time);
+
+        $new_end = $new_start + ($duration * 60);
+
+        $existing_shows = mysqli_query(
             $conn,
             "
             SELECT
@@ -153,37 +158,26 @@ if (isset($_POST['add_show'])) {
             "
         );
 
-    while(
-        $existing =
-        mysqli_fetch_assoc($existing_shows)
-    )
-    {
-        $existing_start =
-            strtotime(
-                $show_date.' '.
-                $existing['show_time']
-            );
+        while (
+            $existing = mysqli_fetch_assoc($existing_shows)
+        ) {
+            $existing_start = strtotime($show_date . ' ' . $existing['show_time']);
 
-        $existing_end =
-            $existing_start +
-            ($existing['duration_minutes'] * 60);
+            $existing_end = $existing_start + ($existing['duration_minutes'] * 60);
 
-        if(
-            $new_start < $existing_end
-            &&
-            $new_end > $existing_start
-        )
-        {
-            $errors['show_time'] =
-                "Show overlaps another show on this screen.";
-
-            break;
+            if (
+                $new_start < $existing_end
+                &&
+                $new_end > $existing_start
+            ) {
+                $errors['show_time'] = "Show overlaps another show on this screen.";
+                break;
+            }
         }
     }
-}
 
     /* ================================
-       INSERT SHOW
+        INSERT SHOW
     ================================ */
 
     if (empty($errors)) {
@@ -213,7 +207,7 @@ if (isset($_POST['add_show'])) {
             $show_id = mysqli_insert_id($conn);
 
             /* ================================
-               GENERATE SHOW SEATS
+                GENERATE SHOW SEATS
             ================================ */
 
             $seat_query = mysqli_query(
@@ -263,15 +257,21 @@ if (isset($_POST['add_show'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Show</title>
     <link rel="stylesheet" href="../Assets/add_show.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="main-container">
         <div class="content-area">
             <div class="page-header">
-                <div>
-                    <h1>Add Show</h1>
-                    <p>Create movie schedules</p>
+                <div class="page-title">
+                    <div class="title-icon">
+                        <i class="fa-regular fa-circle-play"></i>
+                    </div>
+                    <div>
+                        <h1>Add Show</h1>
+                        <p>Create movie schedules</p>
+                    </div>
                 </div>
             </div>
 
@@ -284,14 +284,12 @@ if (isset($_POST['add_show'])) {
 
                 <form method="POST">
                     <div class="form-grid">
-
                         <div class="form-group">
                             <label>Select Movie</label>
                             <select name="movie_id">
                                 <option value="">Choose Movie</option>
                                 <?php while ($movie = mysqli_fetch_assoc($movies)) { ?>
-                                    <option value="<?php echo $movie['movie_id']; ?>" 
-                                    <?php if ($movie_id == $movie['movie_id']) { echo "selected"; } ?>>
+                                    <option value="<?php echo $movie['movie_id']; ?>" <?php if ($movie_id == $movie['movie_id']) { echo "selected"; } ?>>
                                         <?php echo $movie['title']; ?>
                                     </option>
                                 <?php } ?>
@@ -339,8 +337,8 @@ if (isset($_POST['add_show'])) {
                                 <?php echo $errors['ticket_price'] ?? ''; ?>
                             </span>
                         </div>
-
                     </div>
+                    
 
                     <button type="submit" name="add_show" class="submit-btn">
                         Add Show
@@ -351,26 +349,121 @@ if (isset($_POST['add_show'])) {
     </div>
 
 <?php
+
+$limit = $_GET['limit'] ?? 10;
+
+
+// for movie list 
+
+if ($selected_date == 'ALL') {
+    $where_clause = "";
+} else {
+    $where_clause = "WHERE sh.show_date='$selected_date'";
+}
+
+// 
+$count_query = mysqli_query(
+    $conn,
+    "
+    SELECT COUNT(*) total
+    FROM shows sh
+    $where_clause
+    "
+);
+
+$total_rows = mysqli_fetch_assoc($count_query)['total'];
+
+$total_pages = ceil($total_rows / $limit);
+//
+
 $query = "
-SELECT 
-    sh.*,
-    m.title,
-    m.duration_minutes,
-    sc.screen_name,
-    TIMESTAMPADD(
-        MINUTE, 
-        m.duration_minutes, 
-        CONCAT(sh.show_date,' ',sh.show_time)
-    ) AS end_time
-FROM shows sh
-INNER JOIN movies m ON sh.movie_id = m.movie_id
-INNER JOIN screens sc ON sh.screen_id = sc.screen_id
-ORDER BY sh.show_date DESC, sh.show_time DESC";
+    SELECT
+        sh.*,
+        m.title,
+        m.duration_minutes,
+        sc.screen_name,
+
+        TIMESTAMPADD(
+            MINUTE,
+            m.duration_minutes,
+            CONCAT(
+                sh.show_date,
+                ' ',
+                sh.show_time
+            )
+        ) AS end_time
+
+    FROM shows sh
+
+    INNER JOIN movies m
+        ON sh.movie_id = m.movie_id
+
+    INNER JOIN screens sc
+        ON sh.screen_id = sc.screen_id
+
+    $where_clause
+
+    ORDER BY
+        sh.created_at DESC
+
+    LIMIT $offset,$limit";
 
 $result = mysqli_query($conn, $query);
 ?>
 
-<div class="show-table-card">
+
+<!-- heading for the show list -->
+ <div class="show-list-header">
+
+    <div class="show-list-title">
+
+        <i class="fa-solid fa-film"></i>
+
+        <div>
+            <h2>Show List</h2>
+            <p>
+                View and manage scheduled movie shows
+            </p>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- Filter Bar -->
+
+<div class="show-filter-bar">
+    <a href="?date=ALL&page=1" class="date-tab <?= $selected_date == 'ALL' ? 'active-date' : '' ?>">
+        All
+    </a>
+
+    <?php
+    for ($i = 0; $i < 7; $i++) {
+        $date = date("Y-m-d", strtotime("+$i day"));
+        $label = date("d M", strtotime($date));
+
+        if ($i == 0) {
+            $label = "Today";
+        }
+
+        if ($i == 1) {
+            $label = "Tomorrow";
+        }
+    ?>
+        <a href="?date=<?= $date ?>&page=1" class="date-tab <?= $selected_date == $date ? 'active-date' : '' ?>">
+            <?= $label ?>
+        </a>
+    <?php
+    }
+    ?>
+</div>
+
+
+
+
+<!-- Show List Table -->
+
+<div id="show-list" class="show-table-card">
     <table class="show-table">
         <thead>
             <tr>
@@ -381,6 +474,7 @@ $result = mysqli_query($conn, $query);
                 <th>Start</th>
                 <th>End</th>
                 <th>Price</th>
+                <th>Added On</th>
                 <th>Status</th>
                 <th>Actions</th>
             </tr>
@@ -389,11 +483,10 @@ $result = mysqli_query($conn, $query);
         <tbody>
         <?php 
         $i = 1;
-        if(mysqli_num_rows($result) > 0):
-            while($row = mysqli_fetch_assoc($result)):
+        if (mysqli_num_rows($result) > 0):
+            while ($row = mysqli_fetch_assoc($result)):
                 /* AUTO STATUS LOGIC */
-                    $status = $row['show_status'];
-
+                $status = $row['show_status'];
                 $status_low = strtolower($status);
         ?>
             <tr>
@@ -404,43 +497,26 @@ $result = mysqli_query($conn, $query);
                 <td><?= date("h:i A", strtotime($row['show_time'])) ?></td>
                 <td><?= date("h:i A", strtotime($row['end_time'])) ?></td>
                 <td>Rs. <?= $row['ticket_price'] ?></td>
+                <td><?= date("d M Y h:i A", strtotime($row['created_at'])) ?></td>
                 <td>
                     <span class="status <?= $status_low ?>">
                         <?= ucfirst(strtolower($status)) ?>
                     </span>
                 </td>
                 <td>
-
                     <div class="action-buttons">
-
-                        <?php if($status == 'ACTIVE'): ?>
-
-                            <a
-                                href="edit_show.php?id=<?= $row['show_id'] ?>"
-                                class="edit-btn"
-                            >
+                        <?php if ($status == 'ACTIVE'): ?>
+                            <a href="edit_show.php?id=<?= $row['show_id'] ?>" class="edit-btn">
                                 Edit
                             </a>
-
-                            <a
-                                href="cancel_show.php?id=<?= $row['show_id'] ?>"
-                                class="cancel-btn"
-                                onclick="return confirm('Cancel this show?')"
-                            >
+                            <a href="cancel_show.php?id=<?= $row['show_id'] ?>" class="cancel-btn" onclick="return confirm('Cancel this show?')">
                                 Cancel
                             </a>
-
                         <?php endif; ?>
-
-                        <a
-                            href="show_analytics.php?id=<?= $row['show_id'] ?>"
-                            class="view-btn"
-                        >
+                        <a href="admin_dashboard.php?id=<?= $row['show_id'] ?>" class="view-btn">
                             View
                         </a>
-
                     </div>
-
                 </td>
             </tr>
         <?php 
@@ -448,11 +524,32 @@ $result = mysqli_query($conn, $query);
         else: 
         ?>
             <tr>
-                <td colspan="9" class="no-data">No shows available</td>
+                <td colspan="10" class="no-data">No shows available</td>
             </tr>
         <?php endif; ?>
         </tbody>
     </table>
-</div>
+
+    <div class="pagination">
+        <?php if ($page > 1): ?>
+            <a href="?date=<?= $selected_date ?>&page=<?= $page - 1 ?>">
+                Previous
+            </a>
+        <?php endif; ?>
+
+        <?php for ($p = 1; $p <= $total_pages; $p++): ?>
+            <a href="?date=<?= $selected_date ?>&page=<?= $p ?>" class="<?= $page == $p ? 'active-page' : '' ?>">
+                <?= $p ?>
+            </a>
+        <?php endfor; ?>
+
+        <?php if ($page < $total_pages): ?>
+            <a href="?date=<?= $selected_date ?>&page=<?= $page + 1 ?>">
+                Next
+            </a>
+        <?php endif; ?>
+    </div>
+
+    </div>
 </body>
 </html>
