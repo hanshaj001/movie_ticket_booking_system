@@ -1,10 +1,9 @@
 <?php
 
 require_once '../Includes/db_conn.php';
+include '../Includes/sidebar.php';
 
-/* ==============================
-   GET SHOW ID
-============================== */
+// get show id from query parameter
 
 if(!isset($_GET['id']))
 {
@@ -26,9 +25,7 @@ if(mysqli_num_rows($show_query) == 0)
 $show = mysqli_fetch_assoc($show_query);
 
 
-/* ==============================
-   MOVIES & SCREENS
-============================== */
+//   GET ACTIVE MOVIES & SCREENS
 
 $movies = mysqli_query(
     $conn,
@@ -47,9 +44,7 @@ $screens = mysqli_query(
 );
 
 
-/* ==============================
-   CHECK EXISTING BOOKINGS
-============================== */
+// CHECK IF BOOKINGS EXIST FOR THIS SHOW
 
 $booking_check = mysqli_query(
     $conn,
@@ -62,9 +57,7 @@ $booking_check = mysqli_query(
 $has_bookings = mysqli_num_rows($booking_check) > 0;
 
 
-/* ==============================
-   DEFAULT VALUES
-============================== */
+// INITIALIZE VARIABLES
 
 $message = "";
 $errors = [];
@@ -76,20 +69,14 @@ $show_time = $show['show_time'];
 $ticket_price = $show['ticket_price'];
 
 
-/* ==============================
-   UPDATE SHOW
-============================== */
+// update show
 
 if(isset($_POST['update_show']))
 {
 
     $ticket_price = trim($_POST['ticket_price']);
 
-    /*
-      STRICT MODE
-      IF BOOKINGS EXIST
-      ONLY PRICE EDITABLE
-    */
+   // if bookings exist, use existing values for movie, screen, date, time
 
     if($has_bookings)
     {
@@ -107,9 +94,7 @@ if(isset($_POST['update_show']))
     }
 
 
-    /* ==========================
-       MOVIE
-    ========================== */
+    // movie validation
 
     if(empty($movie_id))
     {
@@ -117,9 +102,7 @@ if(isset($_POST['update_show']))
     }
 
 
-    /* ==========================
-       SCREEN
-    ========================== */
+// screen validation
 
     if(empty($screen_id))
     {
@@ -127,9 +110,7 @@ if(isset($_POST['update_show']))
     }
 
 
-    /* ==========================
-       DATE
-    ========================== */
+    // date validation
 
     $today = date("Y-m-d");
 
@@ -143,10 +124,7 @@ if(isset($_POST['update_show']))
     }
 
 
-    /* ==========================
-       TIME
-    ========================== */
-
+    // time validation
     if(empty($show_time))
     {
         $errors['show_time'] = "Please select time.";
@@ -168,9 +146,7 @@ if(isset($_POST['update_show']))
     }
 
 
-    /* ==========================
-       PRICE
-    ========================== */
+    // price validation
 
     if(empty($ticket_price))
     {
@@ -189,9 +165,7 @@ if(isset($_POST['update_show']))
     }
 
 
-    /* ==========================
-       OVERLAP VALIDATION
-    ========================== */
+   // overlapping show validation
 
     if(
         empty($errors)
@@ -274,9 +248,7 @@ if(isset($_POST['update_show']))
     }
 
 
-    /* ==========================
-       UPDATE
-    ========================== */
+    // if no errors, update show
 
     if(empty($errors))
     {
@@ -306,6 +278,7 @@ if(isset($_POST['update_show']))
                      WHERE show_id='$show_id'"
                 )
             );
+        header("Location: add_show.php");
         }
         else
         {
