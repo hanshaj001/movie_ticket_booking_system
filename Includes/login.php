@@ -1,6 +1,6 @@
 <?php
 session_start();
-include "db.php";
+include "db_conn.php";
 
 $error = "";
 
@@ -23,7 +23,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         if ($row = mysqli_fetch_assoc($result)) {
 
-            if (hash('sha256', $password) === $row['password_hash']) {
+            if (( $password) === $row['password_hash']) {
 
                 $_SESSION['user_id'] = $row['user_id'];
                 $_SESSION['name'] = $row['full_name'];
@@ -51,7 +51,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <html>
 <head>
     <title>Login</title>
-    <link rel="stylesheet" href="login.css">
+    <link rel="stylesheet" href="../Assets/login.css">
 </head>
 <body>
 

@@ -1,7 +1,7 @@
 body {
     margin: 0;
     font-family: Arial;
-    background: #0f172a;
+    background: #e4e4e4;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -15,7 +15,7 @@ body {
 }
 
 .card {
-    background: white;
+    background: rgb(255, 253, 253);
     padding: 30px;
     width: 320px;
     border-radius: 12px;
@@ -55,7 +55,7 @@ input:focus {
 button {
     width: 100%;
     padding: 10px;
-    background: #2563eb;
+    background: #c74c0a;
     color: white;
     border: none;
     border-radius: 8px;
