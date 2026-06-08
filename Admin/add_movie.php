@@ -1,104 +1,69 @@
-<div class="movie-table-card">
+<?php require_once 'db_connect.php'; ?>
+<!DOCTYPE html>
+<html>
+<head>
+<title>Add Movie</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
 
-    <h2>Movie List</h2>
+<div class="container">
 
-    <table class="movie-table">
+<div class="card">
 
-        <thead>
-            <tr>
-                <th>S.N</th>
-                <th>Title</th>
-                <th>Genre</th>
-                <th>Language</th>
-                <th>Duration</th>
-                <th>Release Date</th>
-                <th>Format</th>
-                <th>Status</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
+<h2>Add Movie</h2>
 
-        <tbody>
+<form action="add_movie_process.php"
+method="POST"
+enctype="multipart/form-data">
 
-        <?php
-        $i = 1;
+<input type="text"
+name="title"
+placeholder="Movie Title"
+required>
 
-        if(mysqli_num_rows($movie_result) > 0):
+<textarea
+name="description"
+placeholder="Movie Description"
+required></textarea>
 
-            while($movie = mysqli_fetch_assoc($movie_result)):
-        ?>
+<input type="number"
+name="duration"
+placeholder="Duration (Minutes)"
+required>
 
-            <tr>
+<select name="format" required>
+<option value="">Movie Format</option>
+<option value="2D">2D</option>
+<option value="3D">3D</option>
+</select>
 
-                <td><?= $i++ ?></td>
+<input type="date"
+name="release_date">
 
-                <td>
-                    <?= htmlspecialchars($movie['title']) ?>
-                </td>
+<label>Poster</label>
+<input type="file"
+name="poster"
+required>
 
-                <td>
-                    <?= htmlspecialchars($movie['genre']) ?>
-                </td>
+<div class="buttons">
 
-                <td>
-                    <?= htmlspecialchars($movie['language']) ?>
-                </td>
+<button class="btn">
+Add Movie
+</button>
 
-                <td>
-                    <?= $movie['duration_minutes'] ?> min
-                </td>
-
-                <td>
-                    <?= $movie['release_date'] ?>
-                </td>
-
-                <td>
-                    <?= $movie['movie_format'] ?>
-                </td>
-
-                <td>
-                    <span class="<?= strtolower($movie['status']) ?>">
-                        <?= ucfirst(strtolower($movie['status'])) ?>
-                    </span>
-                </td>
-
-                <td>
-
-                    <a
-                        href="edit_movie.php?id=<?= $movie['movie_id'] ?>"
-                        class="edit-btn"
-                    >
-                        Edit
-                    </a>
-
-                    <a
-                        href="toggle_movie.php?id=<?= $movie['movie_id'] ?>"
-                        class="cancel-btn"
-                        onclick="return confirm('Change movie status?')"
-                    >
-                        Status
-                    </a>
-
-                </td>
-
-            </tr>
-
-        <?php
-            endwhile;
-
-        else:
-        ?>
-
-            <tr>
-                <td colspan="9">
-                    No movies found
-                </td>
-            </tr>
-
-        <?php endif; ?>
-
-        </tbody>
-
-    </table>
+<button type="reset"
+class="btn-reset">
+Reset
+</button>
 
 </div>
+
+</form>
+
+</div>
+
+</div>
+
+</body>
+</html>
