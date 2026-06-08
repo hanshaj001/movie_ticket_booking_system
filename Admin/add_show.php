@@ -1,5 +1,5 @@
 <?php
-require_once '../Includes/db_conn.php';
+require_once '../Includes/db_conn.php'; 
 include '../Includes/sidebar.php';
 
 $page = $_GET['page'] ?? 1;
