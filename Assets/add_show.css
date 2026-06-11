@@ -1,248 +1,178 @@
+/* RESET & BASICS */
 *{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', Arial, sans-serif;
 }
 
 body{
-    background:#f5f5f7;
-    color:#222;
+    background: #f5f5f7;
+    color: #222;
 }
 
-
-/* MAIN LAYOUT */
-
+/* CONTAINER LAYOUT */
 .main-container{
-    display:flex;
-    min-height:100vh;
+    display: flex;
+    min-height: 100vh;
 }
-
-
-/* CONTENT AREA */
 
 .content-area{
-    flex:1;
-    padding:40px;
-    margin-left:220px;
-    transition:0.3s;
+    flex: 1;
+    padding: 40px;
+    margin-left: 220px; /* Offset for sidebar layout */
+    transition: 0.3s;
 }
 
-
-/* HEADER */
-
-.page-header{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:30px;
+/* HEADERS */
+.page-header, .show-list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
 }
 
-.page-header h1{
-    font-size:32px;
-    margin-bottom:5px;
+.show-list-header {
+    margin-top: 45px;
+    margin-bottom: 20px;
 }
 
-.page-header p{
-    color:#777;
+.page-title, .show-list-title {
+    display: flex;
+    align-items: center;
+    gap: 16px;
 }
 
-.header-btn{
-    background:#ff4d2d;
-    color:white;
-    border:none;
-    padding:12px 22px;
-    border-radius:12px;
-    cursor:pointer;
-    font-size:15px;
+.title-icon, .show-list-title i {
+    width: 60px;
+    height: 60px;
+    background: #ff6136;
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: white;
 }
 
-.header-btn:hover{
-    background:#e63e1f;
+.show-list-title i {
+    background: #fff4f1;
+    color: #ff4d2d;
 }
 
-
-/* FORM CARD */
-
-.form-card{
-    background:white;
-    padding:35px;
-    border-radius:24px;
-    box-shadow:0 5px 25px rgba(0,0,0,0.05);
+h1, h2 {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 4px;
+    color: #222;
 }
 
+h2 { font-size: 26px; }
 
-/* MESSAGE */
-
-.message{
-    background:#ffe8e3;
-    color:#ff4d2d;
-    padding:14px;
-    border-radius:12px;
-    margin-bottom:20px;
-    font-size:14px;
+.page-title p, .show-list-title p {
+    color: #777;
+    font-size: 14px;
 }
 
-
-/* FORM */
-
-.form-grid{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:20px;
+/* CARDS (Unified Layout Rule) */
+.form-card, .show-table-card {
+    background: white;
+    padding: 35px;
+    border-radius: 24px;
+    box-shadow: 0 5px 25px rgba(0,0,0,0.05);
+    margin-bottom: 25px;
 }
 
-.form-group{
-    display:flex;
-    flex-direction:column;
+.show-table-card {
+    padding: 25px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
-.full-width{
-    grid-column:1 / 3;
+/* FORMS & GRIDS */
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
 }
 
-label{
-    margin-bottom:8px;
-    font-size:14px;
-    font-weight:600;
-}
-
-input,
-select{
-    padding:14px;
-    border:1px solid #ddd;
-    border-radius:14px;
-    outline:none;
-    font-size:15px;
-    transition:0.3s;
-    background:#fafafa;
-}
-
-input:focus,
-select:focus{
-    border-color:#ff4d2d;
-    background:white;
-}
-
-
-/* BUTTON */
-
-.submit-btn{
-    width:100%;
-    margin-top:30px;
-    padding:16px;
-    border:none;
-    background:#ff4d2d;
-    color:white;
-    font-size:16px;
-    border-radius:14px;
-    cursor:pointer;
-    transition:0.3s;
-}
-
-.submit-btn:hover{
-    background:#e63e1f;
-}
-
-.error{
-    color:#ff3b30;
-    font-size:13px;
-    margin-top:6px;
-    font-weight:500;
-    display:block;
-}
-
-.message{
-    background:#e8fff1;
-    color:#14a44d;
-    padding:14px;
-    border-radius:12px;
-    margin-bottom:20px;
-    font-size:14px;
-    font-weight:500;
-}
-
-/* RESPONSIVE */
-
-@media(max-width:900px)
-{
-    .content-area{
-        margin-left:0;
-        padding:20px;
-    }
-
-    .form-grid{
-        grid-template-columns:1fr;
-    }
-
-    .full-width{
-        grid-column:auto;
-    }
-
-    .page-header{
-        flex-direction:column;
-        align-items:flex-start;
-        gap:15px;
-    }
-}
-
-/* 1. LAYOUT WRAPPER (Add this to your main container) */
-/* Assuming your sidebar is roughly 250px-300px wide */
-.main-body-container {
-    margin-left: 260px; /* Adjust this to match your Sidebar width */
-    padding: 20px;
+.form-group {
     display: flex;
     flex-direction: column;
-    gap: 20px; /* Space between the Add Card and the Table Card */
 }
 
-/* 2. SHOW TABLE CARD (Updated for alignment) */
-.show-table-card {
+.full-width { grid-column: 1 / 3; }
+
+label {
+    margin-bottom: 8px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+input, select {
+    padding: 14px;
+    border: 1px solid #ddd;
+    border-radius: 14px;
+    outline: none;
+    font-size: 15px;
+    background: #fafafa;
+    transition: 0.3s;
+}
+
+input:focus, select:focus {
+    border-color: #ff4d2d;
     background: white;
-    border-radius: 24px;
-    padding: 25px;
-    box-shadow: 0 5px 25px rgba(0,0,0,0.05);
-    overflow-x: auto;
-    /* Remove margin-top if using the gap in container above */
-    margin-top: 20px; 
-    width: 100%; /* Ensures it stays within the parent container */
-    box-sizing: border-box;
 }
 
-/* 3. TABLE STYLES (Kept as per your previous design) */
+/* BUTTONS */
+.submit-btn, .date-tab, .action-buttons a, .pagination a {
+    transition: 0.3s;
+    cursor: pointer;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.submit-btn {
+    width: 100%;
+    margin-top: 30px;
+    padding: 16px;
+    border: none;
+    background: #ff4d2d;
+    color: white;
+    font-size: 16px;
+    border-radius: 14px;
+}
+
+.submit-btn:hover { background: #e63e1f; }
+
+/* TABLES */
 .show-table {
     width: 100%;
     border-collapse: collapse;
-    min-width: 1000px;
+    min-width: 900px;
 }
 
-.show-table thead {
-    background: #fafafa;
-}
-
-.show-table th {
+.show-table th, .show-table td {
     padding: 18px 16px;
     text-align: left;
     font-size: 14px;
-    font-weight: 700;
-    color: #444;
     border-bottom: 1px solid #eee;
 }
 
+.show-table th {
+    background: #fafafa;
+    color: #444;
+    font-weight: 700;
+}
+
 .show-table td {
-    padding: 18px 16px;
-    font-size: 14px;
-    border-bottom: 1px solid #f1f1f1;
     color: #555;
     vertical-align: middle;
 }
 
-.show-table tbody tr:hover {
-    background: #fcfcfc;
-    transition: 0.3s;
-}
+.show-table tbody tr:hover { background: #fcfcfc; }
 
-/* 4. STATUS & BUTTONS (Kept as per your previous design) */
+/* STATUS BADGES & ACTIONS */
 .status {
     padding: 8px 14px;
     border-radius: 30px;
@@ -250,32 +180,95 @@ select:focus{
     font-weight: 600;
     display: inline-block;
 }
-
 .status.active { background: #e8fff1; color: #14a44d; }
 .status.completed { background: #eef2ff; color: #3b5bdb; }
 .status.cancelled { background: #ffe8e3; color: #ff4d2d; }
 
 .action-buttons {
     display: flex;
-    gap: 10px;
+    gap: 8px;
 }
 
 .action-buttons a {
-    text-decoration: none;
     padding: 8px 14px;
     border-radius: 10px;
     font-size: 13px;
-    font-weight: 600;
-    transition: 0.3s;
 }
-
 .edit-btn { background: #fff4e8; color: #ff9500; }
 .cancel-btn { background: #ffe8e3; color: #ff4d2d; }
 .view-btn { background: #eef2ff; color: #3b5bdb; }
 
-/* 5. RESPONSIVE */
-@media(max-width: 1100px) {
-    .main-body-container {
-        margin-left: 0; /* Stack on top of each other for smaller screens */
-    }
+/* SYSTEM MESSAGES & ERRORS */
+.message {
+    padding: 14px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    font-weight: 500;
+    background: #e8fff1;
+    color: #14a44d;
 }
+.message.error-msg { background: #ffe8e3; color: #ff4d2d; }
+.error { color: #ff3b30; font-size: 13px; margin-top: 6px; display: block; }
+.no-data { text-align: center; padding: 30px; font-weight: 600; color: #888; }
+
+/* FILTER BAR & TABS */
+.show-filter-bar {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 25px;
+}
+
+.date-tab {
+    padding: 10px 18px;
+    background: white;
+    border-radius: 12px;
+    color: #555;
+    font-size: 14px;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.05);
+}
+
+.date-tab:hover, .active-date, .pagination a:hover, .active-page {
+    background: #ff4d2d !important;
+    color: white !important;
+}
+
+/* PAGINATION */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-top: 25px;
+}
+
+.pagination a {
+    padding: 10px 16px;
+    background: #f5f5f5;
+    border-radius: 10px;
+    color: #444;
+}
+
+/* RESPONSIVE DESIGN */
+@media(max-width: 768px){
+    .content-area {
+        margin-left: 0;
+        padding: 20px;
+    }
+
+    .form-grid { grid-template-columns: 3fr; }
+    .full-width { grid-column: unset; }
+
+    .page-header, .show-list-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    h1 { font-size: 26px; }
+    .action-buttons { flex-direction: column; }
+    .action-buttons a { text-align: center; }
+}
+
+
