@@ -1,6 +1,6 @@
 <?php
 session_start();
-include "db.php";
+include '../Includes/db_conn.php';
 
 $error = "";
 
@@ -9,98 +9,83 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = trim($_POST['email']);
     $password = trim($_POST['password']);
 
-    if (empty($email) || empty($password)) {
-        $error = "All fields are required!";
-    } else {
+    // Fetch user
+    $sql = "SELECT u.user_id, u.full_name, u.email, u.password_hash, r.role_name
+            FROM users u
+            JOIN user_roles ur ON u.user_id = ur.user_id
+            JOIN roles r ON ur.role_id = r.role_id
+            WHERE u.email = ? LIMIT 1";
 
-        $sql = "SELECT u.user_id, u.full_name, u.password_hash, r.role_name
-                FROM users u
-                JOIN user_roles ur ON u.user_id = ur.user_id
-                JOIN roles r ON ur.role_id = r.role_id
-                WHERE u.email = '$email'";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
-        $result = mysqli_query($conn, $sql);
+    if ($result->num_rows === 1) {
 
-        if ($row = mysqli_fetch_assoc($result)) {
+        $user = $result->fetch_assoc();
 
-            if (hash('sha256', $password) === $row['password_hash']) {
+        // ⚠️ Your DB uses plain password (admin123), so direct compare
+        // Later you should upgrade to password_hash()
+        if ($password === $user['password_hash']) {
 
-                $_SESSION['user_id'] = $row['user_id'];
-                $_SESSION['name'] = $row['full_name'];
-                $_SESSION['role'] = $row['role_name'];
+            $_SESSION['user_id'] = $user['user_id'];
+            $_SESSION['name'] = $user['full_name'];
+            $_SESSION['role'] = $user['role_name'];
 
-                if ($row['role_name'] == "ADMIN") {
-                    header("Location: admin/dashboard.php");
-                } else {
-                    header("Location: customer/dashboard.php");
-                }
-                exit();
-
+            // Role-based redirection
+            if ($user['role_name'] == "ADMIN") {
+                header("Location: ../Admin/dash.php");
             } else {
-                $error = "Wrong password!";
+                header("Location: ../Customer/home.php");
             }
+            exit();
 
         } else {
-            $error = "Invalid email or user not found!";
+            $error = "Invalid password!";
         }
+
+    } else {
+        $error = "User not found!";
     }
 }
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Login</title>
-    <link rel="stylesheet" href="login.css">
+    <title>Login - Movie Ticket System</title>
+    <link rel="stylesheet" href="../Assets/login.css">
 </head>
+
 <body>
 
-<div class="container">
+<div class="login-container">
 
-    <div class="card">
-        <h2>Login</h2>
+    <div class="login-box">
+        <h2>Movie Ticket Login</h2>
 
         <?php if ($error != "") { ?>
-            <p class="error"><?php echo $error; ?></p>
+            <div class="error"><?= $error; ?></div>
         <?php } ?>
 
-        <form method="POST" onsubmit="return validateForm()">
+        <form method="POST" action="">
+            
+            <label>Email</label>
+            <input type="email" name="email" placeholder="Enter email" required>
 
-            <input type="text" id="email" name="email" placeholder="Email or Username">
-
-            <div class="password-box">
-                <input type="password" id="password" name="password" placeholder="Password">
-                <span onclick="togglePassword()">👁</span>
-            </div>
+            <label>Password</label>
+            <input type="password" name="password" placeholder="Enter password" required>
 
             <button type="submit">Login</button>
         </form>
+
+        <p class="footer-text">
+            Admin / Customer Login
+        </p>
     </div>
 
 </div>
-
-<script>
-function validateForm() {
-    let email = document.getElementById("email").value;
-    let password = document.getElementById("password").value;
-
-    if (email == "" || password == "") {
-        alert("All fields are required!");
-        return false;
-    }
-    return true;
-}
-
-function togglePassword() {
-    let pass = document.getElementById("password");
-
-    if (pass.type === "password") {
-        pass.type = "text";
-    } else {
-        pass.type = "password";
-    }
-}
-</script>
 
 </body>
 </html>
