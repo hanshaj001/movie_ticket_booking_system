@@ -1,197 +1,252 @@
-/* NAV LINKS */
-
-.sidebar ul li a{
-    text-decoration:none;
-    color:inherit;
-    display:flex;
-    align-items:center;
-    width:100%;
-    height:100%;
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', Arial, sans-serif;
 }
 
-/* STICKY NAVBAR */
-
-.navbar{
-    position:sticky;
-    top:0;
-    z-index:999;
+body {
+    background-color: #f5f5f7; /* Background Token */
+    color: #222222; /* Text Token */
+    overflow-x: hidden;
 }
 
-/* OVERLAY */
-
-.overlay{
-    position:fixed;
-    top:0;
-    left:0;
-    width:100%;
-    height:100%;
-    background:rgba(0,0,0,0.5);
-    z-index:998;
-    display:none;
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 240px;
+    height: 100vh;
+    background-color: #ffffff; /* Card Background Token */
+    box-shadow: 2px 0 12px rgba(0, 0, 0, 0.03);
+    z-index: 100;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.overlay.active{
-    display:block;
+.sidebar .logo {
+    padding: 24px 20px;
+    font-size: 18px;
+    font-weight: 700;
+    color: #ff4d2d; /* Primary Orange Token */
+    border-bottom: 1px solid #f5f5f7;
+    text-align: center;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
 }
 
-/* SIDEBAR */
-
-.sidebar{
-    z-index:999;
+.sidebar ul {
+    list-style: none;
+    padding: 20px 12px;
 }
 
-/* BETTER LOGOUT */
-
-.logout-menu{
-    margin-top:20px;
-    background:#fee2e2;
+.sidebar ul li {
+    margin-bottom: 6px;
 }
 
-.logout-menu:hover{
-    background:#fecaca !important;
-    color:#dc2626;
+.sidebar ul li a {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 16px;
+    color: #222222;
+    text-decoration: none;
+    border-radius: 8px; /* Rounded Design Standard */
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease; /* Fluid Interactive Motion */
 }
 
-/* MENU */
-.sidebar ul{
-  list-style: none;
-  padding: 10px;
+.sidebar ul li a i {
+    font-size: 16px;
+    width: 20px;
+    text-align: center;
+    color: #777777; /* Secondary Text Accent Standard */
+    transition: color 0.2s ease;
 }
 
-.sidebar ul li{
-  padding: 15px;
-  margin: 5px 0;
-  border-radius: 8px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  transition: 0.3s;
-  color: #1f2937; /* FIX: always visible text */
+/* Sidebar Navigation Hover Rules */
+.sidebar ul li a:hover {
+    background-color: #fff4f1; /* Light Orange Token */
+    color: #ff4d2d; /* Primary Orange Token */
 }
 
-/* ICON FIX (IMPORTANT) */
-.sidebar ul li i{
-  color: inherit;
+.sidebar ul li a:hover i {
+    color: #ff4d2d;
 }
 
-/* HOVER */
-.sidebar ul li:hover{
-  background: #fff3ee;
-  color: #ff4d2e;
+/* Sidebar Navigation Highlight Indicators */
+.sidebar ul li.active a {
+    background-color: #ff4d2d; /* Primary Orange Token */
+    color: #ffffff;
 }
 
-/* ACTIVE */
-.sidebar ul li.active{
-  background: linear-gradient(135deg, #ff4d2e, #ff7a45);
-  color: #fff;
-  font-weight: bold;
+.sidebar ul li.active a i {
+    color: #ffffff;
 }
 
-/* LOGOUT */
-.sidebar ul li.logout{
-  color: #ff3b30;
-  font-weight: bold;
+.sidebar ul li.logout-menu {
+    margin-top: 40px;
+    border-top: 1px solid #f5f5f7;
+    padding-top: 20px;
 }
 
-/* MAIN */
-.main{
-  margin-left: 250px;
+/* ==========================================================================
+   Section B: Top Navbar Component Layout
+   ========================================================================== */
+.main {
+    margin-left: 240px;
+    transition: margin-left 0.3s ease;
 }
 
-/* NAVBAR */
-.navbar{
-  height: 70px;
-  background: #ffffff;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 20px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+.navbar {
+    background-color: #ffffff;
+    height: 70px;
+    padding: 0 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.01);
+    position: sticky;
+    top: 0;
+    z-index: 90;
 }
 
-/* LEFT */
-.navbar .left{
-  display: flex;
-  align-items: center;
-  gap: 15px;
+.navbar .left {
+    display: flex;
+    align-items: center;
+    gap: 15px;
 }
 
-/* TOGGLE */
-.toggle-btn{
-  display: none;
-  border: none;
-  background: #ff4d2e;
-  color: #fff;
-  padding: 8px 10px;
-  border-radius: 6px;
-  cursor: pointer;
+.navbar .left h2 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #222222;
 }
 
-/* RIGHT */
-.navbar .right{
-  display: flex;
-  align-items: center;
-  gap: 15px;
+.navbar .toggle-btn {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 20px;
+    color: #222222;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 6px;
+    transition: background-color 0.2s;
 }
 
-.admin{
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  background: #f1f5f9;
-  padding: 6px 10px;
-  border-radius: 20px;
-  color: #1f2937;
+.navbar .toggle-btn:hover {
+    background-color: #f5f5f7;
 }
 
-.logout-btn{
-    transition:0.3s;
+.navbar .right {
+    display: flex;
+    align-items: center;
+    gap: 25px;
 }
 
-.logout-btn:hover{
-    background:#dc2626;
-    transform:translateY(-2px);
+#datetime {
+    font-size: 13px;
+    color: #777777; /* Secondary Text Token */
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
-/* ADMIN PROFILE */
-
-.admin{
-    transition:0.3s;
+.navbar .admin {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    color: #222222;
 }
 
-.admin:hover{
-    background:#dbeafe;
+.navbar .admin i {
+    font-size: 18px;
+    color: #777777;
 }
 
-/* TABLET */
+/* Navbar Secondary Logout Action Layout */
+.navbar .logout-btn {
+    background-color: #fff4f1; /* Light Orange Token */
+    color: #ff4d2d; /* Primary Orange Token */
+    padding: 8px 16px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+}
 
-@media(max-width:1024px){
-    .navbar .right{
-        gap:10px;
+.navbar .logout-btn:hover {
+    background-color: #ff4d2d; /* Primary Orange Token */
+    color: #ffffff;
+}
+
+/* ==========================================================================
+   Section C & D: Primary Content Framework
+   ========================================================================== */
+.content {
+    padding: 30px;
+}
+
+/* Interaction Focus Visual Feedbacks for global application inputs */
+input:focus, select:focus, textarea:focus {
+    border-color: #ff4d2d;
+    box-shadow: 0 0 0 3px #fff4f1;
+    outline: none;
+}
+
+/* ==========================================================================
+   Section D: Responsive Media Breakpoint (Tablet and Mobile Viewports)
+   ========================================================================== */
+@media (max-width: 768px) {
+    .sidebar {
+        transform: translateX(-100%); /* Slides entirely out of window view */
     }
-}
+    
+    .sidebar.active {
+        transform: translateX(0); /* Drops into view canvas */
+    }
+    
+    .main {
+        margin-left: 0;
+    }
+    
+    .navbar {
+        padding: 0 20px;
+    }
+    
+    .navbar .toggle-btn {
+        display: block; /* Unveils hamburger toggle button */
+    }
+    
+    #datetime, .navbar .logout-btn {
+        display: none; /* Collapses text tracking to clean up compact layouts */
+    }
+    
+    .content {
+        padding: 20px;
+    }
 
-/* MOBILE */
-
-@media(max-width:768px){
-    .navbar{
-        flex-wrap:wrap;
-        height:auto;
-        padding:15px;
+    /* Screen Shield Dimmer Layer */
+    .overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.4);
+        z-index: 95;
     }
-    .right{
-        width:100%;
-        justify-content:space-between;
-        margin-top:10px;
-    }
-    .sidebar{
-        left:-250px;
-    }
-    .sidebar.active{
-        left:0;
-    }
-    .toggle-btn{
-        display:block;
+    
+    .overlay.active {
+        display: block;
     }
 }
