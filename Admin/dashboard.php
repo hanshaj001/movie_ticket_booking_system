@@ -19,6 +19,7 @@ if(!$conn)
 
 session_start();
 require_once "../Includes/db_conn.php";
+include "../Includes/sidebar.php";
 
 /* ==========================================
    DEFAULT ADMIN NAME
@@ -180,7 +181,8 @@ $recentBookings = mysqli_query(
 
 <title>Admin Dashboard</title>
 
-<link rel="stylesheet" href="../Assets/dash.css">
+<link rel="stylesheet" href="../Assets/admin_dashboard.css">
+<link rel="stylesheet" href="../Assets/sidebar.css">
 
 <link rel="stylesheet"
 href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
