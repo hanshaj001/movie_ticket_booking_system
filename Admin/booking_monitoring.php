@@ -15,10 +15,10 @@ if(!$conn)
 ?>
 
 
-
 <?php
 session_start();
-require_once 'db_conn.php';
+require_once '../Includes/db_conn.php'; 
+include '../Includes/sidebar.php';
 
 /* Authentication */
 
@@ -94,155 +94,8 @@ WHERE status='ACTIVE'
 <head>
 <meta charset="UTF-8">
 <title>Booking Monitoring</title>
-
-<style>
-
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:'Segoe UI',sans-serif;
-}
-
-body{
-background:#0f172a;
-padding:30px;
-color:white;
-}
-
-.container{
-max-width:1400px;
-margin:auto;
-}
-
-.heading{
-font-size:32px;
-font-weight:700;
-margin-bottom:25px;
-}
-
-.filters{
-display:flex;
-gap:15px;
-flex-wrap:wrap;
-margin-bottom:25px;
-}
-
-.filters input,
-.filters select{
-padding:12px;
-border:none;
-border-radius:8px;
-background:#1e293b;
-color:white;
-}
-
-.search-btn{
-padding:12px 25px;
-background:#2563eb;
-border:none;
-border-radius:8px;
-cursor:pointer;
-color:white;
-font-weight:600;
-}
-
-.table-box{
-overflow-x:auto;
-background:#1e293b;
-border-radius:12px;
-padding:15px;
-}
-
-table{
-width:100%;
-border-collapse:collapse;
-}
-
-th{
-background:#2563eb;
-padding:14px;
-text-align:left;
-}
-
-td{
-padding:14px;
-border-bottom:1px solid #e93d09;
-}
-
-.badge{
-padding:6px 12px;
-border-radius:20px;
-font-size:13px;
-font-weight:600;
-}
-
-.confirmed{
-background:#16a34a;
-}
-
-.cancelled{
-background:#dc2626;
-}
-
-.expired{
-background:#f59e0b;
-}
-
-.action-btn{
-padding:8px 15px;
-border:none;
-border-radius:6px;
-cursor:pointer;
-font-size:13px;
-margin-right:5px;
-}
-
-.view-btn{
-background:#0ea5e9;
-color:white;
-}
-
-.cancel-btn{
-background:#ef4444;
-color:white;
-}
-
-.pagination{
-display:flex;
-justify-content:center;
-gap:10px;
-margin-top:25px;
-}
-
-.pagination button{
-padding:10px 15px;
-border:none;
-border-radius:6px;
-background:#2563eb;
-color:white;
-cursor:pointer;
-}
-
-@media(max-width:768px){
-
-.heading{
-font-size:24px;
-}
-
-.filters{
-flex-direction:column;
-}
-
-.filters input,
-.filters select,
-.search-btn{
-width:100%;
-}
-
-}
-
-</style>
+<link rel="stylesheet" href="../Assets/booking_monitoring.css"/>
+<link rel="stylesheet" href="../Assets/add_show.css">
 </head>
 
 <body>
