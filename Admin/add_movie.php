@@ -1,6 +1,6 @@
 <?php
 require_once '../Includes/db_conn.php';
-include '../Assets/add_movie.css';
+
 
 $message = "";
 $errors = [];
