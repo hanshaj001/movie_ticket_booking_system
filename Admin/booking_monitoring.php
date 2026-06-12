@@ -13,18 +13,21 @@ if(!$conn)
 }
 
 ?>
+
+
+
 <?php
 session_start();
-require_once '../Includes/db_conn.php'; 
+ require_once '../Includes/db_conn.php'; 
 include '../Includes/sidebar.php';
 
 /* Authentication */
 
-if(!isset($_SESSION['user_id']))
-{
-    header("Location: login.php");
-    exit();
-}
+// if(!isset($_SESSION['user_id']))
+// {
+//     header("Location:../Includes/login.php");
+//     exit();
+// }
 
 /* Search & Filters */
 
@@ -93,7 +96,8 @@ WHERE status='ACTIVE'
 <meta charset="UTF-8">
 <title>Booking Monitoring</title>
 <link rel="stylesheet" href="../Assets/booking_monitoring.css"/>
-<link rel="stylesheet" href="../Assets/add_show.css">
+<link rel="stylesheet" href="../Assets/sidebar.css"/>
+<link rel="stylesheet" href="../Assets/login.css"/>
 </head>
 
 <body>
@@ -174,7 +178,7 @@ Search
 <tr>
 
 <td>
-#<?php echo $row['booking_id']; ?>
+<?php echo $row['booking_id']; ?>
 </td>
 
 <td>
