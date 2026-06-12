@@ -4,7 +4,7 @@ require_once '../Includes/db_conn.php'; ?>
 <html>
 <head>
 <title>Add Movie</title>
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="add_movie.css">
 </head>
 <body>
 
