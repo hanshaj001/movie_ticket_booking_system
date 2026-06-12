@@ -16,11 +16,11 @@ if(
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Admin Dashboard</title>
+  <title> </title>
   <link rel="stylesheet" href="../Assets/sidebar.css"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
-
+  
 <body>
 <body>
 
@@ -82,6 +82,7 @@ if(
     <!-- NAVBAR -->
     <header class="navbar">
 
+<<<<<<< HEAD
         <div class="left">
 
             <button
@@ -115,6 +116,14 @@ if(
 
         <!-- Page Content -->
 
+=======
+    <div class="right">
+      <span id="datetime"></span>
+      <div class="admin">
+        <i class="fa fa-user-circle"></i>
+        Admin
+      </div>
+>>>>>>> main
     </div>
 
 </div>

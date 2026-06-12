@@ -9,6 +9,7 @@
     height:100%;
 }
 
+<<<<<<< HEAD
 /* STICKY NAVBAR */
 
 .navbar{
@@ -33,6 +34,8 @@
 .overlay.active{
     display:block;
 }
+=======
+>>>>>>> main
 
 /* SIDEBAR */
 
@@ -47,9 +50,103 @@
     background:#fee2e2;
 }
 
+<<<<<<< HEAD
 .logout-menu:hover{
     background:#fecaca !important;
     color:#dc2626;
+=======
+/* MENU */
+.sidebar ul{
+  list-style: none;
+  padding: 10px;
+}
+
+.sidebar ul li{
+  padding: 15px;
+  margin: 5px 0;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: 0.3s;
+  color: #1f2937; /* FIX: always visible text */
+}
+
+/* ICON FIX (IMPORTANT) */
+.sidebar ul li i{
+  color: inherit;
+}
+
+/* HOVER */
+.sidebar ul li:hover{
+  background: #fff3ee;
+  color: #ff4d2e;
+}
+
+/* ACTIVE */
+.sidebar ul li.active{
+  background: linear-gradient(135deg, #ff4d2e, #ff7a45);
+  color: #fff;
+  font-weight: bold;
+}
+
+/* LOGOUT */
+.sidebar ul li.logout{
+  color: #ff3b30;
+  font-weight: bold;
+}
+
+/* MAIN */
+.main{
+  margin-left: 250px;
+}
+
+/* NAVBAR */
+.navbar{
+  height: 70px;
+  background: #ffffff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+/* LEFT */
+.navbar .left{
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+/* TOGGLE */
+.toggle-btn{
+  display: none;
+  border: none;
+  background: #ff4d2e;
+  color: #fff;
+  padding: 8px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* RIGHT */
+.navbar .right{
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.admin{
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: #f1f5f9;
+  padding: 6px 10px;
+  border-radius: 20px;
+  color: #1f2937;
+>>>>>>> main
 }
 
 .logout-btn{
