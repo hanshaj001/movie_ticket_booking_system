@@ -1,37 +1,60 @@
-*{
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: Arial, sans-serif;
+/* NAV LINKS */
+
+.sidebar ul li a{
+    text-decoration:none;
+    color:inherit;
+    display:flex;
+    align-items:center;
+    width:100%;
+    height:100%;
 }
 
-body{
-  display: flex;
-  background: #f0f7ff;
+<<<<<<< HEAD
+/* STICKY NAVBAR */
+
+.navbar{
+    position:sticky;
+    top:0;
+    z-index:999;
 }
+
+/* OVERLAY */
+
+.overlay{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.5);
+    z-index:998;
+    display:none;
+}
+
+.overlay.active{
+    display:block;
+}
+=======
+>>>>>>> main
 
 /* SIDEBAR */
+
 .sidebar{
-  width: 250px;
-  height: 100vh;
-  background: #ffffff; /* WHITE SIDEBAR */
-  color: #1f2937;
-  position: fixed;
-  left: 0;
-  top: 0;
-  transition: 0.3s;
-  border-right: 1px solid #e5e7eb;
+    z-index:999;
 }
 
-/* LOGO */
-.sidebar .logo{
-  padding: 20px;
-  text-align: center;
-  border-bottom: 1px solid #e5e7eb;
-  font-weight: bold;
-  color: #ff4d2e;
+/* BETTER LOGOUT */
+
+.logout-menu{
+    margin-top:20px;
+    background:#fee2e2;
 }
 
+<<<<<<< HEAD
+.logout-menu:hover{
+    background:#fecaca !important;
+    color:#dc2626;
+=======
 /* MENU */
 .sidebar ul{
   list-style: none;
@@ -77,7 +100,6 @@ body{
 /* MAIN */
 .main{
   margin-left: 250px;
-  width: 100%;
 }
 
 /* NAVBAR */
@@ -124,47 +146,64 @@ body{
   padding: 6px 10px;
   border-radius: 20px;
   color: #1f2937;
+>>>>>>> main
 }
 
 .logout-btn{
-  background: #ff3b30;
-  border: none;
-  color: white;
-  padding: 8px 12px;
-  border-radius: 8px;
-  cursor: pointer;
+    transition:0.3s;
 }
 
-/* CONTENT */
-.content{
-  padding: 20px;
-  background: #f4f7fb; /* FIX: DIFFERENT FROM NAVBAR */
-  min-height: calc(100vh - 70px);
+.logout-btn:hover{
+    background:#dc2626;
+    transform:translateY(-2px);
 }
 
-/* CARD */
-.card{
-  background: white;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+/* ADMIN PROFILE */
+
+.admin{
+    transition:0.3s;
 }
 
-/* RESPONSIVE */
-@media(max-width: 768px){
-  .sidebar{
-    left: -250px;
-  }
+.admin:hover{
+    background:#dbeafe;
+}
 
-  .sidebar.active{
-    left: 0;
-  }
+/* TABLET */
 
-  .main{
-    margin-left: 0;
-  }
+@media(max-width:1024px){
 
-  .toggle-btn{
-    display: block;
-  }
+    .navbar .right{
+        gap:10px;
+    }
+
+}
+
+/* MOBILE */
+
+@media(max-width:768px){
+
+    .navbar{
+        flex-wrap:wrap;
+        height:auto;
+        padding:15px;
+    }
+
+    .right{
+        width:100%;
+        justify-content:space-between;
+        margin-top:10px;
+    }
+
+    .sidebar{
+        left:-250px;
+    }
+
+    .sidebar.active{
+        left:0;
+    }
+
+    .toggle-btn{
+        display:block;
+    }
+
 }
