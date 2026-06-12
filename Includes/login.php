@@ -35,7 +35,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             // Role-based redirection
             if ($user['role_name'] == "ADMIN") {
-                header("Location: ../Admin/dash.php");
+                header("Location: ../Admin/dashboard.php");
             } else {
                 header("Location: ../Customer/home.php");
             }
