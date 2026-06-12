@@ -5,10 +5,6 @@
   font-family: Arial, sans-serif;
 }
 
-body{
-  display: flex;
-  background: #f0f7ff;
-}
 
 /* SIDEBAR */
 .sidebar{
@@ -77,7 +73,6 @@ body{
 /* MAIN */
 .main{
   margin-left: 250px;
-  width: 100%;
 }
 
 /* NAVBAR */
