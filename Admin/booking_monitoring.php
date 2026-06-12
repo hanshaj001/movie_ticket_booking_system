@@ -92,7 +92,7 @@ WHERE status='ACTIVE'
 <head>
 <meta charset="UTF-8">
 <title>Booking Monitoring</title>
-<link rel="stylesheet" href="../Assets/booking_monitoring.css"/>
+<link rel="stylesheet" href="../Assets/dashboard.css"/>
 <link rel="stylesheet" href="../Assets/add_show.css">
 </head>
 
