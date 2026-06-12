@@ -17,7 +17,7 @@ if(!$conn)
 
 <?php
 session_start();
-include('db.php');
+require_once '../Includes/db_conn.php'; 
 
 /* Authentication */
 
@@ -281,6 +281,9 @@ body{
         height:280px;
     }
 }
+
+
+
 
 </style>
 </head>
