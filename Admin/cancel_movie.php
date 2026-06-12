@@ -6,11 +6,11 @@ $id=$_GET['id'];
 
 mysqli_query(
 $conn,
-"UPDATE shows
-SET show_status='CANCELLED'
-WHERE show_id=$id"
+"UPDATE movies
+SET status='CANCELLED'
+WHERE movie_id=$id"
 );
 
-header("Location:add_show.php");
+header("Location:add_movies.php");
 
 ?>
