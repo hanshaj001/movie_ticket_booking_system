@@ -1,137 +1,174 @@
 *{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:Segoe UI;
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, sans-serif;
 }
 
-body{
-background:#f4f4f4;
+/* MAIN CONTENT */
+.content{
+    margin-left:250px;
+    padding:25px;
+    background:#f4f7fb;
+    min-height:100vh;
 }
 
+/* CARD */
 .container{
-display:flex;
-justify-content:center;
-padding:40px;
+    background:#fff;
+    padding:25px;
+    border-radius:15px;
+    box-shadow:0 2px 10px rgba(0,0,0,0.08);
 }
 
-.card{
-width:500px;
-background:white;
-padding:30px;
-border-radius:25px;
-box-shadow:0 5px 20px rgba(0,0,0,.1);
-}
-
+/* HEADINGS */
 h2{
-margin-bottom:20px;
+    color:#1f2937;
+    margin-bottom:20px;
 }
 
+/* SUCCESS MESSAGE */
+.message{
+    background:#e8fff1;
+    color:#1f7a3d;
+    padding:12px;
+    border-radius:8px;
+    margin-bottom:20px;
+    font-weight:bold;
+}
+
+/* FORM */
+form{
+    display:grid;
+    gap:15px;
+}
+
+/* INPUTS */
 input,
 textarea,
 select{
-width:100%;
-padding:14px;
-border:1px solid #ddd;
-border-radius:15px;
-margin-top:15px;
-outline:none;
-font-size:15px;
-transition:.3s;
+    width:100%;
+    padding:12px;
+    border:1px solid #d1d5db;
+    border-radius:8px;
+    outline:none;
+    font-size:15px;
+    transition:.3s;
 }
 
 input:focus,
 textarea:focus,
 select:focus{
-border:1px solid #ff5b2e;
+    border-color:#ff4d2e;
+    box-shadow:0 0 5px rgba(255,77,46,.3);
 }
 
 textarea{
-height:120px;
-resize:none;
+    resize:vertical;
+    min-height:100px;
 }
 
-.buttons{
-display:flex;
-gap:15px;
-margin-top:20px;
+/* ERROR MESSAGE */
+span{
+    color:#ff3b30;
+    font-size:13px;
 }
 
-.btn{
-background:#ff5b2e;
-color:white;
-border:none;
-padding:14px 30px;
-border-radius:15px;
-cursor:pointer;
-font-size:15px;
+/* BUTTON */
+button{
+    background:linear-gradient(135deg,#ff4d2e,#ff7a45);
+    color:#fff;
+    border:none;
+    padding:14px;
+    border-radius:10px;
+    cursor:pointer;
+    font-size:16px;
+    font-weight:bold;
+    transition:.3s;
 }
 
-.btn-reset{
-background:#ccc;
-border:none;
-padding:14px 30px;
-border-radius:15px;
-cursor:pointer;
+button:hover{
+    transform:translateY(-2px);
+    box-shadow:0 5px 15px rgba(255,77,46,.3);
 }
 
-.table-card{
-background:white;
-width:95%;
-margin:30px auto;
-padding:30px;
-border-radius:25px;
-box-shadow:0 5px 20px rgba(0,0,0,.1);
-}
-
+/* TABLE */
 table{
-width:100%;
-border-collapse:collapse;
-margin-top:20px;
+    width:100%;
+    margin-top:25px;
+    border-collapse:collapse;
+    background:#fff;
+    border-radius:12px;
+    overflow:hidden;
+    box-shadow:0 2px 10px rgba(0,0,0,.05);
 }
 
-th{
-background:#ff5b2e;
-color:white;
-padding:15px;
+table th{
+    background:#ff4d2e;
+    color:#fff;
+    padding:15px;
+    text-align:center;
 }
 
-td{
-padding:15px;
-text-align:center;
-border-bottom:1px solid #eee;
+table td{
+    padding:15px;
+    text-align:center;
+    border-bottom:1px solid #eee;
 }
 
-.poster{
-width:70px;
-border-radius:10px;
+table tr:hover{
+    background:#fff7f4;
 }
 
-.add-btn{
-background:#ff5b2e;
-color:white;
-padding:12px 25px;
-text-decoration:none;
-border-radius:15px;
+/* IMAGE */
+table img{
+    width:70px;
+    height:90px;
+    object-fit:cover;
+    border-radius:8px;
 }
 
-.view,
-.edit,
-.cancel{
-padding:10px 16px;
-border-radius:10px;
-text-decoration:none;
-color:white;
+/* EDIT BUTTON */
+table a{
+    background:#2563eb;
+    color:white;
+    padding:8px 14px;
+    border-radius:8px;
+    text-decoration:none;
+    font-size:14px;
+    transition:.3s;
 }
 
-.view{
-background:#3498db;
+table a:hover{
+    background:#1d4ed8;
 }
 
-.edit{
-background:#27ae60;
+/* HR */
+hr{
+    margin:30px 0;
+    border:none;
+    border-top:1px solid #ddd;
 }
 
-.cancel{
-background:#e74c3c;
+/* RESPONSIVE */
+@media(max-width:768px){
+
+    .content{
+        margin-left:0;
+        padding:15px;
+    }
+
+    .container{
+        padding:15px;
+    }
+
+    table{
+        display:block;
+        overflow-x:auto;
+        white-space:nowrap;
+    }
+
+    button{
+        width:100%;
+    }
 }

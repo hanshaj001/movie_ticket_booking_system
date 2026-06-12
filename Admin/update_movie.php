@@ -19,6 +19,6 @@ movie_format='$format'
 WHERE movie_id=$id"
 );
 
-header("Location:add_movies.php");
+header("Location:add_movie.php");
 
 ?>
