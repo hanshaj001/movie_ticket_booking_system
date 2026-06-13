@@ -17,7 +17,7 @@ if(!$conn)
 
 
 <?php
-session_start();
+//session_start();
  require_once '../Includes/db_conn.php'; 
 include '../Includes/sidebar.php';
 
