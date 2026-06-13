@@ -156,6 +156,3 @@ Cancel
 </table>
 
 </div>
-
-</body>
-</html>

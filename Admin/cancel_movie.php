@@ -1,6 +1,7 @@
 <?php
 
 require_once '../Includes/db_conn.php';
+include '../Includes/navbar.php';
 
 $id=$_GET['id'];
 
