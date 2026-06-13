@@ -545,7 +545,7 @@ INSERT INTO users
    password_hash,
    account_status
 )
-VALUES
+VALUESz
 (
    ' Admin',
    'admin@gmail.com',
