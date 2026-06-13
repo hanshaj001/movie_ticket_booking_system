@@ -16,385 +16,471 @@ if(!$conn)
 
 
 <?php
+
 session_start();
-require_once '../Includes/db_conn.php'; 
+require_once "../Includes/db_conn.php";
+include "../Includes/sidebar.php";
 
-/* Authentication */
+/* ==========================================
+   DEFAULT ADMIN NAME
+========================================== */
 
-if(!isset($_SESSION['user_id']))
-{
-    header("Location: login.php");
-    exit();
-}
+$adminName = $_SESSION['full_name'] ?? 'Admin';
 
-/* Dashboard Statistics */
+/* ==========================================
+   TOTAL ACTIVE MOVIES
+========================================== */
 
-$totalMovies = mysqli_fetch_assoc(
-    mysqli_query($conn,"
-        SELECT COUNT(*) total
-        FROM movies
-        WHERE status='ACTIVE'
-    ")
-)['total'] ?? 0;
+$query = "
+SELECT COUNT(*) AS total_movies
+FROM movies
+WHERE status='ACTIVE'
+";
 
-$totalShows = mysqli_fetch_assoc(
-    mysqli_query($conn,"
-        SELECT COUNT(*) total
-        FROM shows
-        WHERE show_status='ACTIVE'
-    ")
-)['total'] ?? 0;
+$result = mysqli_query($conn, $query);
+$totalMovies = mysqli_fetch_assoc($result)['total_movies'] ?? 0;
 
-$todayBookings = mysqli_fetch_assoc(
-    mysqli_query($conn,"
-        SELECT COUNT(*) total
-        FROM bookings
-        WHERE DATE(booking_time)=CURDATE()
-        AND booking_status='CONFIRMED'
-    ")
-)['total'] ?? 0;
+/* ==========================================
+   TOTAL ACTIVE SHOWS
+========================================== */
 
-$availableSeats = mysqli_fetch_assoc(
-    mysqli_query($conn,"
-        SELECT COUNT(*) total
-        FROM show_seats
-        WHERE seat_status='AVAILABLE'
-    ")
-)['total'] ?? 0;
+$query = "
+SELECT COUNT(*) AS total_shows
+FROM shows
+WHERE show_status='ACTIVE'
+";
 
-$soldSeats = mysqli_fetch_assoc(
-    mysqli_query($conn,"
-        SELECT COUNT(*) total
-        FROM show_seats
-        WHERE seat_status='SOLD'
-    ")
-)['total'] ?? 0;
+$result = mysqli_query($conn, $query);
+$totalShows = mysqli_fetch_assoc($result)['total_shows'] ?? 0;
 
+/* ==========================================
+   TODAY'S SHOWS
+========================================== */
 
-/* Running Movies */
+$query = "
+SELECT COUNT(*) AS todays_shows
+FROM shows
+WHERE show_date = CURDATE()
+AND show_status='ACTIVE'
+";
 
-$movies = mysqli_query($conn,"
+$result = mysqli_query($conn, $query);
+$todaysShows = mysqli_fetch_assoc($result)['todays_shows'] ?? 0;
+
+/* ==========================================
+   AVAILABLE SEATS TODAY
+========================================== */
+
+$query = "
+SELECT COUNT(*) AS available_seats
+FROM show_seats ss
+INNER JOIN shows s
+ON ss.show_id = s.show_id
+WHERE
+ss.seat_status='AVAILABLE'
+AND s.show_date = CURDATE()
+AND s.show_status='ACTIVE'
+";
+
+$result = mysqli_query($conn, $query);
+$availableSeats = mysqli_fetch_assoc($result)['available_seats'] ?? 0;
+
+/* ==========================================
+   SOLD SEATS TODAY
+========================================== */
+
+$query = "
+SELECT COUNT(*) AS sold_seats
+FROM show_seats ss
+INNER JOIN shows s
+ON ss.show_id = s.show_id
+WHERE
+ss.seat_status='SOLD'
+AND s.show_date = CURDATE()
+AND s.show_status='ACTIVE'
+";
+
+$result = mysqli_query($conn, $query);
+$soldSeats = mysqli_fetch_assoc($result)['sold_seats'] ?? 0;
+
+/* ==========================================
+   TODAY REVENUE
+========================================== */
+
+$query = "
 SELECT
-    m.title,
-    m.poster_url,
-    m.movie_format,
-    GROUP_CONCAT(
-        TIME_FORMAT(s.show_time,'%h:%i %p')
-        SEPARATOR ', '
-    ) timings
+COALESCE(SUM(total_amount),0) AS revenue
+FROM bookings
+WHERE booking_status='CONFIRMED'
+AND DATE(booking_time)=CURDATE()
+";
+
+$result = mysqli_query($conn, $query);
+$totalRevenue = mysqli_fetch_assoc($result)['revenue'] ?? 0;
+
+/* ==========================================
+   TODAY'S RUNNING SHOWS
+========================================== */
+
+$query = "
+SELECT
+m.title,
+m.poster_url,
+m.movie_format,
+s.show_time,
+sc.screen_name
 FROM movies m
 INNER JOIN shows s
-ON m.movie_id = s.movie_id
-WHERE m.status='ACTIVE'
+ON m.movie_id=s.movie_id
+INNER JOIN screens sc
+ON s.screen_id=sc.screen_id
+WHERE
+m.status='ACTIVE'
 AND s.show_status='ACTIVE'
-GROUP BY
-    m.movie_id,
-    m.title,
-    m.poster_url,
-    m.movie_format
-ORDER BY m.title
-");
-?>
+AND s.show_date = CURDATE()
+ORDER BY s.show_time ASC
+";
 
+$runningShows = mysqli_query($conn,$query);
+
+
+
+$recentBookingsQuery = "
+SELECT
+    b.booking_id,
+    u.full_name,
+    m.title,
+    b.total_seats,
+    b.total_amount,
+    b.booking_time,
+    b.booking_status
+FROM bookings b
+INNER JOIN users u
+    ON b.user_id = u.user_id
+INNER JOIN shows s
+    ON b.show_id = s.show_id
+INNER JOIN movies m
+    ON s.movie_id = m.movie_id
+ORDER BY b.booking_time DESC
+LIMIT 5
+";
+
+$recentBookings = mysqli_query(
+    $conn,
+    $recentBookingsQuery
+);
+
+?>
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Admin Dashboard</title>
 
+<link rel="stylesheet" href="../Assets/admin_dashboard.css">
+<link rel="stylesheet" href="../Assets/sidebar.css">
+
 <link rel="stylesheet"
-href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-<style>
-
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:'Segoe UI',sans-serif;
-}
-
-body{
-    background:#f4f6fb;
-    padding:30px;
-}
-
-/* Title */
-
-.page-title{
-    font-size:34px;
-    font-weight:700;
-    color:#1e293b;
-    margin-bottom:35px;
-}
-
-/* Statistics Cards */
-
-.stats{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-    gap:20px;
-    margin-bottom:45px;
-}
-
-.card{
-    background:#ffffff;
-    padding:25px;
-    border-radius:18px;
-    text-align:center;
-    box-shadow:0 8px 25px rgba(0,0,0,.08);
-    transition:.3s;
-}
-
-.card:hover{
-    transform:translateY(-8px);
-}
-
-.card i{
-    width:70px;
-    height:70px;
-    line-height:70px;
-    border-radius:50%;
-    color:#fff;
-    font-size:28px;
-    margin-bottom:15px;
-}
-
-.movies-icon{
-    background:#7c3aed;
-}
-
-.shows-icon{
-    background:#10b981;
-}
-
-.booking-icon{
-    background:#f97316;
-}
-
-.available-icon{
-    background:#2563eb;
-}
-
-.sold-icon{
-    background:#ef4444;
-}
-
-.card-info h2{
-    font-size:38px;
-    color:#111827;
-    margin-bottom:8px;
-}
-
-.card-info p{
-    color:#6b7280;
-    font-size:15px;
-}
-
-/* Movies Section */
-
-.section-title{
-    font-size:28px;
-    font-weight:700;
-    color:#1e293b;
-    margin-bottom:25px;
-}
-
-.movies{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
-    gap:25px;
-}
-
-.movie-card{
-    background:#fff;
-    border-radius:18px;
-    overflow:hidden;
-    box-shadow:0 8px 25px rgba(0,0,0,.08);
-    transition:.3s;
-}
-
-.movie-card:hover{
-    transform:translateY(-8px);
-}
-
-.movie-card img{
-    width:100%;
-    height:350px;
-    object-fit:cover;
-}
-
-.movie-content{
-    padding:20px;
-}
-
-.movie-content h3{
-    color:#111827;
-    margin-bottom:12px;
-    font-size:22px;
-}
-
-.movie-content p{
-    color:#64748b;
-    margin-bottom:12px;
-    line-height:1.6;
-}
-
-.format{
-    display:inline-block;
-    padding:8px 16px;
-    border-radius:30px;
-    background:#2563eb;
-    color:#fff;
-    font-size:12px;
-    font-weight:600;
-}
-
-.empty{
-    background:#fff;
-    border-radius:15px;
-    padding:40px;
-    text-align:center;
-    color:#64748b;
-    font-size:18px;
-}
-
-/* Responsive */
-
-@media(max-width:768px){
-
-    body{
-        padding:15px;
-    }
-
-    .page-title{
-        font-size:28px;
-    }
-
-    .card-info h2{
-        font-size:30px;
-    }
-
-    .movie-card img{
-        height:280px;
-    }
-}
-
-
-
-
-</style>
 </head>
 
 <body>
 
-<h1 class="page-title">
-    <i class="fa-solid fa-chart-line"></i>
-    Admin Dashboard
-</h1>
+<div class="dashboard-container">
 
-<!-- Statistics -->
+    <!-- HEADER -->
 
-<div class="stats">
+    <div class="dashboard-header">
 
-    <div class="card">
-        <i class="fa-solid fa-film movies-icon"></i>
-        <div class="card-info">
-            <h2><?= $totalMovies ?></h2>
-            <p>Total Movies</p>
+        <div>
+            <h1>Admin Dashboard</h1>
+            <p>Monitor cinema activities and performance.</p>
         </div>
+
+        <div class="admin-info">
+            Welcome,
+            <strong><?= htmlspecialchars($adminName) ?></strong>
+        </div>
+
     </div>
 
-    <div class="card">
-        <i class="fa-solid fa-video shows-icon"></i>
-        <div class="card-info">
-            <h2><?= $totalShows ?></h2>
-            <p>Total Shows</p>
+    <!-- DASHBOARD CARDS -->
+
+    <div class="stats-grid">
+
+        <!-- Movies -->
+
+        <div class="stat-card">
+
+            <div class="stat-icon movie-icon">
+                <i class="fas fa-film"></i>
+            </div>
+
+            <div class="stat-content">
+                <h2><?= $totalMovies ?></h2>
+                <p>Total Movies</p>
+            </div>
+
         </div>
+
+        <!-- Shows -->
+
+        <div class="stat-card">
+
+            <div class="stat-icon show-icon">
+                <i class="fas fa-video"></i>
+            </div>
+
+            <div class="stat-content">
+                <h2><?= $totalShows ?></h2>
+                <p>Total Shows</p>
+            </div>
+
+        </div>
+
+        <!-- Today Shows -->
+
+        <div class="stat-card">
+
+            <div class="stat-icon booking-icon">
+                <i class="fas fa-calendar-day"></i>
+            </div>
+
+            <div class="stat-content">
+                <h2><?= $todaysShows ?></h2>
+                <p>Today's Shows</p>
+            </div>
+
+        </div>
+
+        <!-- Available Seats -->
+
+        <div class="stat-card">
+
+            <div class="stat-icon available-icon">
+                <i class="fas fa-couch"></i>
+            </div>
+
+            <div class="stat-content">
+                <h2><?= $availableSeats ?></h2>
+                <p>Available Seats</p>
+            </div>
+
+        </div>
+
+        <!-- Sold Seats -->
+
+        <div class="stat-card">
+
+            <div class="stat-icon sold-icon">
+                <i class="fas fa-chair"></i>
+            </div>
+
+            <div class="stat-content">
+                <h2><?= $soldSeats ?></h2>
+                <p>Sold Seats</p>
+            </div>
+
+        </div>
+
+        <!-- Revenue -->
+
+        <div class="stat-card">
+
+            <div class="stat-icon revenue-icon">
+                <i class="fas fa-money-bill-wave"></i>
+            </div>
+
+            <div class="stat-content">
+                <h2>Rs. <?= number_format($totalRevenue,2) ?></h2>
+                <p>Today's Revenue</p>
+            </div>
+
+        </div>
+
     </div>
 
-    <div class="card">
-        <i class="fa-solid fa-ticket booking-icon"></i>
-        <div class="card-info">
-            <h2><?= $todayBookings ?></h2>
-            <p>Today's Bookings</p>
-        </div>
+    <!-- RUNNING SHOWS -->
+
+    <div class="section-header">
+        <h2>Today's Running Shows</h2>
     </div>
 
-    <div class="card">
-        <i class="fa-solid fa-couch available-icon"></i>
-        <div class="card-info">
-            <h2><?= $availableSeats ?></h2>
-            <p>Available Seats</p>
-        </div>
+    <div class="movies-grid">
+
+        <?php if(mysqli_num_rows($runningShows) > 0): ?>
+
+            <?php while($show = mysqli_fetch_assoc($runningShows)): ?>
+
+                <div class="movie-card">
+
+                    <div class="movie-poster">
+
+                        <?php if(!empty($show['poster_url'])): ?>
+
+                            <img
+                            src="<?= htmlspecialchars($show['poster_url']) ?>"
+                            alt="<?= htmlspecialchars($show['title']) ?>">
+
+                        <?php else: ?>
+
+                            <img
+                            src="../Assets/images/default-movie.jpg"
+                            alt="Movie Poster">
+
+                        <?php endif; ?>
+
+                    </div>
+
+                    <div class="movie-info">
+
+                        <h3>
+                            <?= htmlspecialchars($show['title']) ?>
+                        </h3>
+
+                        <p>
+                            <i class="fas fa-tv"></i>
+                            <?= htmlspecialchars($show['screen_name']) ?>
+                        </p>
+
+                        <p>
+                            <i class="fas fa-clock"></i>
+
+                            <?= date(
+                                "h:i A",
+                                strtotime($show['show_time'])
+                            ) ?>
+                        </p>
+
+                        <span class="movie-format">
+                            <?= htmlspecialchars($show['movie_format']) ?>
+                        </span>
+
+                    </div>
+
+                </div>
+
+            <?php endwhile; ?>
+
+        <?php else: ?>
+
+            <div class="empty-state">
+
+                <i class="fas fa-film"></i>
+
+                <h3>No Shows Scheduled Today</h3>
+
+                <p>
+                    There are no active movie shows scheduled today.
+                </p>
+
+            </div>
+
+        <?php endif; ?>
+
     </div>
 
-    <div class="card">
-        <i class="fa-solid fa-chair sold-icon"></i>
-        <div class="card-info">
-            <h2><?= $soldSeats ?></h2>
-            <p>Sold Seats</p>
-        </div>
-    </div>
+    <div class="section-header">
+    <h2>Recent Bookings</h2>
+</div>
+
+<div class="booking-table-container">
+
+    <table class="booking-table">
+
+        <thead>
+
+            <tr>
+                <th>Booking ID</th>
+                <th>Customer</th>
+                <th>Movie</th>
+                <th>Seats</th>
+                <th>Amount</th>
+                <th>Time</th>
+                <th>Status</th>
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            <?php if(mysqli_num_rows($recentBookings) > 0): ?>
+
+                <?php while($booking = mysqli_fetch_assoc($recentBookings)): ?>
+
+                    <tr>
+
+                        <td>
+                            #<?= $booking['booking_id']; ?>
+                        </td>
+
+                        <td>
+                            <?= htmlspecialchars($booking['full_name']); ?>
+                        </td>
+
+                        <td>
+                            <?= htmlspecialchars($booking['title']); ?>
+                        </td>
+
+                        <td>
+                            <?= $booking['total_seats']; ?>
+                        </td>
+
+                        <td>
+                            Rs.
+                            <?= number_format(
+                                $booking['total_amount'],
+                                2
+                            ); ?>
+                        </td>
+
+                        <td>
+                            <?= date(
+                                "d M Y h:i A",
+                                strtotime(
+                                    $booking['booking_time']
+                                )
+                            ); ?>
+                        </td>
+
+                        <td>
+
+                            <span class="status-badge">
+
+                                <?= $booking['booking_status']; ?>
+
+                            </span>
+
+                        </td>
+
+                    </tr>
+
+                <?php endwhile; ?>
+
+            <?php else: ?>
+
+                <tr>
+
+                    <td colspan="7">
+                        No bookings found.
+                    </td>
+
+                </tr>
+
+            <?php endif; ?>
+
+        </tbody>
+
+    </table>
 
 </div>
 
-<!-- Running Movies -->
-
-<h2 class="section-title">
-    <i class="fa-solid fa-clapperboard"></i>
-    Running Movies
-</h2>
-
-<div class="movies">
-
-<?php if(mysqli_num_rows($movies)>0){ ?>
-
-<?php while($movie=mysqli_fetch_assoc($movies)){ ?>
-
-<div class="movie-card">
-
-    <img src="<?= $movie['poster_url']; ?>"
-         alt="<?= $movie['title']; ?>">
-
-    <div class="movie-content">
-
-        <h3><?= $movie['title']; ?></h3>
-
-        <p>
-            <strong>Show Timings:</strong><br>
-            <?= $movie['timings']; ?>
-        </p>
-
-        <span class="format">
-            <?= $movie['movie_format']; ?>
-        </span>
-
-    </div>
-
 </div>
-
-<?php } ?>
-
-<?php } else { ?>
-
-<div class="empty">
-    No Active Movies Available
-</div>
-
-<?php } ?>
-
-</div>
-
-<script>
-
-setInterval(function(){
-    location.reload();
-},60000);
-
-</script>
 
 </body>
-</html>
+</html>  
