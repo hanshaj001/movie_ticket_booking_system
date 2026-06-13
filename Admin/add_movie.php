@@ -132,11 +132,17 @@ if (isset($_POST['add_movie'])) {
 ?>
 
 
+<!DOCTYPE html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
     <title>Add Movie - Admin Panel</title>
     <link rel="stylesheet" href="../Assets/add_movie.css">
 </head>
-<div class="page-header">
+<body>
+<div class="main-container">
+    <div class="content-area">
+        <div class="page-header">
     <div class="page-title">
         <div class="title-icon">
             <i class="fas fa-film"></i>
@@ -280,3 +286,8 @@ if (isset($_POST['add_movie'])) {
     <div class="no-data">No movies available.</div>
 <?php endif; ?>
 </div>
+
+    </div>
+</div>
+</body>
+</html>
