@@ -23,11 +23,11 @@ include '../Includes/sidebar.php';
 
 /* Authentication */
 
-// if(!isset($_SESSION['user_id']))
-// {
-//     header("Location:../Includes/login.php");
-//     exit();
-// }
+if(!isset($_SESSION['user_id']))
+{
+    header("Location:../Includes/login.php");
+    exit();
+}
 
 /* Search & Filters */
 
