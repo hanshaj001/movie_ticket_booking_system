@@ -23,11 +23,11 @@ include '../Includes/sidebar.php';
 
 /* Authentication */
 
-// if(!isset($_SESSION['user_id']))
-// {
-//     header("Location:../Includes/login.php");
-//     exit();
-// }
+if(!isset($_SESSION['user_id']))
+{
+    header("Location:../Includes/login.php");
+    exit();
+}
 
 /* Search & Filters */
 
@@ -97,7 +97,7 @@ WHERE status='ACTIVE'
 <title>Booking Monitoring</title>
 <link rel="stylesheet" href="../Assets/booking_monitoring.css"/>
 <link rel="stylesheet" href="../Assets/sidebar.css"/>
-<!--<link rel="stylesheet" href="../Assets/login.css"/>-->
+<link rel="stylesheet" href="../Assets/login.css"/>
 </head>
 
 <body>
