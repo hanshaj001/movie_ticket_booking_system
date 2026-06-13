@@ -1,6 +1,7 @@
 <?php
 
 require_once '../Includes/db_conn.php';
+include '../Includes/navbar.php';
 
 $id=$_GET['id'];
 
@@ -11,6 +12,6 @@ SET status='CANCELLED'
 WHERE movie_id=$id"
 );
 
-header("Location:manage_movies.php");
+header("Location:add_movie.php");
 
 ?>

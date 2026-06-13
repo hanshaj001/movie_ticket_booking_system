@@ -1,6 +1,7 @@
 <?php
 
 require_once '../Includes/db_conn.php';
+include '../Includes/navbar.php';
 
 $id=$_POST['id'];
 $title=$_POST['title'];
@@ -19,6 +20,6 @@ movie_format='$format'
 WHERE movie_id=$id"
 );
 
-header("Location:manage_movies.php");
+header("Location:add_movie.php");
 
 ?>

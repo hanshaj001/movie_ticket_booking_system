@@ -13,16 +13,19 @@ if(!$conn)
 }
 
 ?>
+
+
+
 <?php
 session_start();
-require_once '../Includes/db_conn.php'; 
+ require_once '../Includes/db_conn.php'; 
 include '../Includes/sidebar.php';
 
 /* Authentication */
 
 if(!isset($_SESSION['user_id']))
 {
-    header("Location: login.php");
+    header("Location:../Includes/login.php");
     exit();
 }
 
@@ -174,7 +177,7 @@ Search
 <tr>
 
 <td>
-#<?php echo $row['booking_id']; ?>
+<?php echo $row['booking_id']; ?>
 </td>
 
 <td>

@@ -7,7 +7,6 @@ $page = max(1, $page);
 $limit = 10;
 $offset = ($page - 1) * $limit;
 $selected_date = $_GET['date'] ?? 'ALL';
-
 // Auto-update past shows
 mysqli_query($conn, "
     UPDATE shows sh
