@@ -1,145 +1,201 @@
-
 *{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:'Segoe UI',sans-serif;
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Segoe UI',sans-serif;
 }
 
 body{
-background:#0f172a;
-padding:30px;
-color:white;
+    background:#f5f6fa;
+    padding:30px;
+    color:#333;
 }
 
 .container{
-max-width:1400px;
-margin:auto;
+    width:100%;
+    max-width:1400px;
+    margin:auto;
 }
+
+/* Page Title */
 
 .heading{
-font-size:32px;
-font-weight:700;
-margin-bottom:25px;
+    font-size:28px;
+    font-weight:700;
+    color:#222;
+    margin-bottom:25px;
 }
 
+/* Filters */
+
 .filters{
-display:flex;
-gap:15px;
-flex-wrap:wrap;
-margin-bottom:25px;
+    display:flex;
+    gap:15px;
+    flex-wrap:wrap;
+    margin-bottom:25px;
 }
 
 .filters input,
 .filters select{
-padding:12px;
-border:none;
-border-radius:8px;
-background:#1e293b;
-color:white;
+    padding:12px 15px;
+    border:1px solid #ddd;
+    border-radius:10px;
+    background:#fff;
+    min-width:220px;
+    outline:none;
+}
+
+.filters input:focus,
+.filters select:focus{
+    border-color:#ff6b3d;
 }
 
 .search-btn{
-padding:12px 25px;
-background:#2563eb;
-border:none;
-border-radius:8px;
-cursor:pointer;
-color:white;
-font-weight:600;
+    background:#ff6b3d;
+    color:white;
+    border:none;
+    padding:12px 25px;
+    border-radius:10px;
+    cursor:pointer;
+    font-weight:600;
+    transition:.3s;
 }
+
+.search-btn:hover{
+    background:#f05526;
+}
+
+/* Table Card */
 
 .table-box{
-overflow-x:auto;
-background:#1e293b;
-border-radius:12px;
-padding:15px;
+    background:white;
+    border-radius:16px;
+    box-shadow:0 2px 12px rgba(0,0,0,.08);
+    overflow:hidden;
 }
 
+/* Table */
+
 table{
-width:100%;
-border-collapse:collapse;
+    width:100%;
+    border-collapse:collapse;
+}
+
+thead{
+    background:#ff6b3d;
+    color:white;
 }
 
 th{
-background:#2563eb;
-padding:14px;
-text-align:left;
+    padding:16px;
+    text-align:left;
+    font-size:14px;
+    font-weight:600;
 }
 
 td{
-padding:14px;
-border-bottom:1px solid #e93d09;
+    padding:15px;
+    border-bottom:1px solid #eee;
+    font-size:14px;
 }
 
+tr:hover{
+    background:#fafafa;
+}
+
+/* Status */
+
 .badge{
-padding:6px 12px;
-border-radius:20px;
-font-size:13px;
-font-weight:600;
+    padding:7px 14px;
+    border-radius:30px;
+    font-size:12px;
+    font-weight:600;
 }
 
 .confirmed{
-background:#16a34a;
+    background:#dcfce7;
+    color:#15803d;
 }
 
 .cancelled{
-background:#dc2626;
+    background:#fee2e2;
+    color:#dc2626;
 }
 
 .expired{
-background:#f59e0b;
+    background:#fef3c7;
+    color:#d97706;
 }
 
+/* Buttons */
+
 .action-btn{
-padding:8px 15px;
-border:none;
-border-radius:6px;
-cursor:pointer;
-font-size:13px;
-margin-right:5px;
+    border:none;
+    padding:8px 15px;
+    border-radius:8px;
+    cursor:pointer;
+    color:white;
+    font-size:13px;
+    margin-right:5px;
 }
 
 .view-btn{
-background:#0ea5e9;
-color:white;
+    background:#2563eb;
+}
+
+.view-btn:hover{
+    background:#1d4ed8;
 }
 
 .cancel-btn{
-background:#ef4444;
-color:white;
+    background:#ef4444;
 }
 
+.cancel-btn:hover{
+    background:#dc2626;
+}
+
+/* Pagination */
+
 .pagination{
-display:flex;
-justify-content:center;
-gap:10px;
-margin-top:25px;
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    margin-top:25px;
 }
 
 .pagination button{
-padding:10px 15px;
-border:none;
-border-radius:6px;
-background:#2563eb;
-color:white;
-cursor:pointer;
+    border:none;
+    background:#ff6b3d;
+    color:white;
+    padding:10px 15px;
+    border-radius:8px;
+    cursor:pointer;
 }
+
+.pagination button:hover{
+    background:#f05526;
+}
+
+/* Responsive */
 
 @media(max-width:768px){
 
-.heading{
-font-size:24px;
-}
+    .filters{
+        flex-direction:column;
+    }
 
-.filters{
-flex-direction:column;
-}
+    .filters input,
+    .filters select,
+    .search-btn{
+        width:100%;
+    }
 
-.filters input,
-.filters select,
-.search-btn{
-width:100%;
-}
+    .heading{
+        font-size:24px;
+    }
 
+    table{
+        min-width:900px;
+    }
 }
