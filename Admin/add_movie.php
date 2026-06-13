@@ -132,10 +132,10 @@ if (isset($_POST['add_movie'])) {
 ?>
 
 
-head>
+<head>
     <title>Add Movie - Admin Panel</title>
     <link rel="stylesheet" href="../Assets/add_movie.css">
-
+</head>
 <div class="page-header">
     <div class="page-title">
         <div class="title-icon">
