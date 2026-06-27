@@ -80,9 +80,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
             </a>
         </div>
     </header>
-
-    <main class="content">
-        </main>
+    
 </div>
 
 <script>
