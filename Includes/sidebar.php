@@ -66,7 +66,6 @@ $current_page = basename($_SERVER['PHP_SELF']);
             <button class="toggle-btn" id="toggleBtn" aria-label="Open Navigation">
                 <i class="fa-solid fa-bars"></i>
             </button>
-            <h2>Admin Dashboard</h2>
         </div>
 
         <div class="right">
