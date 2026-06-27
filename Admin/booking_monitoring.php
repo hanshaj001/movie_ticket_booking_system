@@ -96,7 +96,7 @@ WHERE status='ACTIVE'
 <meta charset="UTF-8">
 <title>Booking Monitoring</title>
 <link rel="stylesheet" href="../Assets/booking_monitoring.css"/>
-<link rel="stylesheet" href="../Assets/add_show.css">
+<link rel="stylesheet" href="../Assets/sidebar.css">
 </head>
 
 <body>
