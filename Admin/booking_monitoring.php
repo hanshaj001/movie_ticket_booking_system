@@ -82,6 +82,7 @@ $count_row = mysqli_fetch_assoc($count_result);
 $total_records = $count_row['total'];
 $total_pages = ceil($total_records / $limit);
 
+
 /* Booking Records */
 
 $query = "
@@ -132,14 +133,55 @@ WHERE status='ACTIVE'
 </head>
 
 <body>
+  <script>
+
+function viewBooking(id)
+{
+    window.location='booking_details.php?id='+id;
+}
+
+function cancelBooking(id)
+{
+    if(confirm("Cancel this booking?"))
+    {
+        window.location='cancel_booking.php?id='+id;
+    }
+}
+
+function validateFilters()
+{
+    let movie = document.querySelector('select[name="movie"]').value;
+    let date  = document.querySelector('input[name="date"]').value;
+
+    if(movie === '')
+    {
+        alert("Please select a movie.");
+        return false;
+    }
+
+    if(date === '')
+    {
+        alert("Please select a date.");
+        return false;
+    }
+
+    return true;
+}
+
+setInterval(function(){
+
+    console.log("Refreshing booking data...");
+
+},30000);
+
+</script>
 
 <div class="container">
 
 <h1 class="heading">
 🎟 Booking Monitoring
 </h1>
-
-<form method="GET">
+<form method="GET" onsubmit="return validateFilters()">
 
 <div class="filters">
 
