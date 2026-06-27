@@ -384,10 +384,10 @@ input:focus, select:focus {
     }
 
     /* Inserting Inline Metadata Label Descriptors */
-    .show-table td:nth-of-type(3)::before { content: "📺 Screen: "; font-weight: 600; color: #777; }
-    .show-table td:nth-of-type(4)::before { content: "📅 Date: "; font-weight: 600; color: #777; }
-    .show-table td:nth-of-type(5)::before { content: "🕒 Start: "; font-weight: 600; color: #777; }
-    .show-table td:nth-of-type(6)::before { content: "⏳ End: "; font-weight: 600; color: #777; }
+    .show-table td:nth-of-type(3)::before { content: "Screen : "; font-weight: 600; color: #777; }
+    .show-table td:nth-of-type(4)::before { content: "Date : "; font-weight: 600; color: #777; }
+    .show-table td:nth-of-type(5)::before { content: "Start : "; font-weight: 600; color: #777; }
+    .show-table td:nth-of-type(6)::before { content: "End : "; font-weight: 600; color: #777; }
     
     /* Pricing Badge Formatting */
     .show-table td:nth-of-type(7) {
@@ -400,7 +400,7 @@ input:focus, select:focus {
         border-radius: 8px;
         margin: 8px 0 !important;
     }
-    .show-table td:nth-of-type(7)::before { content: "🎫 Price: "; }
+    .show-table td:nth-of-type(7)::before { content: "Price: "; }
 
     /* Clean Up System Timestamp Columns */
     .show-table td:nth-of-type(8) {
