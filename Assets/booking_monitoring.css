@@ -6,7 +6,7 @@
 }
 
 body{
-    background:#f5f6fa;
+    background:white;
     padding:30px;
     color:#333;
 }
@@ -156,26 +156,34 @@ td{
     background:#dc2626;
 }
 
-/* Pagination */
-
+/* PAGINATION */
 .pagination{
     display:flex;
     justify-content:center;
-    gap:10px;
+    align-items:center;
+    gap:8px;
     margin-top:25px;
 }
 
-.pagination button{
-    border:none;
-    background:#f5b8a6;
-    color:white;
-    padding:10px 15px;
-    border-radius:8px;
-    cursor:pointer;
+.pagination a{
+    padding:12px 20px;
+    background:#f5f5f5;
+    color:#444;
+    text-decoration:none;
+    border-radius:10px;
+    font-size:18px;
+    font-weight:600;
+    transition:0.3s;
 }
 
-.pagination button:hover{
-    background:#f05526;
+.pagination a:hover{
+    background:#ff4d2d;
+    color:#fff;
+}
+
+.pagination a.active{
+    background:#ff4d2d;
+    color:#fff;
 }
 
 /* Responsive */
