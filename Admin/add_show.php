@@ -368,7 +368,6 @@ if (isset($_POST['add_show'])) {
                                         <a href="edit_show.php?id=<?= $row['show_id'] ?>" class="edit-btn">Edit</a>
                                         <a href="cancel_show.php?id=<?= $row['show_id'] ?>" class="cancel-btn" onclick="return confirm('Cancel this show?')">Cancel</a>
                                     <?php endif; ?>
-                                    <a href="admin_dashboard.php?id=<?= $row['show_id'] ?>" class="view-btn">View</a>
                                 </div>
                             </td>
                         </tr>
