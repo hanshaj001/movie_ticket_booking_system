@@ -251,24 +251,4 @@ input:focus, select:focus {
 }
 
 /* RESPONSIVE DESIGN */
-@media(max-width: 768px){
-    .content-area {
-        margin-left: 0;
-        padding: 20px;
-    }
-
-    .form-grid { grid-template-columns: 3fr; }
-    .full-width { grid-column: unset; }
-
-    .page-header, .show-list-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 15px;
-    }
-
-    h1 { font-size: 26px; }
-    .action-buttons { flex-direction: column; }
-    .action-buttons a { text-align: center; }
-}
-
 
