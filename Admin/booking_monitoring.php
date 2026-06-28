@@ -56,6 +56,33 @@ if($date != '')
     $where .= " AND DATE(b.booking_time)='$date'";
 }
 
+/* Pagination */
+
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$limit = 2; // records per page
+$offset = ($page - 1) * $limit;
+
+
+$selected_date = $date;
+
+/* Count Total Records */
+
+$count_query = "
+SELECT COUNT(DISTINCT b.booking_id) as total
+FROM bookings b
+JOIN users u ON b.user_id=u.user_id
+JOIN shows sh ON b.show_id=sh.show_id
+JOIN movies m ON sh.movie_id=m.movie_id
+$where
+";
+
+$count_result = mysqli_query($conn, $count_query);
+$count_row = mysqli_fetch_assoc($count_result);
+
+$total_records = $count_row['total'];
+$total_pages = ceil($total_records / $limit);
+
+
 /* Booking Records */
 
 $query = "
@@ -77,6 +104,7 @@ LEFT JOIN seats st ON ss.seat_id=st.seat_id
 $where
 GROUP BY b.booking_id
 ORDER BY b.booking_time DESC
+LIMIT $limit OFFSET $offset
 ";
 
 $result = mysqli_query($conn,$query);
@@ -88,6 +116,11 @@ SELECT movie_id,title
 FROM movies
 WHERE status='ACTIVE'
 ");
+
+
+
+
+
 ?>
 
 <!DOCTYPE html>
@@ -96,18 +129,59 @@ WHERE status='ACTIVE'
 <meta charset="UTF-8">
 <title>Booking Monitoring</title>
 <link rel="stylesheet" href="../Assets/booking_monitoring.css"/>
-<link rel="stylesheet" href="../Assets/add_show.css">
+<link rel="stylesheet" href="../Assets/sidebar.css">
 </head>
 
 <body>
+  <script>
+
+function viewBooking(id)
+{
+    window.location='booking_details.php?id='+id;
+}
+
+function cancelBooking(id)
+{
+    if(confirm("Cancel this booking?"))
+    {
+        window.location='cancel_booking.php?id='+id;
+    }
+}
+
+function validateFilters()
+{
+    let movie = document.querySelector('select[name="movie"]').value;
+    let date  = document.querySelector('input[name="date"]').value;
+
+    if(movie === '')
+    {
+        alert("Please select a movie.");
+        return false;
+    }
+
+    if(date === '')
+    {
+        alert("Please select a date.");
+        return false;
+    }
+
+    return true;
+}
+
+setInterval(function(){
+
+    console.log("Refreshing booking data...");
+
+},30000);
+
+</script>
 
 <div class="container">
 
 <h1 class="heading">
 🎟 Booking Monitoring
 </h1>
-
-<form method="GET">
+<form method="GET" onsubmit="return validateFilters()">
 
 <div class="filters">
 
@@ -252,11 +326,24 @@ Cancel
 
 <div class="pagination">
 
-<button>Previous</button>
-<button>1</button>
-<button>2</button>
-<button>3</button>
-<button>Next</button>
+    <?php if ($page > 1): ?>
+        <a href="?date=<?= $selected_date ?>&page=<?= $page - 1 ?>">
+            Previous
+        </a>
+    <?php endif; ?>
+
+    <?php for ($p = 1; $p <= $total_pages; $p++): ?>
+        <a href="?date=<?= $selected_date ?>&page=<?= $p ?>"
+           class="<?= ($page == $p) ? 'active' : '' ?>">
+            <?= $p ?>
+        </a>
+    <?php endfor; ?>
+
+    <?php if ($page < $total_pages): ?>
+        <a href="?date=<?= $selected_date ?>&page=<?= $page + 1 ?>">
+            Next
+        </a>
+    <?php endif; ?>
 
 </div>
 
