@@ -59,7 +59,7 @@ if($date != '')
 /* Pagination */
 
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-$limit = 2; // records per page
+$limit = 10; // records per page
 $offset = ($page - 1) * $limit;
 
 
