@@ -1,49 +1,179 @@
 <?php
-require_once'../Includes/db_conn.php';
+
+require_once '../Includes/db_conn.php';
 include '../Includes/sidebar.php';
 
-$id=$_GET['id'];
+if (!isset($_GET['id'])) {
+    echo "<script>
+            alert('Movie not found!');
+            window.location='add_movies.php';
+          </script>";
+    exit();
+}
 
-$result=mysqli_query(
-$conn,
-"SELECT * FROM movies WHERE movie_id=$id"
-);
+$id = intval($_GET['id']);
 
-$row=mysqli_fetch_assoc($result);
+$sql = "SELECT * FROM movies WHERE movie_id='$id'";
+$result = mysqli_query($conn, $sql);
+
+if (mysqli_num_rows($result) == 0) {
+    echo "<script>
+            alert('Movie not found!');
+            window.location='manage_movies.php';
+          </script>";
+    exit();
+}
+
+$row = mysqli_fetch_assoc($result);
 ?>
-<form action="update_movie.php"
-method="POST">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Movie - Admin Panel</title>
+    <link rel="stylesheet" href="../Assets/add_movie.css">
+</head>
+<body>
 
-<input type="hidden"
-name="id"
-value="<?php echo $row['movie_id'];?>">
+<div class="main-content">
 
-<input type="text"
-name="title"
-value="<?php echo $row['title'];?>">
 
-<textarea
-name="description"><?php echo $row['description'];?>
-</textarea>
+    <div class="page-header">
+        <div class="header-icon">
+            <i class="fas fa-edit"></i>
+        </div>
 
-<input type="number"
-name="duration"
-value="<?php echo $row['duration_minutes'];?>">
+        <div>
+            <h2>Edit Movie</h2>
+            <p>Update movie information</p>
+        </div>
+    </div>
 
-<select name="format">
+    <div class="form-container">
 
-<option <?php if($row['movie_format']=="2D") echo "selected"; ?>>
-2D
-</option>
+        <form action="update_movie.php" method="POST" enctype="multipart/form-data">
 
-<option <?php if($row['movie_format']=="3D") echo "selected"; ?>>
-3D
-</option>
+            <input type="hidden" name="id"
+                value="<?php echo $row['movie_id']; ?>">
 
-</select>
+            <div class="form-grid">
 
-<button class="btn">
-Update Movie
-</button>
+                <!-- Movie Title -->
+                <div class="form-group">
+                    <label>Movie Title</label>
 
-</form>
+                    <input
+                        type="text"
+                        name="title"
+                        class="form-control"
+                        value="<?php echo htmlspecialchars($row['title']); ?>"
+                        required>
+                </div>
+
+                <!-- Duration -->
+                <div class="form-group">
+                    <label>Duration (Minutes)</label>
+
+                    <input
+                        type="number"
+                        name="duration"
+                        class="form-control"
+                        value="<?php echo $row['duration_minutes']; ?>"
+                        required>
+                </div>
+
+                <!-- Genre -->
+                <div class="form-group">
+                    <label>Genre</label>
+
+                    <input
+                        type="text"
+                        name="genre"
+                        class="form-control"
+                        value="<?php echo htmlspecialchars($row['genre']); ?>">
+                </div>
+
+                <!-- Language -->
+                <div class="form-group">
+                    <label>Language</label>
+
+                    <input
+                        type="text"
+                        name="language"
+                        class="form-control"
+                        value="<?php echo htmlspecialchars($row['language']); ?>">
+                </div>
+
+                <!-- Movie Format -->
+                <div class="form-group">
+                    <label>Movie Format</label>
+
+                    <select name="format" class="form-control">
+
+                        <option value="2D"
+                        <?php if($row['movie_format']=="2D") echo "selected"; ?>>
+                            2D
+                        </option>
+
+                        <option value="3D"
+                        <?php if($row['movie_format']=="3D") echo "selected"; ?>>
+                            3D
+                        </option>
+
+                    </select>
+                </div>
+
+                <!-- Release Date -->
+                <div class="form-group">
+                    <label>Release Date</label>
+
+                    <input
+                        type="date"
+                        name="release_date"
+                        class="form-control"
+                        value="<?php echo $row['release_date']; ?>">
+                </div>
+
+            </div>
+
+            <!-- Poster -->
+            <div class="form-group">
+
+                <label>Movie Poster</label>
+
+                <input
+                    type="file"
+                    name="poster"
+                    class="form-control">
+
+                <?php
+                if(!empty($row['poster']))
+                {
+                    echo "<br><img src='../uploads/".$row['poster']."' width='120'>";
+                }
+                ?>
+
+            </div>
+
+            <!-- Description -->
+            <div class="form-group">
+
+                <label>Description</label>
+
+                <textarea
+                    name="description"
+                    class="form-control"
+                    rows="6"><?php echo htmlspecialchars($row['description']); ?></textarea>
+
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> Update Movie
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+</body>
