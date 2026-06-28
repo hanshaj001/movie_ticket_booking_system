@@ -34,22 +34,22 @@ $row = mysqli_fetch_assoc($result);
     <link rel="stylesheet" href="../Assets/add_movie.css">
 </head>
 <body>
-
-<div class="main-content">
-
+<div class="main-container">
+    <div class="content-area">
 
     <div class="page-header">
-        <div class="header-icon">
-            <i class="fas fa-edit"></i>
-        </div>
-
-        <div>
-            <h2>Edit Movie</h2>
-            <p>Update movie information</p>
+        <div class="page-title">
+            <div class="title-icon">
+                <i class="fas fa-edit"></i>
+            </div>
+            <div>
+                <h1>Edit Movie</h1>
+                <p>Update movie information</p>
+            </div>
         </div>
     </div>
 
-    <div class="form-container">
+    <div class="form-card">
 
         <form action="update_movie.php" method="POST" enctype="multipart/form-data">
 
@@ -137,7 +137,7 @@ $row = mysqli_fetch_assoc($result);
             </div>
 
             <!-- Poster -->
-            <div class="form-group">
+            <div class="form-group full-width">
 
                 <label>Movie Poster</label>
 
@@ -156,7 +156,7 @@ $row = mysqli_fetch_assoc($result);
             </div>
 
             <!-- Description -->
-            <div class="form-group">
+            <div class="form-group full-width">
 
                 <label>Description</label>
 
@@ -167,13 +167,13 @@ $row = mysqli_fetch_assoc($result);
 
             </div>
 
-            <button type="submit" class="btn btn-primary">
-                <i class="fas fa-save"></i> Update Movie
+            <button type="submit" class="submit-btn" style="width: 100%; margin-top: 20px;">
+                Update Movie
             </button>
 
         </form>
 
     </div>
-
+    </div>
 </div>
 </body>
