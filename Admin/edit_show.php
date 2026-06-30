@@ -278,7 +278,8 @@ if(isset($_POST['update_show']))
                      WHERE show_id='$show_id'"
                 )
             );
-        header("Location: add_show.php");
+        header("Location: add_show.php?msg=Show updated successfully&type=success");
+        exit();
         }
         else
         {
