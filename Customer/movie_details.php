@@ -296,45 +296,33 @@ if ($shows_list_result && mysqli_num_rows($shows_list_result) > 0) {
                                 <div class="showtime-row-card <?php echo $is_sold_out ? 'card-soldout' : ''; ?>"
                                      data-format="<?php echo htmlspecialchars($movie_record['movie_format']); ?>">
 
-                                    <?php if ($is_cutoff_warning): ?>
-                                        <div class="cutoff-warning">
-                                            <i class="fa-solid fa-triangle-exclamation"></i>
-                                            Starts in <?php echo $countdown_label; ?> &mdash; Cancellation no longer allowed after booking!
-                                        </div>
-                                    <?php endif; ?>
-
-                                    <div class="card-body-row">
+                                        <div class="card-body-row">
                                         <!-- Left: Screen & Time -->
                                         <div class="card-left-info">
-                                            <div class="screen-indicator">
-                                                <i class="fa-solid fa-tv"></i> <?php echo htmlspecialchars($show_row['screen_name']); ?>
+                                            <div class="info-box">
+                                                <i class="fa-solid fa-tv"></i>
+                                                <span><?php echo htmlspecialchars($show_row['screen_name']); ?></span>
                                             </div>
-                                            <div class="show-time-badge">
-                                                <i class="fa-regular fa-clock"></i> <?php echo htmlspecialchars(date('h:i A', strtotime($show_row['show_time']))); ?>
-                                            </div>
-                                            <div class="countdown-badge <?php echo $is_cutoff_warning ? 'countdown-urgent' : ''; ?>">
-                                                <i class="fa-solid fa-hourglass-half"></i> Starts in <?php echo $countdown_label; ?>
+                                            <div class="info-box">
+                                                <i class="fa-regular fa-clock"></i>
+                                                <span><?php echo htmlspecialchars(date('h:i A', strtotime($show_row['show_time']))); ?></span>
                                             </div>
                                         </div>
 
-                                        <!-- Mid: Price, Seats, Format -->
+                                        <!-- Mid: Price, Seats, Status -->
                                         <div class="card-mid-price-seats">
-                                            <div class="price-indicator">
-                                                Rs. <?php echo htmlspecialchars(number_format($show_row['ticket_price'], 2)); ?>
+                                            <div class="info-box price-box">
+                                                <i class="fa-solid fa-indian-rupee-sign"></i>
+                                                <span><?php echo htmlspecialchars(number_format($show_row['ticket_price'], 2)); ?></span>
                                             </div>
 
-                                            <!-- SEAT PROGRESS BAR -->
-                                            <div class="seat-progress-wrapper">
-                                                <div class="seat-progress-bar">
-                                                    <div class="seat-progress-fill <?php echo $is_sold_out ? 'fill-soldout' : ($is_fast_filling ? 'fill-fastfilling' : 'fill-available'); ?>"
-                                                         style="width: <?php echo $fill_pct; ?>%;"></div>
-                                                </div>
-                                                <span class="seat-progress-label">
-                                                    <?php echo $available_seats_count; ?> / <?php echo $total_seats_capacity; ?> seats available
-                                                </span>
+                                            <!-- Seat Info Box -->
+                                            <div class="info-box seats-box">
+                                                <i class="fa-solid fa-chair"></i>
+                                                <span><?php echo $available_seats_count; ?> / <?php echo $total_seats_capacity; ?></span>
                                             </div>
 
-                                            <div class="seats-status-indicator <?php echo $status_class; ?>">
+                                            <div class="info-box status-box <?php echo $status_class; ?>">
                                                 <i class="fa-solid fa-circle status-dot-icon"></i>
                                                 <span>
                                                     <?php if ($is_sold_out): ?>
@@ -347,8 +335,9 @@ if ($shows_list_result && mysqli_num_rows($shows_list_result) > 0) {
                                                 </span>
                                             </div>
 
-                                            <div class="format-indicator">
-                                                <i class="fa-solid fa-film"></i> <?php echo htmlspecialchars($movie_record['movie_format']); ?>
+                                            <div class="info-box format-box">
+                                                <i class="fa-solid fa-film"></i>
+                                                <span><?php echo htmlspecialchars($movie_record['movie_format']); ?></span>
                                             </div>
                                         </div>
 

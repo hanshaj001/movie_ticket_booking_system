@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let refreshInterval = null;
     let sessionStarted = false;
     let navigatingAway = false;
+    let sessionCleaned = false;
 
     function init() {
         // Initialize selected seats state from checked checkboxes
@@ -34,19 +35,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function setupNavigationWarnings() {
         // Add beforeunload listener - shows native browser warning
-        window.addEventListener('beforeunload', async (e) => {
-            if (selectedSeats.length > 0 && !navigatingAway) {
-                e.preventDefault();
-                e.returnValue = 'You have selected seats! Are you sure you want to leave? Your selected seats will be unselected.';
-                // Try to clean up in case user confirms
-                try {
-                    await cleanupSessionOnLeave();
-                } catch (err) {
-                    console.error('Error cleaning up on beforeunload:', err);
-                }
-                return e.returnValue;
-            }
-        });
+                    window.addEventListener('beforeunload', (e) => {
+                        if (!navigatingAway && selectedSeats.length > 0) {
+                            cleanupSessionOnLeave();
+                            e.preventDefault();
+                            e.returnValue = '';
+                            return '';
+                        }
+                    });
 
         // Add warning to back to movie button
         const backBtn = document.querySelector('.btn-back');
@@ -79,9 +75,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Function to clean up session when leaving
     async function cleanupSessionOnLeave() {
+            if (sessionCleaned) {
+           return;
+    }
+        sessionCleaned = true;
         try {
             const formData = new FormData();
-            formData.append('show_id', showId);
+
+                formData.append('show_id', showId);
+                formData.append('movie_id', movieId);
+
+            if (navigator.sendBeacon) {
+                const beaconSent = navigator.sendBeacon(
+                    'seat_selection.php?action=cancel_session',
+                    formData
+                );
+                if (beaconSent) {
+                    return;
+                }
+            }
+
             await fetch('seat_selection.php?action=cancel_session', {
                 method: 'POST',
                 body: formData,
@@ -115,23 +128,30 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    async function checkExistingSession() {
-        try {
-            const response = await fetch(`seat_selection.php?action=check_session&show_id=${showId}`);
-            const data = await response.json();
-            
-            if (data.has_session) {
-                expiryTimestamp = new Date(data.expiry_time).getTime();
-                startCountdown();
-                sessionStarted = true;
-            }
-            // Start refresh regardless
+async function checkExistingSession() {
+    try {
+        const response = await fetch(`seat_selection.php?action=check_session&show_id=${showId}`);
+        const data = await response.json();
+
+        if (data.has_session) {
+            expiryTimestamp = new Date(data.expiry_time).getTime();
+            startCountdown();
+            sessionStarted = true;
+        }
+
+        if (!refreshInterval) {
             startSeatRefresh();
-        } catch (error) {
-            console.error('Error checking session:', error);
+        }
+
+    } catch (error) {
+
+        console.error('Error checking session:', error);
+
+        if (!refreshInterval) {
             startSeatRefresh();
         }
     }
+}
 
     async function handleSeatToggle(e) {
         const checkbox = e.target;
@@ -241,17 +261,24 @@ document.addEventListener('DOMContentLoaded', () => {
         if (countdownInterval) {
             clearInterval(countdownInterval);
         }
-        countdownInterval = setInterval(updateTimerDisplay, 1000);
+        countdownInterval = setInterval(async () => {
+            await updateTimerDisplay();
+        }, 1000);
     }
 
-    function updateTimerDisplay() {
+    async function updateTimerDisplay() {
         const now = Date.now();
         const diff = expiryTimestamp - now;
 
         if (diff <= 0) {
-            clearInterval(countdownInterval);
-            alert('Your booking session has expired! Please select seats again.');
-            window.location.href = `movie_details.php?movie_id=${showId}`;
+               clearInterval(countdownInterval);
+                    clearInterval(refreshInterval);
+                    await cleanupSessionOnLeave();
+                    selectedSeats = [];
+                    totalPrice = 0;
+                    sessionStarted = false;
+                    alert("Your booking session has expired!");
+                    window.location.href = `movie_details.php?movie_id=${movieId}`;
             return;
         }
 
@@ -279,6 +306,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function refreshSeatStatus() {
+        if (!sessionStarted) {
+       return;
+}
         try {
             const response = await fetch(`seat_selection.php?action=get_seats&show_id=${showId}`);
             const data = await response.json();
@@ -336,19 +366,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function handleCancel() {
         if (confirm('Are you sure you want to cancel your seat selection?')) {
-            if (selectedSeats.length > 0) {
-                try {
-                    const formData = new FormData();
-                    formData.append('show_id', showId);
-                    await fetch('seat_selection.php?action=cancel_session', {
-                        method: 'POST',
-                        body: formData
-                    });
-                } catch (error) {
-                    console.error('Error canceling session:', error);
-                }
+            try {
+                await cleanupSessionOnLeave();
+            } catch (error) {
+                console.error('Error canceling session:', error);
             }
-            window.location.href = `movie_details.php?movie_id=${showId}`;
+            window.location.href = `movie_details.php?movie_id=${movieId}`;
         }
     }
 
@@ -364,7 +387,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!confirm(confirmMessage)) {
             e.preventDefault();
         } else {
+
             navigatingAway = true;
+
+            clearInterval(countdownInterval);
+            clearInterval(refreshInterval);
+
         }
     }
 
