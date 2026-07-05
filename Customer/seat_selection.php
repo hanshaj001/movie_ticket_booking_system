@@ -1,4 +1,4 @@
-<?php
+`<?php
 // Initialize system secure authentication tracking session
 // if (session_status() === PHP_SESSION_NONE) {
 //     session_start();
@@ -21,19 +21,41 @@ $current_datetime = date('Y-m-d H:i:s');
 
 $user_id = 2; // Demo user
 
+
 // Clean expired sessions
-$cleanup = "UPDATE booking_sessions SET session_status = 'EXPIRED' WHERE session_status = 'ACTIVE' AND expiry_time < NOW()";
-mysqli_query($conn, $cleanup);
+// Release locked seats first
+mysqli_query($conn, "
+UPDATE show_seats ss
+INNER JOIN seat_locks sl
+    ON ss.show_seat_id = sl.show_seat_id
+INNER JOIN booking_sessions bs
+    ON sl.session_id = bs.session_id
+SET
+    ss.seat_status = 'AVAILABLE'
+WHERE
+    bs.expiry_time <= NOW()
+    AND bs.session_status = 'ACTIVE'
+");
 
-$cleanup_locks = "DELETE sl FROM seat_locks sl JOIN booking_sessions bs ON sl.session_id = bs.session_id WHERE bs.session_status = 'EXPIRED'";
-mysqli_query($conn, $cleanup_locks);
+// Delete expired seat locks
+mysqli_query($conn, "
+DELETE sl
+FROM seat_locks sl
+INNER JOIN booking_sessions bs
+    ON sl.session_id = bs.session_id
+WHERE
+    bs.expiry_time <= NOW()
+    AND bs.session_status = 'ACTIVE'
+");
 
-$update_seats = "UPDATE show_seats ss 
-                 JOIN seat_locks sl ON ss.show_seat_id = sl.show_seat_id 
-                 JOIN booking_sessions bs ON sl.session_id = bs.session_id 
-                 SET ss.seat_status = 'AVAILABLE' 
-                 WHERE bs.session_status = 'EXPIRED' AND ss.seat_status = 'LOCKED'";
-mysqli_query($conn, $update_seats);
+// Mark booking session expired
+mysqli_query($conn, "
+UPDATE booking_sessions
+SET session_status='EXPIRED'
+WHERE
+    expiry_time <= NOW()
+    AND session_status='ACTIVE'
+");
 
 // Handle AJAX
 if (isset($_GET['action'])) {
@@ -463,6 +485,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_booking'])) {
                                                class="seat-label <?php echo $seat_class; ?>"
                                                data-show-seat-id="<?php echo $seat['show_seat_id']; ?>">
                                             <span class="seat-number"><?php echo htmlspecialchars($seat['seat_number']); ?></span>
+                                            <?php if (strtoupper($seat['seat_type']) === 'VIP'): ?>
+                                                <span class="vip-label">VIP</span>
+                                            <?php endif; ?>
                                         </label>
                                     </div>
                                 <?php endforeach; ?>
@@ -487,10 +512,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_booking'])) {
                     <div class="legend-item">
                         <div class="legend-seat sold"></div>
                         <span>Sold</span>
-                    </div>
-                    <div class="legend-item">
-                        <div class="legend-seat vip available"></div>
-                        <span>VIP</span>
                     </div>
                 </div>
             </form>
@@ -542,9 +563,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_booking'])) {
 
     <script>
         const showId = <?php echo $show_id; ?>;
+        const movieId = <?php echo intval($show['movie_id']); ?>;
         const ticketPrice = <?php echo $show['ticket_price']; ?>;
     </script>
     <script src="../Assets/js/seat_selection.js"></script>
 </body>
 </html>
 <?php mysqli_close($conn); ?>
+`
