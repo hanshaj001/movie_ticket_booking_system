@@ -277,7 +277,7 @@ if (isset($_POST['add_movie'])) {
                 <div class="action-buttons">
                     <a href="view_movie.php?id=<?= $movie['movie_id']; ?>" class="view-btn">View</a>
                     <a href="edit_movie.php?id=<?= $movie['movie_id']; ?>" class="edit-btn">Edit</a>
-                    <a href="delete_movie.php?id=<?= $movie['movie_id']; ?>" class="cancel-btn" onclick="return confirm('Delete this movie?');">Delete</a>
+                    <a href="cancel_movie.php?id=<?= $movie['movie_id']; ?>" class="cancel-btn" onclick="return confirm('Delete this movie?');">Delete</a>
                 </div>
             </div>
         </div>
