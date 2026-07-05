@@ -17,6 +17,15 @@
     --radius-sm: 16px;
     --gradient-primary: linear-gradient(135deg, #ff4d2d 0%, #ff6b4a 100%);
     --bg-light: #f8f9fc;
+
+    /* Status / info-box color pairs (bg-start, bg-end, fg) — used to remove
+       repeated linear-gradient declarations across price/seat/status/format boxes */
+    --green-bg1: #e8fff1;  --green-bg2: #d4ffdf;  --green-fg: #14a44d;
+    --amber-bg1: #fff8e6;  --amber-bg2: #fff0cc;  --amber-fg: #f59f00;
+    --red-bg1:   #ffe8e3;  --red-bg2:   #ffd0c4;  --red-fg:   #ff4d2d;
+    --blue-bg1:  #e6f3ff;  --blue-bg2:  #cce6ff;  --blue-fg:  #1e40af;
+    --purple-bg1:#f0f0ff;  --purple-bg2:#e0e0ff;  --purple-fg:#6366f1;
+    --orange-bg1:#fff3e6;  --orange-bg2:#ffe0cc;  --orange-fg: var(--accent);
 }
 
 /* ── Base ─────────────────────────────────────────────── */
@@ -300,16 +309,26 @@ body.movie-details-body {
     flex: 1 1 300px;
 }
 
-/* ── Sticky Date Bar ──────────────────────────────────── */
+/* ── Date Bar ─────────────────────────────────────────────
+   FIX: this was previously `position: sticky; top: 16px;`
+   (class name "sticky-dates" kept as-is so the PHP markup
+   doesn't need to change, but it is no longer sticky).
+   A sticky element re-floats over whatever follows it once
+   you scroll past its offset, which is exactly the overlap
+   you were seeing. It's now a normal block that stays put in
+   the document flow on every screen size, so no separate
+   mobile override is needed anymore either. ────────────── */
 .sticky-dates {
-    position: sticky;
-    top: 70px;
-    z-index: 100;
+    position: static;
+    margin-bottom: 20px;
+    background: rgba(255, 255, 255, 0.96);
 }
 
 .date-tabs-scroll-container {
     overflow-x: auto;
     padding-bottom: 8px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--accent) #ececf3;
 }
 
 .date-tabs-scroll-container::-webkit-scrollbar {
@@ -317,7 +336,7 @@ body.movie-details-body {
 }
 
 .date-tabs-scroll-container::-webkit-scrollbar-thumb {
-    background: linear-gradient(90deg, var(--accent) 0%, #ff6b4a 100%);
+    background: var(--gradient-primary);
     border-radius: 10px;
 }
 
@@ -472,7 +491,7 @@ body.movie-details-body {
     transform: translateY(-2px);
 }
 
-/* ── Showtime Cards (Improved Design) ─────────────────── */
+/* ── Showtime Cards ────────────────────────────────────── */
 .showtime-cards-stack {
     display: flex;
     flex-direction: column;
@@ -495,7 +514,7 @@ body.movie-details-body {
     top: 0;
     bottom: 0;
     width: 5px;
-    background: linear-gradient(180deg, var(--accent) 0%, #ff6b4a 100%);
+    background: var(--gradient-primary);
     opacity: 0;
     transition: opacity 0.3s ease;
 }
@@ -538,51 +557,25 @@ body.movie-details-body {
 /* ── Card Body ───────────────────────────────────────── */
 .card-body-row {
     display: grid;
-    grid-template-columns: 1.2fr 1.5fr 1fr;
-    gap: 0;
+    grid-template-columns: 1fr 1.5fr 1fr;
+    gap: 16px;
     padding: 24px;
 }
 
 .card-left-info {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    padding-right: 20px;
+    gap: 12px;
+    padding-right: 16px;
     border-right: 2px solid var(--border);
-}
-
-.screen-indicator {
-    font-size: 16px;
-    font-weight: 800;
-    color: var(--text-primary);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.screen-indicator i {
-    color: var(--accent);
-    font-size: 18px;
-}
-
-.show-time-badge {
-    font-size: 28px;
-    font-weight: 800;
-    color: var(--text-primary);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.show-time-badge i {
-    color: var(--accent);
+    justify-content: center;
 }
 
 .countdown-badge {
     font-size: 12px;
     font-weight: 700;
-    color: #14a44d;
-    background: linear-gradient(135deg, #e8fff1 0%, #d4ffdf 100%);
+    color: var(--green-fg);
+    background: linear-gradient(135deg, var(--green-bg1) 0%, var(--green-bg2) 100%);
     padding: 6px 12px;
     border-radius: 50px;
     display: inline-flex;
@@ -592,107 +585,86 @@ body.movie-details-body {
 }
 
 .countdown-urgent {
-    background: linear-gradient(135deg, #fff8e6 0%, #fff0cc 100%) !important;
-    color: #c87800 !important;
+    background: linear-gradient(135deg, var(--amber-bg1) 0%, var(--amber-bg2) 100%) !important;
+    color: var(--amber-fg) !important;
+}
+
+/* Info boxes */
+.info-box {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 16px;
+    background: #f5f5f8;
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--text-primary);
+    width: fit-content;
+}
+
+.info-box i {
+    color: var(--accent);
+    font-size: 16px;
 }
 
 /* Middle section */
 .card-mid-price-seats {
     display: flex;
-    flex-direction: column;
-    gap: 14px;
-    padding: 0 24px;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 0 16px;
+    justify-content: flex-start;
+    align-items: center;
 }
 
-.price-indicator {
-    font-size: 26px;
-    font-weight: 900;
-    background: linear-gradient(135deg, var(--accent) 0%, #ff6b4a 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+/* Colored info-box variants: price / seats / status / format.
+   These previously each hard-coded their own two-stop gradient;
+   they now just plug the shared color pairs from :root into the
+   same pattern. */
+.price-box,
+.seats-box,
+.format-box {
+    background-image: linear-gradient(135deg, var(--box-bg1) 0%, var(--box-bg2) 100%);
+    color: var(--box-fg);
 }
 
-.seat-progress-wrapper {
-    width: 100%;
+.price-box,
+.seats-box,
+.format-box,
+.status-box {
+    --box-bg1: initial;
+    --box-bg2: initial;
+    --box-fg: initial;
 }
 
-.seat-progress-bar {
-    height: 10px;
-    background: #f0f0f5;
-    border-radius: 20px;
-    overflow: hidden;
-    margin-bottom: 6px;
-    box-shadow: inset 0 2px 6px rgba(0,0,0,0.05);
-}
+.price-box { --box-bg1: var(--orange-bg1); --box-bg2: var(--orange-bg2); --box-fg: var(--orange-fg); font-size: 18px; font-weight: 900; }
+.price-box i { color: var(--box-fg); }
 
-.seat-progress-fill {
-    height: 100%;
-    border-radius: 20px;
-    transition: width 0.5s ease;
-}
+.seats-box { --box-bg1: var(--blue-bg1); --box-bg2: var(--blue-bg2); --box-fg: var(--blue-fg); }
+.seats-box i { color: var(--box-fg); }
 
-.fill-available {
-    background: linear-gradient(90deg, #14a44d 0%, #22c55e 100%);
-}
+.format-box { --box-bg1: var(--purple-bg1); --box-bg2: var(--purple-bg2); --box-fg: var(--purple-fg); }
+.format-box i { color: var(--box-fg); }
 
-.fill-fastfilling {
-    background: linear-gradient(90deg, #f59f00 0%, #fbbf24 100%);
-}
-
-.fill-soldout {
-    background: linear-gradient(90deg, #ff4d2d 0%, #ff6b4a 100%);
-}
-
-.seat-progress-label {
-    font-size: 13px;
-    color: var(--text-muted);
-    font-weight: 600;
-}
-
-.seats-status-indicator {
+.status-box {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    padding: 8px 14px;
-    border-radius: 50px;
-    font-size: 12px;
+    padding: 8px 16px;
+    border-radius: 16px;
+    font-size: 13px;
     font-weight: 800;
     width: fit-content;
+    background-image: linear-gradient(135deg, var(--box-bg1) 0%, var(--box-bg2) 100%);
+    color: var(--box-fg);
 }
 
-.status-dot-icon {
-    font-size: 10px;
-}
-
-.status-available {
-    background: linear-gradient(135deg, #e8fff1 0%, #d4ffdf 100%);
-    color: #14a44d;
-}
-
-.status-fastfilling {
-    background: linear-gradient(135deg, #fff8e6 0%, #fff0cc 100%);
-    color: #f59f00;
-}
-
-.status-soldout {
-    background: linear-gradient(135deg, #ffe8e3 0%, #ffd0c4 100%);
-    color: #ff4d2d;
-}
-
-.format-indicator {
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--text-secondary);
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    width: fit-content;
-}
-
-.format-indicator i {
-    color: var(--accent);
-}
+.status-box.status-available   { --box-bg1: var(--green-bg1); --box-bg2: var(--green-bg2); --box-fg: var(--green-fg); }
+.status-box.status-fastfilling { --box-bg1: var(--amber-bg1); --box-bg2: var(--amber-bg2); --box-fg: var(--amber-fg); }
+.status-box.status-soldout     { --box-bg1: var(--red-bg1);   --box-bg2: var(--red-bg2);   --box-fg: var(--red-fg); }
+.status-box i { color: var(--box-fg); }
 
 /* Right section (Button) */
 .card-right-action {
@@ -1031,10 +1003,6 @@ body.movie-details-body {
         margin-top: 0;
     }
 
-    .sticky-dates {
-        top: 60px;
-    }
-
     .hero-movie-title {
         font-size: 26px;
     }
@@ -1126,4 +1094,4 @@ body.movie-details-body {
     .tab-day-name {
         font-size: 10px;
     }
-}
+}   
