@@ -7,7 +7,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const timerCard = document.getElementById('timerCard');
     const timerValueEl = document.getElementById('timerValue');
     const confirmBtn = document.getElementById('confirmBtn');
-    const cancelBtn = document.getElementById('cancelBtn');
     const bookingForm = document.getElementById('bookingForm');
     const sessionPopup = document.getElementById('sessionPopup');
 
@@ -16,102 +15,23 @@ document.addEventListener('DOMContentLoaded', () => {
     let countdownInterval = null;
     let expiryTimestamp = null;
     let refreshInterval = null;
-    let sessionStarted = false;
-    let navigatingAway = false;
-    let sessionCleaned = false;
 
     function init() {
-        // Initialize selected seats state from checked checkboxes
+        // Initialize state directly from what PHP rendered on the page
         checkboxes.forEach(checkbox => {
             if (checkbox.checked) {
                 addSeatToState(checkbox.value, checkbox);
             }
         });
-        
-        checkExistingSession();
+
+        // If PHP passed an existing session time, start the timer instantly
+        if (typeof initialExpiryTime !== 'undefined' && initialExpiryTime) {
+            expiryTimestamp = new Date(initialExpiryTime).getTime();
+            startCountdown();
+        }
+
         setupEventListeners();
-        setupNavigationWarnings();
-    }
-
-    function setupNavigationWarnings() {
-        // Add beforeunload listener - shows native browser warning
-                    window.addEventListener('beforeunload', (e) => {
-                        if (!navigatingAway && selectedSeats.length > 0) {
-                            cleanupSessionOnLeave();
-                            e.preventDefault();
-                            e.returnValue = '';
-                            return '';
-                        }
-                    });
-
-        // Add warning to back to movie button
-        const backBtn = document.querySelector('.btn-back');
-        if (backBtn) {
-            backBtn.addEventListener('click', async (e) => {
-                if (selectedSeats.length > 0) {
-                    e.preventDefault();
-                    if (confirm('You have selected seats! Are you sure you want to leave? Your selected seats will be unselected.')) {
-                        navigatingAway = true;
-                        await handleCancel();
-                    }
-                }
-            });
-        }
-
-        // Handle home button in navbar
-        const navbarHomeLink = document.querySelector('a[href="home.php"]');
-        if (navbarHomeLink) {
-            navbarHomeLink.addEventListener('click', async (e) => {
-                if (selectedSeats.length > 0) {
-                    e.preventDefault();
-                    if (confirm('You have selected seats! Are you sure you want to leave? Your selected seats will be unselected.')) {
-                        navigatingAway = true;
-                        await handleCancel();
-                    }
-                }
-            });
-        }
-    }
-
-    // Function to clean up session when leaving
-    async function cleanupSessionOnLeave() {
-            if (sessionCleaned) {
-           return;
-    }
-        sessionCleaned = true;
-        try {
-            const formData = new FormData();
-
-                formData.append('show_id', showId);
-                formData.append('movie_id', movieId);
-
-            if (navigator.sendBeacon) {
-                const beaconSent = navigator.sendBeacon(
-                    'seat_selection.php?action=cancel_session',
-                    formData
-                );
-                if (beaconSent) {
-                    return;
-                }
-            }
-
-            await fetch('seat_selection.php?action=cancel_session', {
-                method: 'POST',
-                body: formData,
-                keepalive: true
-            });
-        } catch (error) {
-            console.error('Error cleaning up session on leave:', error);
-        }
-    }
-
-    function showSessionPopup() {
-        if (sessionPopup) {
-            sessionPopup.classList.add('show');
-            setTimeout(() => {
-                sessionPopup.classList.remove('show');
-            }, 5000); // Hide after 5 seconds
-        }
+        refreshInterval = setInterval(refreshSeatStatus, 5000);
     }
 
     function setupEventListeners() {
@@ -119,46 +39,28 @@ document.addEventListener('DOMContentLoaded', () => {
             checkbox.addEventListener('change', handleSeatToggle);
         });
 
-        if (cancelBtn) {
-            cancelBtn.addEventListener('click', handleCancel);
-        }
+        document.getElementById('cancelBtn')?.addEventListener('click', () => {
+            if (confirm('Cancel selection and return to movie details?')) {
+                window.location.href = `movie_details.php?movie_id=${movieId}`;
+            }
+        });
 
-        if (bookingForm) {
-            bookingForm.addEventListener('submit', handleFormSubmit);
-        }
+        bookingForm?.addEventListener('submit', (e) => {
+            if (selectedSeats.length === 0) {
+                e.preventDefault();
+                alert('Please select at least one seat before confirming!');
+            } else {
+                clearInterval(countdownInterval);
+                clearInterval(refreshInterval);
+            }
+        });
     }
-
-async function checkExistingSession() {
-    try {
-        const response = await fetch(`seat_selection.php?action=check_session&show_id=${showId}`);
-        const data = await response.json();
-
-        if (data.has_session) {
-            expiryTimestamp = new Date(data.expiry_time).getTime();
-            startCountdown();
-            sessionStarted = true;
-        }
-
-        if (!refreshInterval) {
-            startSeatRefresh();
-        }
-
-    } catch (error) {
-
-        console.error('Error checking session:', error);
-
-        if (!refreshInterval) {
-            startSeatRefresh();
-        }
-    }
-}
 
     async function handleSeatToggle(e) {
         const checkbox = e.target;
         const seatId = checkbox.value;
         const isSelected = checkbox.checked;
 
-        // Optimistic update
         if (isSelected) {
             addSeatToState(seatId, checkbox);
         } else {
@@ -170,67 +72,59 @@ async function checkExistingSession() {
             formData.append('show_seat_id', seatId);
             formData.append('show_id', showId);
             formData.append('selected', isSelected ? '1' : '0');
+            formData.append('csrf_token', csrfToken);
 
-            const response = await fetch('seat_selection.php?action=toggle_seat', {
+            const response = await fetch(`seat_selection.php?action=toggle_seat`, {
                 method: 'POST',
+                headers: { 'X-CSRF-Token': csrfToken },
                 body: formData
             });
-
             const data = await response.json();
 
             if (data.success) {
-                if (isSelected && selectedSeats.length === 1 && !sessionStarted) {
-                    // First seat selected - start session and show popup
-                    if (data.expiry_time) {
-                        expiryTimestamp = new Date(data.expiry_time).getTime();
-                    } else {
-                        expiryTimestamp = Date.now() + (5 * 60 * 1000);
-                    }
+                if (isSelected && selectedSeats.length === 1 && !countdownInterval) {
+                    expiryTimestamp = data.expiry_time ? new Date(data.expiry_time.replace(/-/g, "/")).getTime() : Date.now() + 300000;
                     startCountdown();
-                    sessionStarted = true;
-                    showSessionPopup();
+                    if (sessionPopup) {
+                        sessionPopup.classList.add('show');
+                        setTimeout(() => sessionPopup.classList.remove('show'), 4000);
+                    }
                 }
             } else {
-                // Revert UI on error
-                if (isSelected) {
-                    checkbox.checked = false;
-                    removeSeatFromState(seatId);
-                } else {
-                    checkbox.checked = true;
-                    addSeatToState(seatId, checkbox);
-                }
-                alert(data.error || 'Failed to update seat selection');
+                revertSeatState(checkbox, seatId, isSelected);
+                alert(data.error || 'Seat is no longer available.');
             }
         } catch (error) {
-            console.error('Error toggling seat:', error);
-            // Revert
-            if (isSelected) {
-                checkbox.checked = false;
-                removeSeatFromState(seatId);
-            } else {
-                checkbox.checked = true;
-                addSeatToState(seatId, checkbox);
-            }
-            alert('Failed to update seat selection');
+            console.error('Error:', error);
+            revertSeatState(checkbox, seatId, isSelected);
+            alert('Server connection error. Please try again.');
         }
     }
 
+    function revertSeatState(checkbox, seatId, wasSelected) {
+        checkbox.checked = !wasSelected;
+        if (wasSelected) removeSeatFromState(seatId);
+        else addSeatToState(seatId, checkbox);
+    }
+
     function addSeatToState(seatId, checkbox) {
-        const seatNumber = checkbox.getAttribute('data-seat-number');
-        const price = parseFloat(checkbox.getAttribute('data-price'));
-        
-        if (!selectedSeats.some(s => s.id === parseInt(seatId))) {
-            selectedSeats.push({ id: parseInt(seatId), number: seatNumber, price: price });
+        const id = parseInt(seatId);
+        const num = checkbox.getAttribute('data-seat-number');
+        const price = parseFloat(checkbox.getAttribute('data-price')) || ticketPrice;
+       
+        if (!selectedSeats.some(s => s.id === id)) {
+            selectedSeats.push({ id, number: num, price });
             totalPrice += price;
             updateSummary();
         }
     }
 
     function removeSeatFromState(seatId) {
-        const seatIndex = selectedSeats.findIndex(s => s.id === parseInt(seatId));
-        if (seatIndex !== -1) {
-            totalPrice -= selectedSeats[seatIndex].price;
-            selectedSeats.splice(seatIndex, 1);
+        const id = parseInt(seatId);
+        const idx = selectedSeats.findIndex(s => s.id === id);
+        if (idx !== -1) {
+            totalPrice -= selectedSeats[idx].price;
+            selectedSeats.splice(idx, 1);
             updateSummary();
         }
     }
@@ -242,8 +136,7 @@ async function checkExistingSession() {
             totalAmountEl.textContent = 'Rs. 0.00';
             confirmBtn.disabled = true;
         } else {
-            const seatNumbers = selectedSeats.map(s => s.number).join(', ');
-            selectedSeatsEl.textContent = seatNumbers;
+            selectedSeatsEl.textContent = selectedSeats.map(s => s.number).join(', ');
             seatCountEl.textContent = selectedSeats.length;
             totalAmountEl.textContent = `Rs. ${totalPrice.toFixed(2)}`;
             confirmBtn.disabled = false;
@@ -254,146 +147,56 @@ async function checkExistingSession() {
     }
 
     function startCountdown() {
-        if (timerCard) {
-            timerCard.style.display = 'flex';
-        }
-        updateTimerDisplay();
-        if (countdownInterval) {
-            clearInterval(countdownInterval);
-        }
-        countdownInterval = setInterval(async () => {
-            await updateTimerDisplay();
-        }, 1000);
-    }
-
-    async function updateTimerDisplay() {
-        const now = Date.now();
-        const diff = expiryTimestamp - now;
-
-        if (diff <= 0) {
-               clearInterval(countdownInterval);
-                    clearInterval(refreshInterval);
-                    await cleanupSessionOnLeave();
-                    selectedSeats = [];
-                    totalPrice = 0;
-                    sessionStarted = false;
-                    alert("Your booking session has expired!");
-                    window.location.href = `movie_details.php?movie_id=${movieId}`;
-            return;
-        }
-
-        const minutes = Math.floor(diff / 60000);
-        const seconds = Math.floor((diff % 60000) / 1000);
-        const formattedMinutes = String(minutes).padStart(2, '0');
-        const formattedSeconds = String(seconds).padStart(2, '0');
-        
-        if (timerValueEl) {
-            timerValueEl.textContent = `${formattedMinutes}:${formattedSeconds}`;
-        }
-
-        if (timerCard) {
-            timerCard.classList.remove('warning', 'danger');
-            if (diff <= 60000) {
-                timerCard.classList.add('danger');
-            } else if (diff <= 120000) {
-                timerCard.classList.add('warning');
+        if (timerCard) timerCard.style.display = 'flex';
+        const updateTimer = () => {
+            const diff = expiryTimestamp - Date.now();
+            if (diff <= 0) {
+                clearInterval(countdownInterval);
+                alert("Your booking session has expired!");
+                window.location.href = `movie_details.php?movie_id=${movieId}`;
+                return;
             }
-        }
-    }
-
-    function startSeatRefresh() {
-        refreshInterval = setInterval(refreshSeatStatus, 5000);
+            const mins = Math.floor(diff / 60000);
+            const secs = Math.floor((diff % 60000) / 1000);
+            if (timerValueEl) timerValueEl.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        };
+        updateTimer();
+        countdownInterval = setInterval(updateTimer, 1000);
     }
 
     async function refreshSeatStatus() {
-        if (!sessionStarted) {
-       return;
-}
         try {
             const response = await fetch(`seat_selection.php?action=get_seats&show_id=${showId}`);
             const data = await response.json();
-            
-            if (data.seats) {
+           
+            if (data && Array.isArray(data.seats)) {
                 data.seats.forEach(seat => {
                     const checkbox = document.querySelector(`#seat-${seat.show_seat_id}`);
-                    const label = checkbox ? checkbox.nextElementSibling : null;
-                    
-                    if (checkbox && label) {
-                        // Check if this seat was selected by us
-                        const isSeatSelected = selectedSeats.some(s => s.id === seat.show_seat_id);
-                        
-                        if (isSeatSelected && !seat.is_locked_by_me) {
-                            // Our seat was taken by someone else!
-                            removeSeatFromState(seat.show_seat_id);
-                            checkbox.checked = false;
-                            alert(`Seat ${seat.seat_number} is no longer available!`);
-                        }
-
-                        // Update UI
-                        const seatType = seat.seat_type.toLowerCase();
-                        let newClass = 'seat-label ' + seatType;
-                        
-                        if (seat.is_locked_by_me || checkbox.checked) {
-                            newClass += ' selected';
-                        } else if (seat.seat_status === 'SOLD') {
-                            newClass += ' sold';
-                        } else if (seat.seat_status === 'LOCKED') {
-                            newClass += ' locked';
-                        } else {
-                            newClass += ' available';
-                        }
-
-                        label.className = newClass;
-                        
-                        // Update disabled status
-                        if (seat.is_locked_by_me || checkbox.checked) {
-                            checkbox.disabled = false;
-                        } else if (seat.seat_status !== 'AVAILABLE') {
-                            checkbox.disabled = true;
-                        } else {
-                            checkbox.disabled = false;
-                        }
-
-                        checkbox.setAttribute('data-status', seat.seat_status);
-                        checkbox.setAttribute('data-is-locked-by-me', seat.is_locked_by_me ? 'true' : 'false');
+                    if (!checkbox) return;
+                   
+                    const label = checkbox.nextElementSibling;
+                    const isSelectedByMe = selectedSeats.some(s => s.id === parseInt(seat.show_seat_id));
+                   
+                    if (isSelectedByMe && !seat.is_locked_by_me && seat.seat_status !== 'AVAILABLE') {
+                        removeSeatFromState(seat.show_seat_id);
+                        checkbox.checked = false;
+                        alert(`Seat ${seat.seat_number} reservation timed out or was claimed by another customer.`);
                     }
+
+                    if (label) {
+                        const type = (seat.seat_type || 'REGULAR').toLowerCase();
+                        let classes = ['seat-label', type];
+                        if (seat.is_locked_by_me || checkbox.checked) classes.push('selected');
+                        else if (seat.seat_status === 'SOLD') classes.push('sold');
+                        else if (seat.seat_status === 'LOCKED') classes.push('locked');
+                        else classes.push('available');
+                        label.className = classes.join(' ');
+                    }
+
+                    checkbox.disabled = (!seat.is_locked_by_me && seat.seat_status !== 'AVAILABLE');
                 });
             }
-        } catch (error) {
-            console.error('Error refreshing seats:', error);
-        }
-    }
-
-    async function handleCancel() {
-        if (confirm('Are you sure you want to cancel your seat selection?')) {
-            try {
-                await cleanupSessionOnLeave();
-            } catch (error) {
-                console.error('Error canceling session:', error);
-            }
-            window.location.href = `movie_details.php?movie_id=${movieId}`;
-        }
-    }
-
-    function handleFormSubmit(e) {
-        if (selectedSeats.length === 0) {
-            e.preventDefault();
-            alert('Please select at least one seat!');
-            return;
-        }
-        const confirmMessage = selectedSeats.length === 1 
-            ? 'Are you sure you want to book this seat?' 
-            : `Are you sure you want to book these ${selectedSeats.length} seats?`;
-        if (!confirm(confirmMessage)) {
-            e.preventDefault();
-        } else {
-
-            navigatingAway = true;
-
-            clearInterval(countdownInterval);
-            clearInterval(refreshInterval);
-
-        }
+        } catch (e) { console.error('Poller error:', e); }
     }
 
     init();
