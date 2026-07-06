@@ -41,13 +41,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
             exit();
 
-        } else {
-            $error = "Invalid password!";
-        }
+       } else {
+    $error = "Invalid email or password!";
+}
 
-    } else {
-        $error = "User not found!";
-    }
+} else {
+    $error = "Invalid email or password!";
+}
 }
 ?>
 
@@ -75,7 +75,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <input type="email" name="email" placeholder="Enter email" required>
 
             <label>Password</label>
-            <input type="password" name="password" placeholder="Enter password" required>
+
+<div class="password-container">
+    <input type="password"
+           id="password"
+           name="password"
+           placeholder="Enter password"
+           required>
+
+    <span class="toggle-password" onclick="togglePassword()">
+        👁
+    </span>
+</div>
 
             <button type="submit">Login</button>
         </form>
@@ -86,6 +97,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </div>
 
 </div>
+<script>
+function togglePassword() {
+    const password = document.getElementById("password");
+
+    if (password.type === "password") {
+        password.type = "text";
+    } else {
+        password.type = "password";
+    }
+}
+</script>
 
 </body>
 </html>
