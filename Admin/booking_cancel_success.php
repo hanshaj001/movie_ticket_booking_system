@@ -7,7 +7,7 @@ $id = $_GET['id'];
 <head>
 <meta charset="UTF-8">
 <title>Booking Cancelled</title>
-<link rel="stylesheet" href="../Assets/cancel_success.css">
+<link rel="stylesheet" href="../Assets/css/Admin/cancel_success.css">
 </head>
 <body>
 
