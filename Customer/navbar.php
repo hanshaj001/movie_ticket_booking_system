@@ -19,7 +19,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Customer Panel - MTBS</title>
 
-    <link rel="stylesheet" href="../Assets/Customer/navbar.css">
+    <link rel="stylesheet" href="../Assets/css/Customer/navbar.css">
 
     <link rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">

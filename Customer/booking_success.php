@@ -1,14 +1,17 @@
 <?php
 // Initialize system secure authentication tracking session
-// if (session_status() === PHP_SESSION_NONE) {
-//     session_start();
-// }
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
-// // 1. Access Control Validation: Verify user login status
-// if (!isset($_SESSION['user_id'])) {
-//     header("Location: home.php");
-//     exit();
-// }
+     include_once 'navbar.php'; 
+
+
+// 1. Access Control Validation: Verify user login status
+if (!isset($_SESSION['user_id'])) {
+    header("Location: home.php");
+    exit();
+}
 
 require_once '../Includes/db_conn.php';
 
@@ -58,6 +61,7 @@ while ($seat = mysqli_fetch_assoc($seats_result)) {
     <title>Booking Successful!</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="../Assets/css/Customer/booking_success.css">
 
 </head>
 <body>

@@ -1,20 +1,20 @@
 <?php
 // Securely initialize or resume the session context
-// if (session_status() === PHP_SESSION_NONE) {
-//     session_start();
-// }
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
-// // Enforce authentication context boundaries
-// if (!isset($_SESSION['user_id'])) {
-//     header("Location: home.php");
-//     exit();
-// }
+// Enforce authentication context boundaries
+if (!isset($_SESSION['user_id'])) {
+    header("Location: home.php");
+    exit();
+}
 
-// // Enforce role-based structural access boundaries
-// if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'CUSTOMER') {
-//     header("Location: home.php");
-//     exit();
-// }
+// Enforce role-based structural access boundaries
+if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'CUSTOMER') {
+    header("Location: home.php");
+    exit();
+}
 
 require_once '../Includes/db_conn.php';
 
