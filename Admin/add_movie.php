@@ -1,10 +1,10 @@
 <?php
-include '../Includes/sidebar.php';
-require_once '../includes/db_conn.php';
+require_once '../Includes/db_conn.php';
+include 'components/sidebar.php';
 
 // Authentication check
 if (!isset($_SESSION['user_id'])) {
-    header("Location: ../Includes/login.php");
+    header("Location: ../login.php");
     exit();
 }
 
@@ -111,7 +111,7 @@ if (isset($_POST['add_movie'])) {
     if (empty($errors)) {
         $extension = strtolower(pathinfo($_FILES['poster']['name'], PATHINFO_EXTENSION));
         $poster_name = time() . "_" . uniqid() . "." . $extension;
-        $upload_path = "../uploads/movie_posters/" . $poster_name;
+        $upload_path = "../Assets/uploads/movie_posters/" . $poster_name;
 
         if (move_uploaded_file($_FILES['poster']['tmp_name'], $upload_path)) {
             $stmt = $conn->prepare("INSERT INTO movies (title, description, duration_minutes, genre, language, release_date, movie_format, poster_url, status) VALUES (?,?,?,?,?,?,?,?,'ACTIVE')");
@@ -137,7 +137,7 @@ if (isset($_POST['add_movie'])) {
 <head>
     <meta charset="UTF-8">
     <title>Add Movie - Admin Panel</title>
-    <link rel="stylesheet" href="../Assets/add_movie.css">
+    <link rel="stylesheet" href="../Assets/css/Admin/add_movie.css">
 </head>
 <body>
 <div class="main-container">
@@ -247,7 +247,7 @@ if (isset($_POST['add_movie'])) {
     <?php while ($movie = $movieQuery->fetch_assoc()) : ?>
         <div class="movie-card">
             <div class="movie-poster">
-                <img src="../uploads/movie_posters/<?= htmlspecialchars($movie['poster_url']); ?>" alt="<?= htmlspecialchars($movie['title']); ?>">
+                <img src="../Assets/uploads/movie_posters/<?= htmlspecialchars($movie['poster_url']); ?>" alt="<?= htmlspecialchars($movie['title']); ?>">
             </div>
 
             <div class="movie-content">

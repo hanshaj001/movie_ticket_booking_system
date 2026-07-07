@@ -85,7 +85,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <nav class="navbar">
             <ul>
                 <li>
-                    <a href="../index.php">
+                    <a href="../login.php">
                         Home
                     </a>
                 </li>
