@@ -6,20 +6,20 @@ font-family:'Segoe UI',sans-serif;
 }
 
 body{
-background:#0f172a;
-color:white;
+background:white;
+color:rgb(7, 7, 7);
 }
 
 /* Hero Section */
 
 .hero{
 height:450px;
-background:
-linear-gradient(
+background:white;
+/* linear-gradient(
 rgba(0,0,0,.7),
 rgba(0,0,0,.7)
 ),
-url('../images/banner.jpg');
+url('../images/banner.jpg'); */
 
 background-size:cover;
 background-position:center;
@@ -38,7 +38,7 @@ margin-bottom:15px;
 .hero-content p{
 font-size:20px;
 margin-bottom:25px;
-color:#cbd5e1;
+color:rgb(12, 12, 12);
 }
 
 .book-btn{
@@ -59,17 +59,17 @@ background:#b91c1c;
 .date-filter{
 padding:25px;
 text-align:center;
-background:#111827;
+background:rgb(213, 208, 208);
 }
 
 .date-filter a{
 display:inline-block;
 padding:12px 20px;
 margin:5px;
-background:#1e293b;
-color:white;
+background:white;
+color:#111827;
 text-decoration:none;
-border-radius:6px;
+border-radius:10px;
 }
 
 .date-filter a.active{
@@ -95,7 +95,7 @@ gap:25px;
 }
 
 .movie-card{
-background:#1e293b;
+background:white;
 border-radius:12px;
 overflow:hidden;
 transition:.3s;
