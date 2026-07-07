@@ -62,7 +62,7 @@ $result = $stmt->get_result();
 <html>
 <head>
 <title>Home</title>
-<link rel="stylesheet" href="./Assets/Customer/homepage.css">
+<link rel="stylesheet" href="../Assets/Customer/homepage.css">
 
 
 </head>
