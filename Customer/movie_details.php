@@ -1,20 +1,26 @@
 <?php
 // Initialize system secure authentication tracking session
-// if (session_status() === PHP_SESSION_NONE) {
-//     session_start();
-// }
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
-// // 1. Access Control Validation: Verify user login status
-// if (!isset($_SESSION['user_id'])) {
-//     header("Location: home.php");
-//     exit();
-// }
+// Security Access and Session Tracking
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 'CUSTOMER') {
+    header("Location: ../login.php");
+    exit();
+}
 
-// // Access Control Validation: Check customer role
-// if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'CUSTOMER') {
-//     header("Location: home.php");
-//     exit();
-// }
+// 1. Access Control Validation: Verify user login status
+if (!isset($_SESSION['user_id'])) {
+    header("Location: home.php");
+    exit();
+}
+
+// Access Control Validation: Check customer role
+if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'CUSTOMER') {
+    header("Location: home.php");
+    exit();
+}
 
 require_once '../Includes/db_conn.php';
 
