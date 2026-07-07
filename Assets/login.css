@@ -108,6 +108,34 @@ button[type="submit"]:active {
     font-size: 14px;
     font-weight: 500;
 }
+/* Password Eye Icon */
+.password-container {
+    position: relative;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.password-container input {
+    width: 100%;
+    padding: 12px 45px 12px 14px;
+    margin-bottom: 0;
+}
+
+.toggle-password {
+    position: absolute;
+    top: 50%;
+    right: 15px;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 18px;
+    color: #777;
+    user-select: none;
+    transition: color 0.2s ease;
+}
+
+.toggle-password:hover {
+    color: #ff4d2d;
+}
 
 /* Footer text */
 .footer-text {
