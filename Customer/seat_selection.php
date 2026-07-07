@@ -344,7 +344,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_booking'])) {
     <title>Select Seats - <?php echo htmlspecialchars($show['title']); ?></title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="../Assets/Customer/seat_selection.css">
+    <link rel="stylesheet" href="../Assets/css/Customer/seat_selection.css">
 </head>
 <body class="seat-selection-body">
     <?php include_once 'navbar.php'; ?>
@@ -494,7 +494,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_booking'])) {
         <span>Booking session started! You have 5 minutes to complete your booking.</span>
     </div>
 
-    <?php include_once 'footer.php'; ?>
+    <?php if (file_exists(__DIR__ . '/footer.php')) { include_once 'footer.php'; } ?>
 
     <script>
         // Global variables initialized cleanly via structural state rendering engines inside PHP
@@ -504,7 +504,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_booking'])) {
         const csrfToken = "<?php echo $csrf_token; ?>";
         const initialExpiryTime = <?php echo $initial_expiry_time ? '"'.date('Y/m/d H:i:s', strtotime($initial_expiry_time)).'"' : 'null'; ?>;
     </script>
-    <script src="../assets/js/seat_selection.js"></script>
+    <script src="../Assets/js/Customer/seat_selection.js"></script>
 </body>
 </html>
 <?php mysqli_close($conn); ?>

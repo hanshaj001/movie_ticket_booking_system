@@ -138,7 +138,7 @@ while ($seat = mysqli_fetch_assoc($seats_result)) {
             </a>
         </div>
     </div>
-    <?php include_once 'footer.php'; ?>
+    <?php if (file_exists(__DIR__ . '/footer.php')) { include_once 'footer.php'; } ?>
 </body>
 </html>
 <?php mysqli_close($conn); ?>

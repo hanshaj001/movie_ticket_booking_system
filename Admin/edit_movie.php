@@ -1,7 +1,7 @@
 <?php
 
 require_once '../Includes/db_conn.php';
-include '../Includes/sidebar.php';
+include 'components/sidebar.php';
 
 if (!isset($_GET['id'])) {
     echo "<script>
@@ -31,7 +31,7 @@ $row = mysqli_fetch_assoc($result);
 <head>
     <meta charset="UTF-8">
     <title>Add Movie - Admin Panel</title>
-    <link rel="stylesheet" href="../Assets/add_movie.css">
+    <link rel="stylesheet" href="../Assets/css/Admin/add_movie.css">
 </head>
 <body>
 <div class="main-container">
@@ -149,7 +149,7 @@ $row = mysqli_fetch_assoc($result);
                 <?php
                 if(!empty($row['poster']))
                 {
-                    echo "<br><img src='../uploads/".$row['poster']."' width='120'>";
+                    echo "<br><img src='../Assets/uploads/".$row['poster']."' width='120'>";
                 }
                 ?>
 

@@ -1,6 +1,6 @@
 <?php
 session_start();
-include '../Includes/db_conn.php';
+include 'Includes/db_conn.php';
 
 $error = "";
 
@@ -35,9 +35,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             // Role-based redirection
             if ($user['role_name'] == "ADMIN") {
-                header("Location: ../Admin/dashboard.php");
+                header("Location: Admin/dashboard.php");
             } else {
-                header("Location: ../Customer/home.php");
+                header("Location: Customer/home.php");
             }
             exit();
 
@@ -55,7 +55,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <html lang="en">
 <head>
     <title>Login - Movie Ticket System</title>
-    <link rel="stylesheet" href="../Assets/login.css">
+    <link rel="stylesheet" href="Assets/login.css">
 </head>
 
 <body>
