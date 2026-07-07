@@ -3,7 +3,7 @@ session_start();
 
 // Security Access and Session Tracking
  if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 'ADMIN') {
-     header("Location: ../Includes/login.php");
+     header("Location: ../login.php");
     exit();
 }
 
@@ -17,7 +17,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Admin System Panel - MTBS</title>
-    <link rel="stylesheet" href="../Assets/sidebar.css"/>
+    <link rel="stylesheet" href="../Assets/css/Admin/sidebar.css"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
@@ -52,7 +52,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
             </a>
         </li>
         <li class="logout-menu">
-            <a href="../Includes/logout.php">
+            <a href=" ../logout.php">
                 <i class="fa-solid fa-right-from-bracket"></i> Logout
             </a>
         </li>
@@ -75,7 +75,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 <i class="fa-solid fa-circle-user"></i> <span><?= htmlspecialchars($admin_name); ?></span>
             </div>
             
-            <a href="../Includes/logout.php" class="logout-btn">
+            <a href="../logout.php" class="logout-btn">
                 <i class="fa-solid fa-power-off"></i> Logout
             </a>
         </div>

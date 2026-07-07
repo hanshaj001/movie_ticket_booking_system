@@ -19,7 +19,7 @@ if(!$conn)
 
 //session_start();
 require_once "../Includes/db_conn.php";
-include "../Includes//sidebar.php";
+include "components/sidebar.php";
 
 /* ==========================================
    DEFAULT ADMIN NAME
@@ -181,8 +181,8 @@ $recentBookings = mysqli_query(
 
 <title>Admin Dashboard</title>
 
-<link rel="stylesheet" href="../Assets/admin_dashboard.css">
-<link rel="stylesheet" href="../Assets/sidebar.css">
+<link rel="stylesheet" href="../Assets/css/Admin/admin_dashboard.css">
+<link rel="stylesheet" href="../Assets/css/Admin/sidebar.css">
 
 <link rel="stylesheet"
 href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -330,7 +330,7 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
                         <?php else: ?>
 
                             <img
-                            src="../Assets/images/default-movie.jpg"
+                            src="../Assets/uploads/movie_posters/1782620046_6a409f8ebf8be.jpg"
                             alt="Movie Poster">
 
                         <?php endif; ?>

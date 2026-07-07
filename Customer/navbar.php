@@ -3,7 +3,7 @@ session_start();
 
 // Security Access and Session Tracking
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 'CUSTOMER') {
-    header("Location: ../Includes/login.php");
+    header("Location: ../login.php");
     exit();
 }
 
@@ -71,7 +71,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
             <span><?= htmlspecialchars($customer_name); ?></span>
         </div>
 
-        <a href="../Includes/logout.php" class="logout-btn">
+        <a href="../logout.php" class="logout-btn">
             <i class="fa-solid fa-right-from-bracket"></i>
             Logout
         </a>

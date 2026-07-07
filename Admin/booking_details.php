@@ -16,8 +16,8 @@ if(!$conn)
 
 
 <?php
-require_once '../includes/db_conn.php';
-include "../Includes//sidebar.php";
+require_once '../Includes/db_conn.php';
+include "components/sidebar.php";
 
 if(!isset($_GET['id']))
 {
@@ -63,8 +63,8 @@ if(!$booking)
 <head>
 <meta charset="UTF-8">
 <title>Booking Details</title>
-<link rel="stylesheet" href="../Assets/booking_details.css">
-<link rel="stylesheet" href="../Assets/sidebar.css">
+<link rel="stylesheet" href="../Assets/css/Admin/booking_details.css">
+<link rel="stylesheet" href="../Assets/css/Admin/sidebar.css">
 </head>
 <body>
 
