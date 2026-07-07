@@ -1,10 +1,10 @@
 <?php
-include '../Includes/sidebar.php';
-require_once '../includes/db_conn.php';
+require_once '../Includes/db_conn.php';
+include 'components/sidebar.php';
 
 // Authentication check
 if (!isset($_SESSION['user_id'])) {
-    header("Location: ../Includes/login.php");
+    header("Location: ../login.php");
     exit();
 }
 
@@ -24,7 +24,7 @@ if (isset($_POST['add_movie'])) {
     $title = trim($_POST['title']);
     $description = trim($_POST['description']);
     $duration = trim($_POST['duration']);
-    $genre = isset($_POST['genre']) && is_array($_POST['genre']) ? implode(', ', $_POST['genre']) : '';
+    $genre = isset($_POST['genre']) ? (is_array($_POST['genre']) ? implode(', ', $_POST['genre']) : trim($_POST['genre'])) : '';
     $language = trim($_POST['language']);
     $movie_format = trim($_POST['movie_format']);
     $release_date = trim($_POST['release_date']);
@@ -111,7 +111,7 @@ if (isset($_POST['add_movie'])) {
     if (empty($errors)) {
         $extension = strtolower(pathinfo($_FILES['poster']['name'], PATHINFO_EXTENSION));
         $poster_name = time() . "_" . uniqid() . "." . $extension;
-        $upload_path = "../uploads/movie_posters/" . $poster_name;
+        $upload_path = "../Assets/uploads/movie_posters/" . $poster_name;
 
         if (move_uploaded_file($_FILES['poster']['tmp_name'], $upload_path)) {
             $stmt = $conn->prepare("INSERT INTO movies (title, description, duration_minutes, genre, language, release_date, movie_format, poster_url, status) VALUES (?,?,?,?,?,?,?,?,'ACTIVE')");
@@ -137,7 +137,7 @@ if (isset($_POST['add_movie'])) {
 <head>
     <meta charset="UTF-8">
     <title>Add Movie - Admin Panel</title>
-    <link rel="stylesheet" href="../Assets/add_movie.css">
+    <link rel="stylesheet" href="../Assets/css/Admin/add_movie.css">
 </head>
 <body>
 <div class="main-container">
@@ -184,21 +184,44 @@ if (isset($_POST['add_movie'])) {
 
             <div class="form-group">
                 <label>Genre</label>
-                <div class="checkbox-group" id="genre-checkboxes" style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 5px;">
+                <div style="display: flex; gap: 15px; flex-wrap: wrap; padding: 10px 0;">
                     <?php
-                    $available_genres = ['Action', 'Adventure', 'Animation', 'Comedy', 'Crime', 'Documentary', 'Drama', 'Family', 'Fantasy', 'History', 'Horror', 'Music', 'Mystery', 'Romance', 'Science Fiction', 'Thriller', 'War', 'Western'];
-                    $selected_genres = $genre ? array_map('trim', explode(',', $genre)) : [];
+                    $available_genres = [
+                        'Action', 'Adventure', 'Animation', 'Comedy', 'Crime', 'Documentary', 'Drama', 
+                        'Family', 'Fantasy', 'History', 'Horror', 'Music', 'Mystery', 'Romance', 
+                        'Sci-Fi', 'Superhero', 'Thriller', 'War', 'Western'
+                    ];
+                    $selected_genres = array_map('trim', explode(',', $genre));
                     foreach ($available_genres as $g) {
                         $checked = in_array($g, $selected_genres) ? 'checked' : '';
-                        echo "<label style='display:inline-flex; align-items:center; gap:5px; font-weight:normal; cursor:pointer;'><input type='checkbox' name='genre[]' value='$g' $checked onchange='updateSelectedGenres()'> $g</label>";
+                        echo "<label style='font-weight: normal; display: flex; align-items: center; gap: 5px;'>
+                                <input type='checkbox' name='genre[]' value='$g' class='genre-checkbox' $checked> $g
+                              </label>";
                     }
                     ?>
                 </div>
-                <div id="selected-genres-display" style="margin-top: 8px; font-weight: 500; color: #4caf50;">
-                    <?= $genre ? "Selected: " . htmlspecialchars($genre) : '' ?>
+                <div style="margin-top: 10px; font-style: italic; color: #666;">
+                    Selected: <span id="selected-genres-display">None</span>
                 </div>
                 <span class="error"><?= $errors['genre'] ?? ''; ?></span>
             </div>
+
+            <script>
+                document.addEventListener("DOMContentLoaded", function() {
+                    const checkboxes = document.querySelectorAll('.genre-checkbox');
+                    const display = document.getElementById('selected-genres-display');
+
+                    function updateDisplay() {
+                        const selected = Array.from(checkboxes)
+                            .filter(cb => cb.checked)
+                            .map(cb => cb.value);
+                        display.textContent = selected.length > 0 ? selected.join(', ') : 'None';
+                    }
+
+                    checkboxes.forEach(cb => cb.addEventListener('change', updateDisplay));
+                    updateDisplay();
+                });
+            </script>
 
             <div class="form-group">
                 <label>Language</label>
@@ -259,7 +282,7 @@ if (isset($_POST['add_movie'])) {
     <?php while ($movie = $movieQuery->fetch_assoc()) : ?>
         <div class="movie-card">
             <div class="movie-poster">
-                <img src="../uploads/movie_posters/<?= htmlspecialchars($movie['poster_url']); ?>" alt="<?= htmlspecialchars($movie['title']); ?>">
+                <img src="../Assets/uploads/movie_posters/<?= htmlspecialchars($movie['poster_url']); ?>" alt="<?= htmlspecialchars($movie['title']); ?>">
             </div>
 
             <div class="movie-content">
@@ -301,20 +324,5 @@ if (isset($_POST['add_movie'])) {
 
     </div>
 </div>
-
-<script>
-function updateSelectedGenres() {
-    const checkboxes = document.querySelectorAll('input[name="genre[]"]:checked');
-    const selected = Array.from(checkboxes).map(cb => cb.value);
-    const display = document.getElementById('selected-genres-display');
-    
-    if (selected.length > 0) {
-        display.textContent = 'Selected: ' + selected.join(', ');
-    } else {
-        display.textContent = '';
-    }
-}
-</script>
-
 </body>
 </html>

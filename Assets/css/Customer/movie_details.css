@@ -1,0 +1,1097 @@
+/* ==========================================================================
+   MOVIE DETAILS - MODERN DESIGN
+   Font: Poppins | Accent: #ff4d2d | Icons: Font Awesome 6
+   ========================================================================== */
+
+:root {
+    --accent: #ff4d2d;
+    --accent-hover: #e63e1f;
+    --accent-light: #fff4f1;
+    --text-primary: #1a1a2e;
+    --text-secondary: #4a4a6a;
+    --text-muted: #9494a8;
+    --border: #e8e8f0;
+    --card-shadow: 0 10px 40px rgba(0,0,0,0.08);
+    --card-shadow-hover: 0 15px 50px rgba(0,0,0,0.12);
+    --radius: 24px;
+    --radius-sm: 16px;
+    --gradient-primary: linear-gradient(135deg, #ff4d2d 0%, #ff6b4a 100%);
+    --bg-light: #f8f9fc;
+
+    /* Status / info-box color pairs (bg-start, bg-end, fg) — used to remove
+       repeated linear-gradient declarations across price/seat/status/format boxes */
+    --green-bg1: #e8fff1;  --green-bg2: #d4ffdf;  --green-fg: #14a44d;
+    --amber-bg1: #fff8e6;  --amber-bg2: #fff0cc;  --amber-fg: #f59f00;
+    --red-bg1:   #ffe8e3;  --red-bg2:   #ffd0c4;  --red-fg:   #ff4d2d;
+    --blue-bg1:  #e6f3ff;  --blue-bg2:  #cce6ff;  --blue-fg:  #1e40af;
+    --purple-bg1:#f0f0ff;  --purple-bg2:#e0e0ff;  --purple-fg:#6366f1;
+    --orange-bg1:#fff3e6;  --orange-bg2:#ffe0cc;  --orange-fg: var(--accent);
+}
+
+/* ── Base ─────────────────────────────────────────────── */
+body.movie-details-body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg-light);
+    color: var(--text-primary);
+    font-family: 'Poppins', Arial, sans-serif;
+    line-height: 1.6;
+}
+
+.movie-details-container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 30px 20px;
+}
+
+/* ── Section Card ─────────────────────────────────────── */
+.section-card {
+    background: #ffffff;
+    padding: 30px;
+    border-radius: var(--radius);
+    box-shadow: var(--card-shadow);
+    border: 1px solid var(--border);
+    margin-bottom: 24px;
+    transition: box-shadow 0.3s ease;
+}
+
+.section-card:hover {
+    box-shadow: var(--card-shadow-hover);
+}
+
+.section-title {
+    font-size: 22px;
+    font-weight: 700;
+    margin: 0 0 20px 0;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.section-title i {
+    color: var(--accent);
+}
+
+/* ── Breadcrumb ───────────────────────────────────────── */
+.breadcrumb-nav {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    margin-bottom: 20px;
+    color: var(--text-muted);
+}
+
+.bc-link {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s;
+}
+
+.bc-link:hover {
+    text-decoration: underline;
+    color: var(--accent-hover);
+}
+
+.bc-sep {
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+.bc-current {
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+
+/* ── Hero Banner ──────────────────────────────────────── */
+.movie-hero-banner {
+    background: linear-gradient(135deg, #ffffff 0%, #fefefe 100%);
+    padding: 35px;
+    border-radius: var(--radius);
+    box-shadow: var(--card-shadow);
+    border: 1px solid var(--border);
+    margin-bottom: 24px;
+}
+
+.hero-content-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 40px;
+}
+
+.hero-poster-column {
+    flex: 0 0 240px;
+    max-width: 240px;
+}
+
+.poster-card {
+    border-radius: 20px;
+    overflow: hidden;
+    background: var(--bg-light);
+    border: 1px solid var(--border);
+    aspect-ratio: 2/3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+}
+
+.hero-poster-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+    display: block;
+}
+
+.poster-card:hover .hero-poster-img {
+    transform: scale(1.08);
+}
+
+.no-image-fallback {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: var(--text-muted);
+    font-size: 14px;
+    gap: 8px;
+}
+
+.fallback-icon {
+    font-size: 40px;
+}
+
+.hero-info-column {
+    flex: 1 1 400px;
+}
+
+.hero-movie-title {
+    font-size: 38px;
+    font-weight: 800;
+    margin: 0 0 18px 0;
+    background: linear-gradient(135deg, var(--text-primary) 0%, #3a3a5a 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.hero-meta-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 18px;
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--accent-light);
+    color: var(--accent);
+    padding: 8px 16px;
+    border-radius: 50px;
+    font-size: 12px;
+    font-weight: 700;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.badge:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255,77,45,0.2);
+}
+
+.hero-meta-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+    margin-bottom: 18px;
+    padding-bottom: 18px;
+    border-bottom: 2px solid var(--border);
+    font-size: 14px;
+}
+
+.meta-item {
+    display: flex;
+    gap: 6px;
+}
+
+.meta-label {
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
+.meta-value {
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.hero-synopsis-brief {
+    font-size: 15px;
+    color: var(--text-secondary);
+    margin-bottom: 24px;
+    line-height: 1.8;
+}
+
+/* ── CTA Row (Book + Share) ───────────────────────────── */
+.hero-cta-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 14px;
+}
+
+.btn-primary-cta {
+    background: var(--gradient-primary);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 14px 28px;
+    font-family: 'Poppins', Arial, sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 6px 20px rgba(255,77,45,0.35);
+}
+
+.btn-primary-cta:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(255,77,45,0.45);
+}
+
+.btn-share-cta {
+    background: #fff;
+    color: var(--accent);
+    border: 2px solid var(--accent);
+    border-radius: var(--radius-sm);
+    padding: 12px 24px;
+    font-family: 'Poppins', Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-share-cta:hover {
+    background: var(--accent-light);
+    transform: translateY(-2px);
+}
+
+.share-msg {
+    font-size: 13px;
+    color: #14a44d;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* ── Layout Grid ──────────────────────────────────────── */
+.details-layout-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+}
+
+.layout-main-column {
+    flex: 1 1 650px;
+}
+
+.layout-side-column {
+    flex: 1 1 300px;
+}
+
+/* ── Date Bar ─────────────────────────────────────────────
+   FIX: this was previously `position: sticky; top: 16px;`
+   (class name "sticky-dates" kept as-is so the PHP markup
+   doesn't need to change, but it is no longer sticky).
+   A sticky element re-floats over whatever follows it once
+   you scroll past its offset, which is exactly the overlap
+   you were seeing. It's now a normal block that stays put in
+   the document flow on every screen size, so no separate
+   mobile override is needed anymore either. ────────────── */
+.sticky-dates {
+    position: static;
+    margin-bottom: 20px;
+    background: rgba(255, 255, 255, 0.96);
+}
+
+.date-tabs-scroll-container {
+    overflow-x: auto;
+    padding-bottom: 8px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--accent) #ececf3;
+}
+
+.date-tabs-scroll-container::-webkit-scrollbar {
+    height: 6px;
+}
+
+.date-tabs-scroll-container::-webkit-scrollbar-thumb {
+    background: var(--gradient-primary);
+    border-radius: 10px;
+}
+
+.date-tabs-flex {
+    display: flex;
+    gap: 12px;
+}
+
+.date-tab-link, .date-tab-disabled {
+    flex: 0 0 100px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 14px 10px;
+    border-radius: 14px;
+    text-decoration: none;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.date-tab-link {
+    background: #ffffff;
+    border: 2px solid var(--border);
+    color: var(--text-secondary);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.date-tab-link:hover {
+    border-color: var(--accent);
+    background: var(--accent-light);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(255,77,45,0.15);
+}
+
+.date-tab-link.selected-date-tab {
+    background: var(--gradient-primary) !important;
+    border-color: var(--accent) !important;
+    color: #fff !important;
+    box-shadow: 0 6px 24px rgba(255,77,45,0.4) !important;
+    transform: translateY(-3px);
+}
+
+.date-tab-link.selected-date-tab .tab-day-name {
+    color: rgba(255,255,255,0.9) !important;
+}
+
+.date-tab-disabled {
+    background: #f5f5f8;
+    border: 2px solid #eaeaf0;
+    color: var(--text-muted);
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.tab-day-name {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.tab-day-num {
+    font-size: 20px;
+    font-weight: 800;
+    margin-top: 2px;
+}
+
+.no-shows-label {
+    font-size: 9px;
+    font-weight: 800;
+    background: #eaeaf0;
+    color: #888898;
+    padding: 3px 8px;
+    border-radius: 6px;
+    margin-top: 4px;
+    text-transform: uppercase;
+}
+
+/* ── Showtime Section Header ──────────────────────────── */
+.section-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid var(--border);
+}
+
+.section-header-row .section-title {
+    margin: 0;
+}
+
+.selected-date-indicator {
+    font-size: 15px;
+    color: var(--text-secondary);
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg-light);
+    padding: 8px 16px;
+    border-radius: 50px;
+}
+
+.selected-date-indicator i {
+    color: var(--accent);
+}
+
+/* ── Format Filter Bar ────────────────────────────────── */
+.format-filter-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.filter-label {
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.format-filter-btn {
+    background: #fff;
+    border: 2px solid var(--border);
+    color: var(--text-secondary);
+    padding: 8px 18px;
+    border-radius: 50px;
+    font-family: 'Poppins', Arial, sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.format-filter-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    transform: translateY(-2px);
+}
+
+.format-filter-btn.active-filter {
+    background: var(--gradient-primary);
+    border-color: var(--accent);
+    color: #fff;
+    box-shadow: 0 4px 16px rgba(255,77,45,0.3);
+    transform: translateY(-2px);
+}
+
+/* ── Showtime Cards ────────────────────────────────────── */
+.showtime-cards-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.showtime-row-card {
+    background: linear-gradient(135deg, #ffffff 0%, #fdfdfd 100%);
+    border: 2px solid var(--border);
+    border-radius: 20px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.showtime-row-card::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 5px;
+    background: var(--gradient-primary);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.showtime-row-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+    border-color: var(--accent);
+}
+
+.showtime-row-card:hover::before {
+    opacity: 1;
+}
+
+.showtime-row-card.card-soldout {
+    opacity: 0.7;
+}
+
+.showtime-row-card.card-soldout::before {
+    background: linear-gradient(180deg, #888 0%, #aaa 100%);
+}
+
+/* Cutoff warning strip */
+.cutoff-warning {
+    background: linear-gradient(90deg, #fff9e6 0%, #fff3cc 100%);
+    color: #c87800;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 12px 24px;
+    border-bottom: 2px solid #ffe0a0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.cutoff-warning i {
+    font-size: 16px;
+}
+
+/* ── Card Body ───────────────────────────────────────── */
+.card-body-row {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr 1fr;
+    gap: 16px;
+    padding: 24px;
+}
+
+.card-left-info {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-right: 16px;
+    border-right: 2px solid var(--border);
+    justify-content: center;
+}
+
+.countdown-badge {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--green-fg);
+    background: linear-gradient(135deg, var(--green-bg1) 0%, var(--green-bg2) 100%);
+    padding: 6px 12px;
+    border-radius: 50px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    width: fit-content;
+}
+
+.countdown-urgent {
+    background: linear-gradient(135deg, var(--amber-bg1) 0%, var(--amber-bg2) 100%) !important;
+    color: var(--amber-fg) !important;
+}
+
+/* Info boxes */
+.info-box {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 16px;
+    background: #f5f5f8;
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--text-primary);
+    width: fit-content;
+}
+
+.info-box i {
+    color: var(--accent);
+    font-size: 16px;
+}
+
+/* Middle section */
+.card-mid-price-seats {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 0 16px;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+/* Colored info-box variants: price / seats / status / format.
+   These previously each hard-coded their own two-stop gradient;
+   they now just plug the shared color pairs from :root into the
+   same pattern. */
+.price-box,
+.seats-box,
+.format-box {
+    background-image: linear-gradient(135deg, var(--box-bg1) 0%, var(--box-bg2) 100%);
+    color: var(--box-fg);
+}
+
+.price-box,
+.seats-box,
+.format-box,
+.status-box {
+    --box-bg1: initial;
+    --box-bg2: initial;
+    --box-fg: initial;
+}
+
+.price-box { --box-bg1: var(--orange-bg1); --box-bg2: var(--orange-bg2); --box-fg: var(--orange-fg); font-size: 18px; font-weight: 900; }
+.price-box i { color: var(--box-fg); }
+
+.seats-box { --box-bg1: var(--blue-bg1); --box-bg2: var(--blue-bg2); --box-fg: var(--blue-fg); }
+.seats-box i { color: var(--box-fg); }
+
+.format-box { --box-bg1: var(--purple-bg1); --box-bg2: var(--purple-bg2); --box-fg: var(--purple-fg); }
+.format-box i { color: var(--box-fg); }
+
+.status-box {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 16px;
+    font-size: 13px;
+    font-weight: 800;
+    width: fit-content;
+    background-image: linear-gradient(135deg, var(--box-bg1) 0%, var(--box-bg2) 100%);
+    color: var(--box-fg);
+}
+
+.status-box.status-available   { --box-bg1: var(--green-bg1); --box-bg2: var(--green-bg2); --box-fg: var(--green-fg); }
+.status-box.status-fastfilling { --box-bg1: var(--amber-bg1); --box-bg2: var(--amber-bg2); --box-fg: var(--amber-fg); }
+.status-box.status-soldout     { --box-bg1: var(--red-bg1);   --box-bg2: var(--red-bg2);   --box-fg: var(--red-fg); }
+.status-box i { color: var(--box-fg); }
+
+/* Right section (Button) */
+.card-right-action {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-left: 20px;
+    border-left: 2px solid var(--border);
+}
+
+.btn-seats-select {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: var(--gradient-primary);
+    color: #fff;
+    border: none;
+    padding: 16px 32px;
+    font-family: 'Poppins', Arial, sans-serif;
+    font-size: 15px;
+    font-weight: 800;
+    text-decoration: none;
+    border-radius: 14px;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    text-align: center;
+    box-shadow: 0 6px 20px rgba(255,77,45,0.35);
+    width: 100%;
+}
+
+.btn-seats-select:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(255,77,45,0.45);
+}
+
+.btn-seats-disabled {
+    background: linear-gradient(135deg, #f5f5f8 0%, #eaeaf0 100%);
+    color: var(--text-muted);
+    border: 2px solid var(--border);
+    padding: 16px 32px;
+    font-family: 'Poppins', Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 800;
+    border-radius: 14px;
+    cursor: not-allowed;
+    width: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+/* ── Empty State ──────────────────────────────────────── */
+.empty-showtimes-placeholder {
+    text-align: center;
+    padding: 50px 30px;
+    color: var(--text-secondary);
+}
+
+.empty-icon {
+    font-size: 56px;
+    color: var(--accent);
+    margin-bottom: 16px;
+    display: block;
+}
+
+.empty-showtimes-placeholder h4 {
+    margin: 0 0 10px 0;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.empty-showtimes-placeholder p {
+    margin: 0;
+    font-size: 15px;
+}
+
+/* ── Legend ───────────────────────────────────────────── */
+.showtimes-legend-footer {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 2px solid var(--border);
+}
+
+.legend-title {
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.legend-items-wrapper {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.legend-item {
+    font-size: 13px;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+}
+
+/* ── About & Info ─────────────────────────────────────── */
+.about-description-text {
+    font-size: 15px;
+    color: var(--text-secondary);
+    line-height: 1.8;
+}
+
+.info-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.info-list li {
+    display: flex;
+    gap: 12px;
+    font-size: 14px;
+    color: var(--text-secondary);
+    align-items: flex-start;
+}
+
+.info-bullet {
+    color: var(--accent);
+    margin-top: 3px;
+    flex-shrink: 0;
+    font-size: 18px;
+}
+
+/* ── Similar Movies ───────────────────────────────────── */
+.similar-movies-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 24px;
+    margin-top: 20px;
+}
+
+.similar-movie-card {
+    background: #fff;
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: var(--card-shadow);
+}
+
+.similar-movie-card:hover {
+    transform: translateY(-6px);
+    border-color: var(--accent);
+    box-shadow: var(--card-shadow-hover);
+}
+
+.similar-poster-wrapper {
+    position: relative;
+    aspect-ratio: 2/3;
+    background: var(--bg-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.similar-poster-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+}
+
+.similar-movie-card:hover .similar-poster-img {
+    transform: scale(1.1);
+}
+
+.similar-badge-format {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: var(--gradient-primary);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 800;
+    padding: 5px 12px;
+    border-radius: 50px;
+    box-shadow: 0 4px 12px rgba(255,77,45,0.3);
+}
+
+.similar-info {
+    padding: 18px;
+}
+
+.similar-title {
+    color: var(--text-primary);
+    font-size: 15px;
+    font-weight: 800;
+    margin: 0 0 6px 0;
+}
+
+.similar-genre {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
+/* ── Back Button ──────────────────────────────────────── */
+.back-home-wrapper {
+    text-align: center;
+    margin-top: 30px;
+}
+
+.btn-back-home {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 14px;
+    padding: 12px 28px;
+    border-radius: var(--radius-sm);
+    border: 2px solid var(--border);
+    background: #fff;
+    transition: all 0.3s ease;
+}
+
+.btn-back-home:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    background: var(--accent-light);
+}
+
+/* ── Responsive ───────────────────────────────────────── */
+@media (max-width: 992px) {
+    .card-body-row {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .card-right-action {
+        grid-column: 1 / -1;
+        border-left: none;
+        border-top: 2px solid var(--border);
+        padding: 20px 0 0 0;
+        margin-top: 20px;
+    }
+
+    .card-mid-price-seats {
+        border-right: none;
+        padding-right: 0;
+    }
+
+    .hero-poster-column {
+        flex: 0 0 200px;
+        max-width: 200px;
+    }
+}
+
+@media (max-width: 768px) {
+    .movie-details-container {
+        padding: 20px 15px;
+    }
+
+    .section-card,
+    .movie-hero-banner {
+        padding: 20px;
+        border-radius: 16px;
+    }
+
+    .hero-content-wrapper {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 24px;
+    }
+
+    .hero-poster-column {
+        flex: 0 0 100%;
+        max-width: 220px;
+    }
+
+    .hero-info-column {
+        flex: 1 1 100%;
+    }
+
+    .hero-meta-badges,
+    .hero-meta-list,
+    .hero-cta-row {
+        justify-content: center;
+    }
+
+    .hero-meta-list {
+        gap: 16px;
+    }
+
+    .card-body-row {
+        grid-template-columns: 1fr;
+        padding: 20px;
+        gap: 0;
+    }
+
+    .card-left-info {
+        border-right: none;
+        border-bottom: 2px solid var(--border);
+        padding-right: 0;
+        padding-bottom: 20px;
+        align-items: center;
+        text-align: center;
+    }
+
+    .card-mid-price-seats {
+        padding: 20px 0;
+        border-bottom: 2px solid var(--border);
+        align-items: center;
+        text-align: center;
+    }
+
+    .card-right-action {
+        border-left: none;
+        border-top: none;
+        padding: 20px 0 0 0;
+        margin-top: 0;
+    }
+
+    .hero-movie-title {
+        font-size: 26px;
+    }
+
+    .show-time-badge {
+        font-size: 24px;
+    }
+
+    .price-indicator {
+        font-size: 22px;
+    }
+
+    .date-tabs-flex {
+        gap: 8px;
+    }
+
+    .date-tab-link, .date-tab-disabled {
+        flex: 0 0 85px;
+        padding: 12px 8px;
+        border-radius: 12px;
+    }
+
+    .tab-day-num {
+        font-size: 18px;
+    }
+
+    .format-filter-bar {
+        justify-content: center;
+    }
+
+    .similar-movies-grid {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 16px;
+    }
+
+    .section-title {
+        font-size: 18px;
+    }
+
+    .showtimes-legend-footer {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+
+    .legend-items-wrapper {
+        gap: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-movie-title {
+        font-size: 22px;
+    }
+
+    .badge {
+        font-size: 11px;
+        padding: 6px 12px;
+    }
+
+    .btn-primary-cta,
+    .btn-seats-select {
+        padding: 12px 20px;
+        font-size: 14px;
+    }
+
+    .btn-share-cta {
+        padding: 10px 18px;
+        font-size: 13px;
+    }
+
+    .show-time-badge {
+        font-size: 20px;
+    }
+
+    .price-indicator {
+        font-size: 20px;
+    }
+
+    .date-tab-link, .date-tab-disabled {
+        flex: 0 0 75px;
+        padding: 10px 6px;
+    }
+
+    .tab-day-num {
+        font-size: 16px;
+    }
+
+    .tab-day-name {
+        font-size: 10px;
+    }
+}   

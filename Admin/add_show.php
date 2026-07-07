@@ -1,12 +1,13 @@
 <?php
 require_once '../Includes/db_conn.php'; 
-include '../Includes/sidebar.php';
+include 'components/sidebar.php';
 
-$page = $_GET['page'] ?? 1;
+$page = isset($_GET['page']) ? intval($_GET['page']) : 1;
 $page = max(1, $page);
 $limit = 10;
 $offset = ($page - 1) * $limit;
 $selected_date = $_GET['date'] ?? 'ALL';
+
 // Auto-update past shows
 mysqli_query($conn, "
     UPDATE shows sh
@@ -19,12 +20,18 @@ mysqli_query($conn, "
 $movies = mysqli_query($conn, "SELECT * FROM movies WHERE status='ACTIVE'");
 $screens = mysqli_query($conn, "SELECT * FROM screens WHERE screen_status='ACTIVE'");
 
-$message = "";
+$notify_message = "";
+$notify_type = "";
 $errors = [];
 $movie_id = $screen_id = $show_date = $show_time = $ticket_price = "";
 
+// Capture notification queries coming from external action scripts (Edit, Delete, Cancel parameters)
+if (isset($_GET['msg'])) {
+    $notify_message = $_GET['msg'];
+    $notify_type = $_GET['type'] ?? 'success';
+}
 
-// show addition logic
+// Show addition logic
 if (isset($_POST['add_show'])) {
 
     $movie_id = trim($_POST['movie_id']);
@@ -36,18 +43,13 @@ if (isset($_POST['add_show'])) {
     $today = date("Y-m-d");
     $max_date = date("Y-m-d", strtotime("+7 days"));
 
-    // movie validation
-
     if (empty($movie_id)) {
         $errors['movie_id'] = "Please select movie.";
     }
 
-    // screen validation
     if (empty($screen_id)) {
         $errors['screen_id'] = "Please select screen.";
     }
-
-    // date validation
 
     if (empty($show_date)) {
         $errors['show_date'] = "Please select show date.";
@@ -57,18 +59,11 @@ if (isset($_POST['add_show'])) {
         $errors['show_date'] = "Only next 7 days allowed.";
     }
 
-    // time validation
     if (empty($show_time)) {
         $errors['show_time'] = "Please select show time.";
-    } elseif (
-        $show_date == date("Y-m-d")
-        &&
-        strtotime($show_time) <= strtotime(date("H:i"))
-    ) {
+    } elseif ($show_date == date("Y-m-d") && strtotime($show_time) <= strtotime(date("H:i"))) {
         $errors['show_time'] = "Past time not allowed for today.";
     }
-
-    // price validation
 
     if (empty($ticket_price)) {
         $errors['ticket_price'] = "Please enter ticket price.";
@@ -78,124 +73,58 @@ if (isset($_POST['add_show'])) {
         $errors['ticket_price'] = "Price must be greater than 0.";
     }
 
-    // overlap validation
-
+    // Overlap validation
     if (empty($errors)) {
-        $movie_query = mysqli_query(
-            $conn,
-            "SELECT duration_minutes
-             FROM movies
-             WHERE movie_id='$movie_id'"
-        );
-
+        $movie_query = mysqli_query($conn, "SELECT duration_minutes FROM movies WHERE movie_id='$movie_id'");
         $movie_data = mysqli_fetch_assoc($movie_query);
-
         $duration = $movie_data['duration_minutes'];
 
         $new_start = strtotime($show_date . ' ' . $show_time);
-
         $new_end = $new_start + ($duration * 60);
 
-        $existing_shows = mysqli_query(
-            $conn,
-            "
-            SELECT
-                sh.show_time,
-                m.duration_minutes
-            FROM shows sh
-            INNER JOIN movies m
-                ON sh.movie_id=m.movie_id
-            WHERE
-                sh.screen_id='$screen_id'
-                AND sh.show_date='$show_date'
-                AND sh.show_status='ACTIVE'
-            "
-        );
+        $existing_shows = mysqli_query($conn, "
+            SELECT sh.show_time, m.duration_minutes 
+            FROM shows sh 
+            INNER JOIN movies m ON sh.movie_id=m.movie_id 
+            WHERE sh.screen_id='$screen_id' AND sh.show_date='$show_date' AND sh.show_status='ACTIVE'
+        ");
 
-        while (
-            $existing = mysqli_fetch_assoc($existing_shows)
-        ) {
+        while ($existing = mysqli_fetch_assoc($existing_shows)) {
             $existing_start = strtotime($show_date . ' ' . $existing['show_time']);
-
             $existing_end = $existing_start + ($existing['duration_minutes'] * 60);
 
-            if (
-                $new_start < $existing_end
-                &&
-                $new_end > $existing_start
-            ) {
+            if ($new_start < $existing_end && $new_end > $existing_start) {
                 $errors['show_time'] = "Show overlaps another show on this screen.";
                 break;
             }
         }
     }
 
-        // insert show if no errors
-
+    // Insert data if clean
     if (empty($errors)) {
-        $insert_show = mysqli_query(
-            $conn,
-            "INSERT INTO shows
-            (
-                movie_id,
-                screen_id,
-                show_date,
-                show_time,
-                ticket_price,
-                show_status
-            )
-            VALUES
-            (
-                '$movie_id',
-                '$screen_id',
-                '$show_date',
-                '$show_time',
-                '$ticket_price',
-                'ACTIVE'
-            )"
-        );
+        $insert_show = mysqli_query($conn, "
+            INSERT INTO shows (movie_id, screen_id, show_date, show_time, ticket_price, show_status) 
+            VALUES ('$movie_id', '$screen_id', '$show_date', '$show_time', '$ticket_price', 'ACTIVE')
+        ");
 
         if ($insert_show) {
             $show_id = mysqli_insert_id($conn);
 
-            // create show_seats entries for this show based on screen seats
-
-            $seat_query = mysqli_query(
-                $conn,
-                "SELECT *
-                 FROM seats
-                 WHERE screen_id='$screen_id'"
-            );
-
+            // Populate show_seats entries based on layout templates
+            $seat_query = mysqli_query($conn, "SELECT * FROM seats WHERE screen_id='$screen_id'");
             while ($seat = mysqli_fetch_assoc($seat_query)) {
                 $seat_id = $seat['seat_id'];
-                mysqli_query(
-                    $conn,
-                    "INSERT INTO show_seats
-                    (
-                        show_id,
-                        seat_id,
-                        seat_status
-                    )
-                    VALUES
-                    (
-                        '$show_id',
-                        '$seat_id',
-                        'AVAILABLE'
-                    )"
-                );
+                mysqli_query($conn, "INSERT INTO show_seats (show_id, seat_id, seat_status) VALUES ('$show_id', '$seat_id', 'AVAILABLE')");
             }
 
-            $message = "Show added successfully.";
+            $notify_message = "Show added successfully.";
+            $notify_type = "success";
 
-            /* RESET INPUTS */
-            $movie_id = "";
-            $screen_id = "";
-            $show_date = "";
-            $show_time = "";
-            $ticket_price = "";
+            // Reset inputs cleanly
+            $movie_id = $screen_id = $show_date = $show_time = $ticket_price = "";
         } else {
-            $message = "Failed to add show.";
+            $notify_message = "Failed to add show.";
+            $notify_type = "error";
         }
     }
 }
@@ -206,11 +135,56 @@ if (isset($_POST['add_show'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Movie Shows</title>
-    <link rel="stylesheet" href="../Assets/add_show.css">
+    <link rel="stylesheet" href="../Assets/css/Admin/add_show.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Floating Toast Notification CSS Configuration */
+        .toast-box {
+            position: fixed;
+            top: 25px;
+            right: -450px;
+            background-color: #ffffff;
+            padding: 16px 22px;
+            border-radius: 6px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            z-index: 10000;
+            transition: right 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
+            opacity: 0;
+        }
+        .toast-box.active {
+            right: 25px;
+            opacity: 1;
+        }
+        .toast-box.success { border-left: 6px solid #2ecc71; color: #27ae60; }
+        .toast-box.error { border-left: 6px solid #e74c3c; color: #c0392b; }
+        .toast-box .toast-icon { font-size: 22px; }
+        .toast-box .toast-msg-text { font-family: 'Poppins', sans-serif; font-weight: 500; font-size: 14px; }
+
+        /* Mobile Responsive View Styling Sheets */
+        @media screen and (max-width: 768px) {
+            .main-container { padding: 8px; }
+            .form-grid { grid-template-columns: 1fr !important; gap: 10px; }
+            .show-table-card { overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; }
+            .show-table th, .show-table td { padding: 10px 8px; font-size: 12px; }
+            .show-filter-bar { display: flex; overflow-x: auto; padding-bottom: 6px; gap: 5px; }
+            .date-tab { padding: 6px 10px; font-size: 11px; flex-shrink: 0; }
+            .action-buttons { flex-direction: column; gap: 4px; }
+            .edit-btn, .cancel-btn { padding: 4px 6px; font-size: 11px; width: 100%; text-align: center; }
+            .toast-box { width: 90%; max-width: 320px; top: 15px; }
+            .toast-box.active { right: 5%; }
+        }
+    </style>
 </head>
 <body>
+    <div id="popupToast" class="toast-box">
+        <div id="popupIcon" class="toast-icon"></div>
+        <div id="popupText" class="toast-msg-text"></div>
+    </div>
+
     <div class="main-container">
         <div class="content-area">
             
@@ -225,19 +199,16 @@ if (isset($_POST['add_show'])) {
             </div>
 
             <div class="form-card">
-                <?php if ($message != ""): ?>
-                    <div class="message <?= strpos($message, 'successfully') !== false ? 'success' : 'error-msg' ?>">
-                        <?= $message; ?>
-                    </div>
-                <?php endif; ?>
-
-                <form method="POST">
+                <form method="POST" id="addShowForm">
                     <div class="form-grid">
                         <div class="form-group">
                             <label>Select Movie</label>
-                            <select name="movie_id">
+                            <select name="movie_id" id="movie_id">
                                 <option value="">Choose Movie</option>
-                                <?php while ($movie = mysqli_fetch_assoc($movies)): ?>
+                                <?php 
+                                mysqli_data_seek($movies, 0);
+                                while ($movie = mysqli_fetch_assoc($movies)): 
+                                ?>
                                     <option value="<?= $movie['movie_id']; ?>" <?= $movie_id == $movie['movie_id'] ? 'selected' : ''; ?>>
                                         <?= htmlspecialchars($movie['title']); ?>
                                     </option>
@@ -248,9 +219,12 @@ if (isset($_POST['add_show'])) {
 
                         <div class="form-group">
                             <label>Select Screen</label>
-                            <select name="screen_id">
+                            <select name="screen_id" id="screen_id">
                                 <option value="">Choose Screen</option>
-                                <?php while ($screen = mysqli_fetch_assoc($screens)): ?>
+                                <?php 
+                                mysqli_data_seek($screens, 0);
+                                while ($screen = mysqli_fetch_assoc($screens)): 
+                                ?>
                                     <option value="<?= $screen['screen_id']; ?>" <?= $screen_id == $screen['screen_id'] ? 'selected' : ''; ?>>
                                         <?= htmlspecialchars($screen['screen_name']); ?>
                                     </option>
@@ -261,19 +235,19 @@ if (isset($_POST['add_show'])) {
 
                         <div class="form-group">
                             <label>Show Date</label>
-                            <input type="date" name="show_date" value="<?= htmlspecialchars($show_date); ?>">
+                            <input type="date" name="show_date" id="show_date" value="<?= htmlspecialchars($show_date); ?>">
                             <span class="error"><?= $errors['show_date'] ?? ''; ?></span>
                         </div>
 
                         <div class="form-group">
                             <label>Show Time</label>
-                            <input type="time" name="show_time" value="<?= htmlspecialchars($show_time); ?>">
+                            <input type="time" name="show_time" id="show_time" value="<?= htmlspecialchars($show_time); ?>">
                             <span class="error"><?= $errors['show_time'] ?? ''; ?></span>
                         </div>
 
                         <div class="form-group full-width">
                             <label>Ticket Price</label>
-                            <input type="number" step="0.01" name="ticket_price" placeholder="Enter ticket price" value="<?= htmlspecialchars($ticket_price); ?>">
+                            <input type="number" step="0.01" name="ticket_price" id="ticket_price" placeholder="Enter ticket price" value="<?= htmlspecialchars($ticket_price); ?>">
                             <span class="error"><?= $errors['ticket_price'] ?? ''; ?></span>
                         </div>
                     </div>
@@ -282,7 +256,7 @@ if (isset($_POST['add_show'])) {
             </div>
 
             <?php
-            $where_clause = ($selected_date == 'ALL') ? "" : "WHERE sh.show_date='$selected_date'";
+            $where_clause = ($selected_date == 'ALL') ? "" : "WHERE sh.show_date='" . mysqli_real_escape_string($conn, $selected_date) . "'";
             $count_query = mysqli_query($conn, "SELECT COUNT(*) total FROM shows sh $where_clause");
             $total_rows = mysqli_fetch_assoc($count_query)['total'];
             $total_pages = ceil($total_rows / $limit);
@@ -307,28 +281,22 @@ if (isset($_POST['add_show'])) {
                 </div>
             </div>
 
-                <div class="show-filter-bar">
-                    <a href="?date=ALL&page=1#show-list" class="date-tab <?= $selected_date == 'ALL' ? 'active-date' : '' ?>">
-                        All
+            <div class="show-filter-bar">
+                <a href="?date=ALL&page=1" class="date-tab <?= $selected_date == 'ALL' ? 'active-date' : '' ?>">All</a>
+                <?php
+                for ($i = 0; $i < 7; $i++) {
+                    $date = date("Y-m-d", strtotime("+$i day"));
+                    $label = date("d M", strtotime($date));
+                    if ($i == 0) $label = "Today";
+                    if ($i == 1) $label = "Tomorrow";
+                ?>
+                    <a href="?date=<?= $date ?>&page=1" class="date-tab <?= $selected_date == $date ? 'active-date' : '' ?>">
+                        <?= $label ?>
                     </a>
+                <?php } ?>
+            </div>
 
-                    <?php
-                    for ($i = 0; $i < 7; $i++) {
-                        $date = date("Y-m-d", strtotime("+$i day"));
-                        $label = date("d M", strtotime($date));
-
-                        if ($i == 0) $label = "Today";
-                        if ($i == 1) $label = "Tomorrow";
-                    ?>
-                        <a href="?date=<?= $date ?>&page=1#show-list" class="date-tab <?= $selected_date == $date ? 'active-date' : '' ?>">
-                            <?= $label ?>
-                        </a>
-                    <?php
-                    }
-                    ?>
-                </div>
-
-            <div id="show-list" class="show-table-card">
+            <div class="show-table-card">
                 <table class="show-table">
                     <thead>
                         <tr>
@@ -393,5 +361,94 @@ if (isset($_POST['add_show'])) {
                 </div>
             </div>
 
-        </div> </div> </body>
+        </div> 
+    </div>
+
+    <script>
+    // Unified function to throw clean toast notification alerts (disappears after 5 seconds)
+    function showNotification(message, type = 'success') {
+        const toast = document.getElementById("popupToast");
+        const icon = document.getElementById("popupIcon");
+        const text = document.getElementById("popupText");
+
+        toast.className = "toast-box";
+        
+        if (type === 'error') {
+            toast.classList.add("error");
+            icon.innerHTML = '<i class="fa-solid fa-circle-xmark"></i>';
+        } else {
+            toast.classList.add("success");
+            icon.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
+        }
+
+        text.textContent = message;
+        toast.classList.add("active");
+
+        setTimeout(() => {
+            toast.classList.remove("active");
+        }, 5000);
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        // Trigger popup message if parsed from PHP database transaction execution
+        <?php if (!empty($notify_message)): ?>
+            showNotification("<?= addslashes($notify_message) ?>", "<?= $notify_type ?>");
+        <?php endif; ?>
+
+        // URL interceptor for incoming external redirections (Edit/Cancel success parameters)
+        const urlParams = new URLSearchParams(window.location.search);
+        const msg = urlParams.get('msg');
+        const mType = urlParams.get('type');
+
+        if (msg) {
+            // Trigger custom notification box safely
+            showNotification(msg, mType || 'success');
+            
+            // Clean up the URL state parameters instantly to control F5/refresh popup bugs
+            const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+            window.history.replaceState({ path: cleanUrl }, '', cleanUrl);
+        }
+
+        // JavaScript Client Form Validation 
+        const form = document.getElementById("addShowForm");
+        form.addEventListener("submit", function(event) {
+            let isValid = true;
+            
+            // Wipe older errors
+            document.querySelectorAll(".error").forEach(el => el.textContent = "");
+
+            const movie = document.getElementById("movie_id").value;
+            const screen = document.getElementById("screen_id").value;
+            const sDate = document.getElementById("show_date").value;
+            const sTime = document.getElementById("show_time").value;
+            const price = document.getElementById("ticket_price").value;
+
+            if (!movie) {
+                document.getElementById("movie_id").nextElementSibling.textContent = "Please select movie.";
+                isValid = false;
+            }
+            if (!screen) {
+                document.getElementById("screen_id").nextElementSibling.textContent = "Please select screen.";
+                isValid = false;
+            }
+            if (!sDate) {
+                document.getElementById("show_date").nextElementSibling.textContent = "Please select show date.";
+                isValid = false;
+            }
+            if (!sTime) {
+                document.getElementById("show_time").nextElementSibling.textContent = "Please select show time.";
+                isValid = false;
+            }
+            if (!price || isNaN(price) || parseFloat(price) <= 0) {
+                document.getElementById("ticket_price").nextElementSibling.textContent = "Price must be greater than 0.";
+                isValid = false;
+            }
+
+            if (!isValid) {
+                event.preventDefault(); 
+              }
+        });
+    });
+    </script>
+</body>
 </html>
