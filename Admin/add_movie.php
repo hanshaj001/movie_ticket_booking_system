@@ -24,7 +24,7 @@ if (isset($_POST['add_movie'])) {
     $title = trim($_POST['title']);
     $description = trim($_POST['description']);
     $duration = trim($_POST['duration']);
-    $genre = trim($_POST['genre']);
+    $genre = isset($_POST['genre']) && is_array($_POST['genre']) ? implode(', ', $_POST['genre']) : '';
     $language = trim($_POST['language']);
     $movie_format = trim($_POST['movie_format']);
     $release_date = trim($_POST['release_date']);
@@ -184,7 +184,19 @@ if (isset($_POST['add_movie'])) {
 
             <div class="form-group">
                 <label>Genre</label>
-                <input type="text" name="genre" value="<?= htmlspecialchars($genre); ?>" placeholder="Action, Drama, Comedy">
+                <div class="checkbox-group" id="genre-checkboxes" style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 5px;">
+                    <?php
+                    $available_genres = ['Action', 'Adventure', 'Animation', 'Comedy', 'Crime', 'Documentary', 'Drama', 'Family', 'Fantasy', 'History', 'Horror', 'Music', 'Mystery', 'Romance', 'Science Fiction', 'Thriller', 'War', 'Western'];
+                    $selected_genres = $genre ? array_map('trim', explode(',', $genre)) : [];
+                    foreach ($available_genres as $g) {
+                        $checked = in_array($g, $selected_genres) ? 'checked' : '';
+                        echo "<label style='display:inline-flex; align-items:center; gap:5px; font-weight:normal; cursor:pointer;'><input type='checkbox' name='genre[]' value='$g' $checked onchange='updateSelectedGenres()'> $g</label>";
+                    }
+                    ?>
+                </div>
+                <div id="selected-genres-display" style="margin-top: 8px; font-weight: 500; color: #4caf50;">
+                    <?= $genre ? "Selected: " . htmlspecialchars($genre) : '' ?>
+                </div>
                 <span class="error"><?= $errors['genre'] ?? ''; ?></span>
             </div>
 
@@ -289,5 +301,20 @@ if (isset($_POST['add_movie'])) {
 
     </div>
 </div>
+
+<script>
+function updateSelectedGenres() {
+    const checkboxes = document.querySelectorAll('input[name="genre[]"]:checked');
+    const selected = Array.from(checkboxes).map(cb => cb.value);
+    const display = document.getElementById('selected-genres-display');
+    
+    if (selected.length > 0) {
+        display.textContent = 'Selected: ' + selected.join(', ');
+    } else {
+        display.textContent = '';
+    }
+}
+</script>
+
 </body>
 </html>
