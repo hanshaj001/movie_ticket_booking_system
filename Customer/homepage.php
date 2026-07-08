@@ -116,9 +116,8 @@ class="<?=($selected_date==$date)?'active':'';?>">
 
 <div class="movie-card">
 
-<img
-src="uploads/<?=$movie['poster_url']?>"
-alt="<?=$movie['title']?>">
+<img src="../uploads/<?php echo $movie['poster_url']; ?>"
+     alt="<?php echo $movie['title']; ?>">
 
 <div class="movie-info">
 
