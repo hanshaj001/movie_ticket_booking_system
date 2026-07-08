@@ -97,7 +97,9 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             console.error('Error:', error);
             revertSeatState(checkbox, seatId, isSelected);
-            alert('Server connection error. Please try again.');
+            // If an error occurs (likely not logged in), show a centered modal
+            // prompting the user to Login or Register instead of a simple alert.
+            showAuthModal();
         }
     }
 
@@ -145,6 +147,9 @@ document.addEventListener('DOMContentLoaded', () => {
             selectedSeatsInput.value = JSON.stringify(selectedSeats.map(s => s.id));
         }
     }
+
+    // Auth modal markup and styles are provided by a shared partial and Assets/css/Customer/auth_modal.css
+    // Behavior is handled by Assets/js/Customer/auth_modal.js which exposes `showAuthModal()` globally.
 
     function startCountdown() {
         if (timerCard) timerCard.style.display = 'flex';
