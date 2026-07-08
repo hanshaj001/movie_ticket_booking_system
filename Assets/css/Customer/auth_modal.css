@@ -1,0 +1,15 @@
+/* Auth modal styles matching site theme variables from seat_selection.css */
+:root{--accent:#ff4d2d;--accent-hover:#e63e1f;--bg-light:#f8f9fc;--text-primary:#1a1a2e;--card-shadow:0 10px 40px rgba(0,0,0,0.08);--radius:24px}
+
+#authModal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.48);z-index:10000}
+#authModal[aria-hidden="true"]{display:none}
+#authModal .auth-card{background:#fff;padding:20px;border-radius:16px;max-width:420px;width:92%;text-align:center;box-shadow:var(--card-shadow);position:relative}
+#authModal .auth-title{font-size:18px;margin:0 0 8px;color:var(--text-primary);font-weight:700}
+#authModal .auth-desc{margin:0 0 14px;color:#4a4a6a}
+#authModal .auth-actions{display:flex;gap:10px;justify-content:center}
+#authModal button{padding:8px 14px;border-radius:8px;border:none;cursor:pointer;font-weight:700}
+#authModal .auth-login{background:var(--accent);color:#fff}
+#authModal .auth-login:hover{background:var(--accent-hover)}
+#authModal .auth-register{background:#fff;border:2px solid var(--accent);color:var(--accent)}
+#authModal .auth-register:hover{background:var(--accent);color:#fff}
+#authModal .auth-close{position:absolute;right:10px;top:8px;background:transparent;border:none;font-size:20px;cursor:pointer;color:#666}
