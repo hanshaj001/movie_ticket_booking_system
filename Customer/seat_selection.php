@@ -5,21 +5,19 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 // Enforce authentication context boundaries
-if (!isset($_SESSION['user_id'])) {
-    header("Location: home.php");
-    exit();
-}
+// if (!isset($_SESSION['user_id'])) {
+//     header("Location: home.php");
+//     exit();
+// }
 
 // Enforce role-based structural access boundaries
-if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'CUSTOMER') {
-    header("Location: home.php");
-    exit();
-}
+// if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'CUSTOMER') {
+//     header("Location: home.php");
+//     exit();
+// }
 
 require_once '../Includes/db_conn.php';
 
-$_SESSION['user_id'] = 1;         // Gives you a fake customer ID
-$_SESSION['role'] = 'CUSTOMER';
 
 // Configure contextual operational time boundaries
 date_default_timezone_set('Asia/Kathmandu');
@@ -345,6 +343,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_booking'])) {
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="../Assets/css/Customer/seat_selection.css">
+    <link rel="stylesheet" href="../Assets/css/Customer/auth_modal.css">
 </head>
 <body class="seat-selection-body">
     <?php include_once 'navbar.php'; ?>
@@ -494,6 +493,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_booking'])) {
         <span>Booking session started! You have 5 minutes to complete your booking.</span>
     </div>
 
+    <?php include_once __DIR__ . '/components/auth_modal.php'; ?>
+
     <?php if (file_exists(__DIR__ . '/footer.php')) { include_once 'footer.php'; } ?>
 
     <script>
@@ -504,6 +505,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_booking'])) {
         const csrfToken = "<?php echo $csrf_token; ?>";
         const initialExpiryTime = <?php echo $initial_expiry_time ? '"'.date('Y/m/d H:i:s', strtotime($initial_expiry_time)).'"' : 'null'; ?>;
     </script>
+    <script src="../Assets/js/Customer/auth_modal.js"></script>
     <script src="../Assets/js/Customer/seat_selection.js"></script>
 </body>
 </html>
