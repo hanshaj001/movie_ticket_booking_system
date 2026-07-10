@@ -623,6 +623,75 @@ VALUES
 (2,'C3','REGULAR','Group 3'),
 (2,'C4','REGULAR','Group 3');
 
+
+-- to add banner url
+ALTER TABLE movies
+ADD COLUMN banner_url VARCHAR(255) NULL AFTER poster_url;
+
+-- to remove the genere for the movie table
+ALTER TABLE movies
+DROP COLUMN genre;
+
+-- Create Genres Table
+CREATE TABLE genres (
+    genre_id INT AUTO_INCREMENT PRIMARY KEY,
+
+    genre_name VARCHAR(50) NOT NULL UNIQUE,
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    ON UPDATE CURRENT_TIMESTAMP
+);
+
+
+-- Create Movie_Genres Bridge Table
+CREATE TABLE movie_genres (
+    movie_genre_id INT AUTO_INCREMENT PRIMARY KEY,
+
+    movie_id INT NOT NULL,
+
+    genre_id INT NOT NULL,
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (movie_id)
+    REFERENCES movies(movie_id)
+    ON DELETE CASCADE,
+
+    FOREIGN KEY (genre_id)
+    REFERENCES genres(genre_id)
+    ON DELETE CASCADE,
+
+    UNIQUE(movie_id, genre_id)
+);
+
+-- Insert Genres
+INSERT INTO genres (genre_name)
+VALUES
+('Action'),
+('Adventure'),
+('Animation'),
+('Biography'),
+('Comedy'),
+('Crime'),
+('Documentary'),
+('Drama'),
+('Family'),
+('Fantasy'),
+('History'),
+('Horror'),
+('Music'),
+('Mystery'),
+('Romance'),
+('Sci-Fi'),
+('Sport'),
+('Superhero'),
+('Thriller'),
+('War'),
+('Western');
+
+
 •       Users — Stores user account details, authentication information, and profile data.
 •       Roles — Stores system role definitions (ADMIN, CUSTOMER).
 •       User_Roles — Bridge table between Users and Roles; supports multiple roles per user.
