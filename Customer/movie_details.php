@@ -55,7 +55,14 @@ if (isset($_GET['date'])) {
     $selected_date = mysqli_real_escape_string($conn, $url_date);
 }
 
-$movie_query_string = "SELECT * FROM movies WHERE movie_id = $movie_id AND status = 'ACTIVE' LIMIT 1";
+$movie_query_string = "SELECT m.*, GROUP_CONCAT(DISTINCT g.genre_name SEPARATOR ', ') AS genre_names
+                     FROM movies m
+                     LEFT JOIN movie_genres mg ON mg.movie_id = m.movie_id
+                     LEFT JOIN genres g ON g.genre_id = mg.genre_id
+                     WHERE m.movie_id = $movie_id
+                     AND m.status = 'ACTIVE'
+                     GROUP BY m.movie_id
+                     LIMIT 1";
 $movie_query_result = mysqli_query($conn, $movie_query_string);
 
 if (!$movie_query_result || mysqli_num_rows($movie_query_result) === 0) {
@@ -64,6 +71,14 @@ if (!$movie_query_result || mysqli_num_rows($movie_query_result) === 0) {
 }
 
 $movie_record = mysqli_fetch_assoc($movie_query_result);
+$movie_genres = array();
+if (!empty($movie_record['genre_names'])) {
+    $movie_genres = array_map('trim', explode(',', $movie_record['genre_names']));
+}
+
+if (!empty($movie_record['poster_url']) && strpos($movie_record['poster_url'], 'http') !== 0 && strpos($movie_record['poster_url'], '../Assets/uploads/') === false) {
+    $movie_record['poster_url'] = '../Assets/uploads/movie_posters/' . ltrim($movie_record['poster_url'], '/');
+}
 
 $seven_days_schedule_matrix = array();
 for ($day_offset = 0; $day_offset < 7; $day_offset++) {
@@ -107,8 +122,30 @@ $shows_list_query = "SELECT s.*, scr.screen_name, scr.total_seats as screen_tota
                      ORDER BY s.show_time ASC";
 $shows_list_result = mysqli_query($conn, $shows_list_query);
 
-$similar_movies_query = "SELECT * FROM movies WHERE status = 'ACTIVE' AND movie_id != $movie_id LIMIT 4";
+$similar_movies_query = "SELECT m.*, GROUP_CONCAT(DISTINCT g.genre_name SEPARATOR ', ') AS genre_names
+                         FROM movies m
+                         INNER JOIN movie_genres mg ON mg.movie_id = m.movie_id
+                         INNER JOIN genres g ON g.genre_id = mg.genre_id
+                         WHERE m.status = 'ACTIVE'
+                         AND m.movie_id != $movie_id
+                         AND mg.genre_id IN (SELECT genre_id FROM movie_genres WHERE movie_id = $movie_id)
+                         GROUP BY m.movie_id
+                         ORDER BY m.movie_id DESC
+                         LIMIT 4";
 $similar_movies_result = mysqli_query($conn, $similar_movies_query);
+
+if ($similar_movies_result && mysqli_num_rows($similar_movies_result) === 0) {
+    $fallback_similar_query = "SELECT m.*, GROUP_CONCAT(DISTINCT g.genre_name SEPARATOR ', ') AS genre_names
+                               FROM movies m
+                               LEFT JOIN movie_genres mg ON mg.movie_id = m.movie_id
+                               LEFT JOIN genres g ON g.genre_id = mg.genre_id
+                               WHERE m.status = 'ACTIVE'
+                               AND m.movie_id != $movie_id
+                               GROUP BY m.movie_id
+                               ORDER BY m.movie_id DESC
+                               LIMIT 4";
+    $similar_movies_result = mysqli_query($conn, $fallback_similar_query);
+}
 
 // Collect unique formats for filter buttons
 $formats_available = array();
@@ -180,7 +217,7 @@ if ($shows_list_result && mysqli_num_rows($shows_list_result) > 0) {
                     <div class="hero-meta-list">
                         <div class="meta-item">
                             <span class="meta-label">Genre:</span>
-                            <span class="meta-value"><?php echo htmlspecialchars(implode(' | ', explode('|', $movie_record['genre'] ?? ''))); ?></span>
+                            <span class="meta-value"><?php echo htmlspecialchars(!empty($movie_genres) ? implode(' | ', $movie_genres) : 'N/A'); ?></span>
                         </div>
                         <div class="meta-item">
                             <span class="meta-label">Release Date:</span>
@@ -417,15 +454,27 @@ if ($shows_list_result && mysqli_num_rows($shows_list_result) > 0) {
                 <h3 class="section-title"><i class="fa-solid fa-film"></i> You May Also Like</h3>
                 <div class="similar-movies-grid">
                     <?php while ($similar_movie = mysqli_fetch_assoc($similar_movies_result)): ?>
+                        <?php
+                            $similar_movie_genres = array();
+                            if (!empty($similar_movie['genre_names'])) {
+                                $similar_movie_genres = array_map('trim', explode(',', $similar_movie['genre_names']));
+                            }
+                        ?>
                         <a href="movie_details.php?movie_id=<?php echo intval($similar_movie['movie_id']); ?>" class="similar-movie-card">
                             <div class="similar-poster-wrapper">
-                                <?php if (!empty($similar_movie['poster_url'])): ?>
-                                    <img src="<?php echo htmlspecialchars($similar_movie['poster_url']); ?>"
+                                <?php
+                            $similar_movie_poster = '';
+                            if (!empty($similar_movie['poster_url'])) {
+                                $similar_movie_poster = '../Assets/uploads/movie_posters/' . ltrim($similar_movie['poster_url'], '/');
+                            }
+                        ?>
+                        <?php if (!empty($similar_movie_poster)): ?>
+                                    <img src="<?php echo htmlspecialchars($similar_movie_poster); ?>"
                                          alt="<?php echo htmlspecialchars($similar_movie['title']); ?>"
                                          class="similar-poster-img"
                                          onerror="showFallback(this)">
                                 <?php endif; ?>
-                                <div class="no-image-fallback" style="<?php echo empty($similar_movie['poster_url']) ? 'display:flex;' : 'display:none;'; ?>">
+                                <div class="no-image-fallback" style="<?php echo empty($similar_movie_poster) ? 'display:flex;' : 'display:none;'; ?>">
                                     <i class="fa-solid fa-film fallback-icon"></i>
                                 </div>
                                 <span class="similar-badge-format">
@@ -434,7 +483,7 @@ if ($shows_list_result && mysqli_num_rows($shows_list_result) > 0) {
                             </div>
                             <div class="similar-info">
                                 <h4 class="similar-title"><?php echo htmlspecialchars($similar_movie['title']); ?></h4>
-                                <span class="similar-genre"><?php echo htmlspecialchars($similar_movie['genre']); ?></span>
+                                <span class="similar-genre"><?php echo htmlspecialchars(!empty($similar_movie_genres) ? implode(' | ', $similar_movie_genres) : 'Genre unavailable'); ?></span>
                             </div>
                         </a>
                     <?php endwhile; ?>
