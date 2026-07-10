@@ -83,7 +83,8 @@ while ($seat = mysqli_fetch_assoc($seats_result)) {
             
             <div class="movie-info">
                 <?php if (!empty($booking['poster_url'])): ?>
-                    <img src="<?php echo htmlspecialchars($booking['poster_url']); ?>" 
+                    <?php $booking_poster_path = '../Assets/uploads/movie_posters/' . ltrim($booking['poster_url'], '/'); ?>
+                    <img src="<?php echo htmlspecialchars($booking_poster_path); ?>" 
                          alt="<?php echo htmlspecialchars($booking['title']); ?>" 
                          class="poster">
                 <?php endif; ?>
