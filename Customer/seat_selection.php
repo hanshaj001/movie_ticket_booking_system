@@ -208,11 +208,15 @@ if (!isset($_GET['show_id']) || !is_numeric($_GET['show_id'])) {
 }
 
 $show_id = intval($_GET['show_id']);
-$show_query = "SELECT s.*, scr.screen_name, m.title, m.poster_url, m.movie_format, m.genre, m.duration_minutes, m.language 
+$show_query = "SELECT s.*, scr.screen_name, m.title, m.poster_url, m.movie_format, m.duration_minutes, m.language,
+                     GROUP_CONCAT(DISTINCT g.genre_name SEPARATOR ', ') AS genre_names
               FROM shows s 
               JOIN screens scr ON s.screen_id = scr.screen_id 
               JOIN movies m ON s.movie_id = m.movie_id 
-              WHERE s.show_id = $show_id AND s.show_status = 'ACTIVE' AND m.status = 'ACTIVE'";
+              LEFT JOIN movie_genres mg ON mg.movie_id = m.movie_id
+              LEFT JOIN genres g ON g.genre_id = mg.genre_id
+              WHERE s.show_id = $show_id AND s.show_status = 'ACTIVE' AND m.status = 'ACTIVE'
+              GROUP BY s.show_id";
 $show_result = mysqli_query($conn, $show_query);
 
 if (mysqli_num_rows($show_result) === 0) {
@@ -220,6 +224,10 @@ if (mysqli_num_rows($show_result) === 0) {
     exit();
 }
 $show = mysqli_fetch_assoc($show_result);
+$show_genres = [];
+if (!empty($show['genre_names'])) {
+    $show_genres = array_map('trim', explode(',', $show['genre_names']));
+}
 
 if (strtotime($show['show_date'] . ' ' . $show['show_time']) < strtotime($current_datetime)) {
     header("Location: home.php?error=show_started");
@@ -360,14 +368,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_booking'])) {
         <section class="movie-info-card">
             <div class="movie-info-content">
                 <?php if (!empty($show['poster_url'])): ?>
+                    <?php $show_poster_path = '../Assets/uploads/movie_posters/' . ltrim($show['poster_url'], '/'); ?>
                     <div class="poster-wrapper">
-                        <img src="<?php echo htmlspecialchars($show['poster_url']); ?>" alt="<?php echo htmlspecialchars($show['title']); ?>" class="movie-poster">
+                        <img src="<?php echo htmlspecialchars($show_poster_path); ?>" alt="<?php echo htmlspecialchars($show['title']); ?>" class="movie-poster">
                     </div>
                 <?php endif; ?>
                 <div class="info-wrapper">
                     <h1 class="movie-title"><?php echo htmlspecialchars($show['title']); ?></h1>
                     <div class="show-details">
-                        <div class="detail-item"><i class="fa-solid fa-layer-group"></i> <span><?php echo htmlspecialchars($show['genre']); ?></span></div>
+                        <div class="detail-item"><i class="fa-solid fa-layer-group"></i> <span><?php echo htmlspecialchars(!empty($show_genres) ? implode(' | ', $show_genres) : 'N/A'); ?></span></div>
                         <div class="detail-item"><i class="fa-solid fa-language"></i> <span><?php echo htmlspecialchars($show['language']); ?></span></div>
                         <div class="detail-item"><i class="fa-solid fa-clock"></i> <span><?php echo intval($show['duration_minutes']); ?> mins</span></div>
                         <div class="detail-item"><i class="fa-solid fa-tv"></i> <span><?php echo htmlspecialchars($show['screen_name']); ?></span></div>
