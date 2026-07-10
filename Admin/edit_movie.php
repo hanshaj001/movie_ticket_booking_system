@@ -177,12 +177,41 @@ $row = mysqli_fetch_assoc($result);
                     name="poster"
                     class="form-control">
 
-                <?php
-                if(!empty($row['poster']))
-                {
-                    echo "<br><img src='../Assets/uploads/".$row['poster']."' width='120'>";
-                }
-                ?>
+<?php
+if (!empty($row['poster_url'])) {
+?>
+    <br>
+    <img src="../Assets/uploads/movie_posters/<?php echo htmlspecialchars($row['poster_url']); ?>"
+         width="120"
+         alt="Movie Poster">
+<?php
+}
+?>
+
+
+<div class="form-group full-width">
+
+    <label>Hero Banner (16:9)</label>
+
+    <input
+        type="file"
+        name="banner"
+        class="form-control"
+        accept=".jpg,.jpeg,.png,.webp">
+
+    <?php
+    if (!empty($row['banner_url'])) {
+    ?>
+        <br>
+        <img src="../Assets/uploads/movie_banners/<?php echo htmlspecialchars($row['banner_url']); ?>"
+             width="300"
+             style="border-radius:8px;"
+             alt="Hero Banner">
+    <?php
+    }
+    ?>
+
+</div>
 
             </div>
 

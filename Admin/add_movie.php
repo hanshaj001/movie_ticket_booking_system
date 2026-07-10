@@ -92,31 +92,53 @@ if (isset($_POST['add_movie'])) {
 
     // File binary upload validation
     $poster_name = "";
-    if (isset($_FILES['poster']) && $_FILES['poster']['error'] == 0) {
-        $allowed_types = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-        $file_type = mime_content_type($_FILES['poster']['tmp_name']);
-        $file_size = $_FILES['poster']['size'];
+    $banner_name = "";
+            
+        // Banner validation
+        if (isset($_FILES['banner']) && $_FILES['banner']['error'] == 0) {
 
-        if (!in_array($file_type, $allowed_types)) {
-            $errors['poster'] = "Only JPG, PNG and WEBP images are allowed.";
+            $allowed_types = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+
+            $file_type = mime_content_type($_FILES['banner']['tmp_name']);
+
+            $file_size = $_FILES['banner']['size'];
+
+            if (!in_array($file_type, $allowed_types)) {
+                $errors['banner'] = "Only JPG, PNG and WEBP images are allowed.";
+            }
+
+            if ($file_size > 3145728) {
+                $errors['banner'] = "Banner size must not exceed 3MB.";
+            }
+
+        } else {
+            $errors['banner'] = "Movie banner is required.";
         }
-        if ($file_size > 2097152) {
-            $errors['poster'] = "Poster size must not exceed 2MB.";
-        }
-    } else {
-        $errors['poster'] = "Movie poster is required.";
-    }
 
     // Process image move and insert into database
     if (empty($errors)) {
-        $extension = strtolower(pathinfo($_FILES['poster']['name'], PATHINFO_EXTENSION));
-        $poster_name = time() . "_" . uniqid() . "." . $extension;
-        $upload_path = "../Assets/uploads/movie_posters/" . $poster_name;
+       $poster_extension = strtolower(pathinfo($_FILES['poster']['name'], PATHINFO_EXTENSION));
 
-        if (move_uploaded_file($_FILES['poster']['tmp_name'], $upload_path)) {
-            $stmt = $conn->prepare("INSERT INTO movies (title, description, duration_minutes, genre, language, release_date, movie_format, poster_url, status) VALUES (?,?,?,?,?,?,?,?,'ACTIVE')");
-            $stmt->bind_param("ssisssss", $title, $description, $duration, $genre, $language, $release_date, $movie_format, $poster_name);
-
+                $banner_extension = strtolower(pathinfo($_FILES['banner']['name'], PATHINFO_EXTENSION));
+                $poster_name = time() . "_poster_" . uniqid() . "." . $poster_extension;
+                $banner_name = time() . "_banner_" . uniqid() . "." . $banner_extension;
+                $poster_path = "../Assets/uploads/movie_posters/" . $poster_name;
+                $banner_path = "../Assets/uploads/movie_banners/" . $banner_name;
+        if (move_uploaded_file($_FILES['poster']['tmp_name'], $poster_path) &&
+        move_uploaded_file($_FILES['banner']['tmp_name'], $banner_path)) {
+            $stmt = $conn->prepare("INSERT INTO movies(title,description,duration_minutes,genre,language,release_date,movie_format,poster_url,banner_url,status) VALUES(?,?,?,?,?,?,?,?,?,'ACTIVE')");
+            $stmt->bind_param(
+            "ssissssss",
+            $title,
+            $description,
+            $duration,
+            $genre,
+            $language,
+            $release_date,
+            $movie_format,
+            $poster_name,
+            $banner_name
+            );
             if ($stmt->execute()) {
                 $_SESSION['success_message'] = "Movie added successfully.";
                 header("Location: add_movie.php");
@@ -249,6 +271,17 @@ if (isset($_POST['add_movie'])) {
                 <label>Movie Poster</label>
                 <input type="file" name="poster" accept=".jpg,.jpeg,.png,.webp">
                 <span class="error"><?= $errors['poster'] ?? ''; ?></span>
+            </div>
+
+            <div class="form-group full-width">
+                <label>Hero Banner (16:9)</label>
+                <input type="file"
+                    name="banner"
+                    accept=".jpg,.jpeg,.png,.webp">
+                <small>
+                    Recommended size: 1920 × 1080 or any 16:9 image.
+                </small>
+                <span class="error"><?= $errors['banner'] ?? ''; ?></span>
             </div>
 
             <div class="form-group full-width">
