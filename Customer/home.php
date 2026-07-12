@@ -271,6 +271,7 @@ scheduled for the selected date.
 </div>
 
 </section>
-
+<!-- Footer -->
+<?php include('includes/footer.php'); ?>
 </body>
 </html>
