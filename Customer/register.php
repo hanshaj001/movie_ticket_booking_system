@@ -7,7 +7,7 @@ if (isset($_SESSION['user_id'])) {
     if (!empty($_SESSION['role']) && $_SESSION['role'] === 'ADMIN') {
         header('Location: ../Admin/dashboard.php');
     } else {
-        header('Location: ../Customer/home.php');
+      //  header('Location: ../Customer/home.php');
     }
     exit;
 }
@@ -95,20 +95,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Register - Movie Ticket System</title>
     <link rel="stylesheet" href="../Assets/Customer/register.css"/>
-    <link rel="stylesheet" href="../Assets/sidebar.css"/>
+<?php /* guest register should not depend on admin sidebar css */ ?>
+
 </head>
 <body>
 
-<header class="public-navbar">
-    <div class="public-brand">Movie Ticket System</div>
+<?php
+// Public navbar/footer (works for guests too)
+?>
+<?php include_once 'components/navbar.php'; ?>
 
-    <nav class="public-nav">
-        <a href="../Customer/movie_details.php">Movies</a>
-        <a href="../Customer/seat_selection.php">Seat Selection</a>
-        <a href="../Includes/login.php">Login</a>
-        <a href="../Customer/register.php" class="active">Register</a>
-    </nav>
-</header>
 
 <main class="register-container">
     <div class="register-box">
@@ -147,9 +143,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 </main>
 
-<footer class="public-footer">
-    <div>© <?= date('Y'); ?> Movie Ticket Booking System</div>
-</footer>
+<?php include_once 'components/footer.php'; ?>
+
 
 </body>
 </html>
