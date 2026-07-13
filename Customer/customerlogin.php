@@ -124,7 +124,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <div class="login-card">
 
             
-
                 <?php if (!empty($error)) : ?>
                     <div class="error-message">
                         <?= htmlspecialchars($error); ?>
