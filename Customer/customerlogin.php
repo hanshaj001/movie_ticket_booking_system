@@ -123,10 +123,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             <div class="login-card">
 
-                <h2>
-                    Customer Login
-                </h2>
-
+            
                 <?php if (!empty($error)) : ?>
                     <div class="error-message">
                         <?= htmlspecialchars($error); ?>
