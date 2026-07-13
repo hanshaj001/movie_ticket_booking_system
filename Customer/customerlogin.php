@@ -48,7 +48,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     exit();
 
                 case 'CUSTOMER':
-                    header("Location: ../Customer/home.php");
+                    header("Location: ../Customer/home_page.php");
                     exit();
 
                 case 'STAFF':
