@@ -9,12 +9,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const confirmBtn = document.getElementById('confirmBtn');
     const bookingForm = document.getElementById('bookingForm');
     const sessionPopup = document.getElementById('sessionPopup');
+    const exitConfirmModal = document.getElementById('exitConfirmModal');
 
     let selectedSeats = [];
     let totalPrice = 0;
     let countdownInterval = null;
     let expiryTimestamp = null;
     let refreshInterval = null;
+    let pendingNavigationUrl = null;
+    let allowPageExit = false;
 
     function init() {
         // Initialize state directly from what PHP rendered on the page
@@ -39,8 +42,12 @@ document.addEventListener('DOMContentLoaded', () => {
             checkbox.addEventListener('change', handleSeatToggle);
         });
 
-        document.getElementById('cancelBtn')?.addEventListener('click', () => {
-            if (confirm('Cancel selection and return to movie details?')) {
+        document.getElementById('cancelBtn')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (selectedSeats.length > 0) {
+                showExitModal(`movie_details.php?movie_id=${movieId}`);
+            } else {
+                allowPageExit = true;
                 window.location.href = `movie_details.php?movie_id=${movieId}`;
             }
         });
@@ -50,10 +57,98 @@ document.addEventListener('DOMContentLoaded', () => {
                 e.preventDefault();
                 alert('Please select at least one seat before confirming!');
             } else {
+                allowPageExit = true;
                 clearInterval(countdownInterval);
                 clearInterval(refreshInterval);
             }
         });
+
+        // Intercept all internal navigation link clicks using capturing phase
+        document.addEventListener('click', (e) => {
+            const anchor = e.target.closest('a');
+            if (anchor) {
+                const href = anchor.getAttribute('href');
+                if (href && !href.startsWith('#') && !href.startsWith('javascript:')) {
+                    if (selectedSeats.length > 0 && !allowPageExit) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        showExitModal(anchor.href);
+                    }
+                }
+            }
+        }, true);
+
+        // Modal Action Handlers
+        if (exitConfirmModal) {
+            exitConfirmModal.querySelector('.btn-exit-cancel')?.addEventListener('click', hideExitModal);
+            exitConfirmModal.querySelector('.exit-confirm-close')?.addEventListener('click', hideExitModal);
+            exitConfirmModal.querySelector('.btn-exit-confirm')?.addEventListener('click', handleExitConfirm);
+        }
+
+        // Beforeunload prompt (native browser message)
+        window.addEventListener('beforeunload', (e) => {
+            if (selectedSeats.length > 0 && !allowPageExit) {
+                e.preventDefault();
+                e.returnValue = 'You have selected seats. If you leave now, they will be released.';
+                return e.returnValue;
+            }
+        });
+
+        // Unload/pagehide cleanly releasing seat locks via keepalive
+        window.addEventListener('pagehide', () => {
+            if (selectedSeats.length > 0 && !allowPageExit) {
+                const formData = new FormData();
+                formData.append('show_id', showId);
+                formData.append('csrf_token', csrfToken);
+                fetch(`seat_selection.php?action=cancel_session`, {
+                    method: 'POST',
+                    headers: { 'X-CSRF-Token': csrfToken },
+                    body: formData,
+                    keepalive: true
+                });
+            }
+        });
+    }
+
+    function showExitModal(url) {
+        pendingNavigationUrl = url;
+        if (exitConfirmModal) {
+            exitConfirmModal.style.display = 'flex';
+            exitConfirmModal.setAttribute('aria-hidden', 'false');
+        }
+    }
+
+    function hideExitModal() {
+        pendingNavigationUrl = null;
+        if (exitConfirmModal) {
+            exitConfirmModal.style.display = 'none';
+            exitConfirmModal.setAttribute('aria-hidden', 'true');
+        }
+    }
+
+    async function handleExitConfirm() {
+        allowPageExit = true;
+        hideExitModal();
+        if (selectedSeats.length > 0) {
+            try {
+                const formData = new FormData();
+                formData.append('show_id', showId);
+                formData.append('csrf_token', csrfToken);
+                
+                await fetch(`seat_selection.php?action=cancel_session`, {
+                    method: 'POST',
+                    headers: { 'X-CSRF-Token': csrfToken },
+                    body: formData
+                });
+            } catch (e) {
+                console.error('Error canceling session:', e);
+            }
+        }
+        if (pendingNavigationUrl) {
+            window.location.href = pendingNavigationUrl;
+        } else {
+            window.location.href = `movie_details.php?movie_id=${movieId}`;
+        }
     }
 
     async function handleSeatToggle(e) {
@@ -62,6 +157,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const isSelected = checkbox.checked;
 
         if (isSelected) {
+            if (selectedSeats.length >= 5) {
+                checkbox.checked = false;
+                alert('You can select a maximum of 5 seats at once.');
+                return;
+            }
             addSeatToState(seatId, checkbox);
         } else {
             removeSeatFromState(seatId);
