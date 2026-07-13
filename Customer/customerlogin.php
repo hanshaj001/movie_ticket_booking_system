@@ -54,7 +54,7 @@ case 'CUSTOMER':
                     header("Location: ../Staff/dashboard.php");
                     exit();
 
-                default:
+                 default:
                     $error = "No role assigned.";
                     break;
             }
