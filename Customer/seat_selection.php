@@ -285,6 +285,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_booking'])) {
         if (empty($selected_seats)) {
             $message = "Please select at least one seat!";
             $message_type = 'error';
+        } else if (count($selected_seats) > 5) {
+            $message = "You can only book up to 5 seats at once.";
+            $message_type = 'error';
         } else {
             mysqli_begin_transaction($conn);
             try {
@@ -350,8 +353,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_booking'])) {
     <title>Select Seats - <?php echo htmlspecialchars($show['title']); ?></title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="../Assets/css/Customer/seat_selection.css">
-    <link rel="stylesheet" href="../Assets/css/Customer/auth_modal.css">
+    <link rel="stylesheet" href="../Assets/css/Customer/seat_selection.css?v=<?= time(); ?>">
+    <link rel="stylesheet" href="../Assets/css/Customer/auth_modal.css?v=<?= time(); ?>">
 </head>
 <body class="seat-selection-body">
     <?php include_once 'navbar.php'; ?>
@@ -502,6 +505,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_booking'])) {
         <span>Booking session started! You have 5 minutes to complete your booking.</span>
     </div>
 
+    <!-- Exit Confirmation Modal -->
+    <div id="exitConfirmModal" class="exit-confirm-modal" aria-hidden="true" style="display:none;">
+        <div class="exit-confirm-card">
+            <button class="exit-confirm-close" aria-label="Close">&times;</button>
+            <div class="exit-confirm-icon">
+                <i class="fa-solid fa-circle-question"></i>
+            </div>
+            <h3 class="exit-confirm-title">Exit Seat Selection?</h3>
+            <p class="exit-confirm-desc">You have selected seats. If you exit now, your selected seats will be released and made available for other customers.</p>
+            <div class="exit-confirm-actions">
+                <button class="btn-exit-cancel" type="button">No, Keep Selecting</button>
+                <button class="btn-exit-confirm" type="button">Yes, Exit</button>
+            </div>
+        </div>
+    </div>
+
     <?php include_once __DIR__ . '/components/auth_modal.php'; ?>
 
     <?php if (file_exists(__DIR__ . '/footer.php')) { include_once 'footer.php'; } ?>
@@ -515,7 +534,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_booking'])) {
         const initialExpiryTime = <?php echo $initial_expiry_time ? '"'.date('Y/m/d H:i:s', strtotime($initial_expiry_time)).'"' : 'null'; ?>;
     </script>
     <script src="../Assets/js/Customer/auth_modal.js"></script>
-    <script src="../Assets/js/Customer/seat_selection.js"></script>
+    <script src="../Assets/js/Customer/seat_selection.js?v=<?= time(); ?>"></script>
 </body>
 </html>
 <?php mysqli_close($conn); ?>
