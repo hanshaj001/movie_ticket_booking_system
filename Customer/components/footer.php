@@ -1,3 +1,4 @@
+<link rel="stylesheet" href="../Assets/css/Customer/footer.css">
 <footer class="footer">
     <div class="footer-container">
 
