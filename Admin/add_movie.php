@@ -1,10 +1,10 @@
 <?php
-include '../Includes/sidebar.php';
-require_once '../includes/db_conn.php';
+require_once '../Includes/db_conn.php';
+include 'components/sidebar.php';
 
 // Authentication check
 if (!isset($_SESSION['user_id'])) {
-    header("Location: ../Includes/login.php");
+    header("Location: ../login.php");
     exit();
 }
 
@@ -24,7 +24,7 @@ if (isset($_POST['add_movie'])) {
     $title = trim($_POST['title']);
     $description = trim($_POST['description']);
     $duration = trim($_POST['duration']);
-    $genre = trim($_POST['genre']);
+    $genre = isset($_POST['genre']) ? (is_array($_POST['genre']) ? implode(', ', $_POST['genre']) : trim($_POST['genre'])) : '';
     $language = trim($_POST['language']);
     $movie_format = trim($_POST['movie_format']);
     $release_date = trim($_POST['release_date']);
@@ -92,31 +92,53 @@ if (isset($_POST['add_movie'])) {
 
     // File binary upload validation
     $poster_name = "";
-    if (isset($_FILES['poster']) && $_FILES['poster']['error'] == 0) {
-        $allowed_types = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-        $file_type = mime_content_type($_FILES['poster']['tmp_name']);
-        $file_size = $_FILES['poster']['size'];
+    $banner_name = "";
+            
+        // Banner validation
+        if (isset($_FILES['banner']) && $_FILES['banner']['error'] == 0) {
 
-        if (!in_array($file_type, $allowed_types)) {
-            $errors['poster'] = "Only JPG, PNG and WEBP images are allowed.";
+            $allowed_types = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+
+            $file_type = mime_content_type($_FILES['banner']['tmp_name']);
+
+            $file_size = $_FILES['banner']['size'];
+
+            if (!in_array($file_type, $allowed_types)) {
+                $errors['banner'] = "Only JPG, PNG and WEBP images are allowed.";
+            }
+
+            if ($file_size > 3145728) {
+                $errors['banner'] = "Banner size must not exceed 3MB.";
+            }
+
+        } else {
+            $errors['banner'] = "Movie banner is required.";
         }
-        if ($file_size > 2097152) {
-            $errors['poster'] = "Poster size must not exceed 2MB.";
-        }
-    } else {
-        $errors['poster'] = "Movie poster is required.";
-    }
 
     // Process image move and insert into database
     if (empty($errors)) {
-        $extension = strtolower(pathinfo($_FILES['poster']['name'], PATHINFO_EXTENSION));
-        $poster_name = time() . "_" . uniqid() . "." . $extension;
-        $upload_path = "../uploads/movie_posters/" . $poster_name;
+       $poster_extension = strtolower(pathinfo($_FILES['poster']['name'], PATHINFO_EXTENSION));
 
-        if (move_uploaded_file($_FILES['poster']['tmp_name'], $upload_path)) {
-            $stmt = $conn->prepare("INSERT INTO movies (title, description, duration_minutes, genre, language, release_date, movie_format, poster_url, status) VALUES (?,?,?,?,?,?,?,?,'ACTIVE')");
-            $stmt->bind_param("ssisssss", $title, $description, $duration, $genre, $language, $release_date, $movie_format, $poster_name);
-
+                $banner_extension = strtolower(pathinfo($_FILES['banner']['name'], PATHINFO_EXTENSION));
+                $poster_name = time() . "_poster_" . uniqid() . "." . $poster_extension;
+                $banner_name = time() . "_banner_" . uniqid() . "." . $banner_extension;
+                $poster_path = "../Assets/uploads/movie_posters/" . $poster_name;
+                $banner_path = "../Assets/uploads/movie_banners/" . $banner_name;
+        if (move_uploaded_file($_FILES['poster']['tmp_name'], $poster_path) &&
+        move_uploaded_file($_FILES['banner']['tmp_name'], $banner_path)) {
+            $stmt = $conn->prepare("INSERT INTO movies(title,description,duration_minutes,genre,language,release_date,movie_format,poster_url,banner_url,status) VALUES(?,?,?,?,?,?,?,?,?,'ACTIVE')");
+            $stmt->bind_param(
+            "ssissssss",
+            $title,
+            $description,
+            $duration,
+            $genre,
+            $language,
+            $release_date,
+            $movie_format,
+            $poster_name,
+            $banner_name
+            );
             if ($stmt->execute()) {
                 $_SESSION['success_message'] = "Movie added successfully.";
                 header("Location: add_movie.php");
@@ -137,7 +159,7 @@ if (isset($_POST['add_movie'])) {
 <head>
     <meta charset="UTF-8">
     <title>Add Movie - Admin Panel</title>
-    <link rel="stylesheet" href="../Assets/add_movie.css">
+    <link rel="stylesheet" href="../Assets/css/Admin/add_movie.css">
 </head>
 <body>
 <div class="main-container">
@@ -184,9 +206,44 @@ if (isset($_POST['add_movie'])) {
 
             <div class="form-group">
                 <label>Genre</label>
-                <input type="text" name="genre" value="<?= htmlspecialchars($genre); ?>" placeholder="Action, Drama, Comedy">
+                <div style="display: flex; gap: 15px; flex-wrap: wrap; padding: 10px 0;">
+                    <?php
+                    $available_genres = [
+                        'Action', 'Adventure', 'Animation', 'Comedy', 'Crime', 'Documentary', 'Drama', 
+                        'Family', 'Fantasy', 'History', 'Horror', 'Music', 'Mystery', 'Romance', 
+                        'Sci-Fi', 'Superhero', 'Thriller', 'War', 'Western'
+                    ];
+                    $selected_genres = array_map('trim', explode(',', $genre));
+                    foreach ($available_genres as $g) {
+                        $checked = in_array($g, $selected_genres) ? 'checked' : '';
+                        echo "<label style='font-weight: normal; display: flex; align-items: center; gap: 5px;'>
+                                <input type='checkbox' name='genre[]' value='$g' class='genre-checkbox' $checked> $g
+                              </label>";
+                    }
+                    ?>
+                </div>
+                <div style="margin-top: 10px; font-style: italic; color: #666;">
+                    Selected: <span id="selected-genres-display">None</span>
+                </div>
                 <span class="error"><?= $errors['genre'] ?? ''; ?></span>
             </div>
+
+            <script>
+                document.addEventListener("DOMContentLoaded", function() {
+                    const checkboxes = document.querySelectorAll('.genre-checkbox');
+                    const display = document.getElementById('selected-genres-display');
+
+                    function updateDisplay() {
+                        const selected = Array.from(checkboxes)
+                            .filter(cb => cb.checked)
+                            .map(cb => cb.value);
+                        display.textContent = selected.length > 0 ? selected.join(', ') : 'None';
+                    }
+
+                    checkboxes.forEach(cb => cb.addEventListener('change', updateDisplay));
+                    updateDisplay();
+                });
+            </script>
 
             <div class="form-group">
                 <label>Language</label>
@@ -214,6 +271,17 @@ if (isset($_POST['add_movie'])) {
                 <label>Movie Poster</label>
                 <input type="file" name="poster" accept=".jpg,.jpeg,.png,.webp">
                 <span class="error"><?= $errors['poster'] ?? ''; ?></span>
+            </div>
+
+            <div class="form-group full-width">
+                <label>Hero Banner (16:9)</label>
+                <input type="file"
+                    name="banner"
+                    accept=".jpg,.jpeg,.png,.webp">
+                <small>
+                    Recommended size: 1920 × 1080 or any 16:9 image.
+                </small>
+                <span class="error"><?= $errors['banner'] ?? ''; ?></span>
             </div>
 
             <div class="form-group full-width">
@@ -247,7 +315,7 @@ if (isset($_POST['add_movie'])) {
     <?php while ($movie = $movieQuery->fetch_assoc()) : ?>
         <div class="movie-card">
             <div class="movie-poster">
-                <img src="../uploads/movie_posters/<?= htmlspecialchars($movie['poster_url']); ?>" alt="<?= htmlspecialchars($movie['title']); ?>">
+                <img src="../Assets/uploads/movie_posters/<?= htmlspecialchars($movie['poster_url']); ?>" alt="<?= htmlspecialchars($movie['title']); ?>">
             </div>
 
             <div class="movie-content">
@@ -277,7 +345,7 @@ if (isset($_POST['add_movie'])) {
                 <div class="action-buttons">
                     <a href="view_movie.php?id=<?= $movie['movie_id']; ?>" class="view-btn">View</a>
                     <a href="edit_movie.php?id=<?= $movie['movie_id']; ?>" class="edit-btn">Edit</a>
-                    <a href="delete_movie.php?id=<?= $movie['movie_id']; ?>" class="cancel-btn" onclick="return confirm('Delete this movie?');">Delete</a>
+                    <a href="cancel_movie.php?id=<?= $movie['movie_id']; ?>" class="cancel-btn" onclick="return confirm('Delete this movie?');">Delete</a>
                 </div>
             </div>
         </div>

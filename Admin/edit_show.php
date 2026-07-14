@@ -1,7 +1,7 @@
 <?php
 
 require_once '../Includes/db_conn.php';
-include '../Includes/sidebar.php';
+include 'components/sidebar.php';
 
 // get show id from query parameter
 
@@ -278,7 +278,8 @@ if(isset($_POST['update_show']))
                      WHERE show_id='$show_id'"
                 )
             );
-        header("Location: add_show.php");
+        header("Location: add_show.php?msg=Show updated successfully&type=success");
+        exit();
         }
         else
         {
@@ -296,7 +297,7 @@ if(isset($_POST['update_show']))
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Show</title>
 
-    <link rel="stylesheet" href="../Assets/add_show.css">
+    <link rel="stylesheet" href="../Assets/css/Admin/add_show.css">
 </head>
 
 <body>

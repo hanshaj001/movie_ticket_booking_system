@@ -17,13 +17,13 @@ if(!$conn)
 <?php
 //session_start();
  require_once '../Includes/db_conn.php'; 
-include '../Includes/sidebar.php';
+include 'components/sidebar.php';
 
 /* Authentication */
 
 if(!isset($_SESSION['user_id']))
 {
-    header("Location:../Includes/login.php");
+    header("Location:../login.php");
     exit();
 }
 
@@ -126,8 +126,8 @@ WHERE status='ACTIVE'
 <head>
 <meta charset="UTF-8">
 <title>Booking Monitoring</title>
-<link rel="stylesheet" href="../Assets/booking_monitoring.css"/>
-<link rel="stylesheet" href="../Assets/sidebar.css">
+<link rel="stylesheet" href="../Assets/css/Admin/booking_monitoring.css"/>
+<link rel="stylesheet" href="../Assets/css/Admin/sidebar.css">
 </head>
 
 <body>
