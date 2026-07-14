@@ -46,15 +46,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 case 'ADMIN':
                     header("Location: ../Admin/dashboard.php");
                     exit();
+<<<<<<< HEAD
 case 'CUSTOMER':
     header("Location: home_page.php");
     exit();
 
+=======
+
+                case 'CUSTOMER':
+                    header("Location: ../Customer/home.php");
+                    exit();
+
+>>>>>>> main
                 case 'STAFF':
                     header("Location: ../Staff/dashboard.php");
                     exit();
 
+<<<<<<< HEAD
                  default:
+=======
+                default:
+>>>>>>> main
                     $error = "No role assigned.";
                     break;
             }
