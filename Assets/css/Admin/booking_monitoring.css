@@ -66,6 +66,24 @@ body{
     background:#f05526;
 }
 
+
+.reset-btn{
+    background:#ff6b3d;
+    color:white;
+    text-decoration:none;
+    padding:12px 25px;
+    border-radius:10px;
+    font-weight:600;
+    transition:.3s;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.reset-btn:hover{
+    background:#f05526;
+}
+
 /* Table Card */
 
 .table-box{
