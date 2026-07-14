@@ -15,7 +15,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 'CUSTOMER') {
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>About Us | Movie Ticket Booking System</title>
 
-<link rel="stylesheet" href="css/about.css">
+<link rel="stylesheet" href="../Assets/Customer/about.css">
 
 <!-- Font Awesome -->
 <link rel="stylesheet"
