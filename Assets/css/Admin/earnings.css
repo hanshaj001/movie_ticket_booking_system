@@ -1,0 +1,217 @@
+/* Reset & basics */
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', Arial, sans-serif; }
+body { background: #f5f5f7; color: #222; }
+
+/* Container layout fixed */
+.main-container { display: flex; width: 100%; min-height: 100vh; position: relative; }
+.content-area { flex: 1; min-width: 0; padding: 40px; margin-left: 220px; position: relative; z-index: 1; transition: margin-left 0.3s ease, padding 0.3s ease; }
+
+@media(max-width: 992px) { .content-area { margin-left: 0; padding: 30px; } }
+@media(max-width: 768px) { .content-area { margin-left: 0; padding: 20px; } }
+
+/* Earnings Specific CSS */
+.page-header {
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 25px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+}
+
+.page-title {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.title-icon {
+    width: 60px;
+    height: 60px;
+    background: #ff6136;
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: white;
+}
+
+.page-title h1 {
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.page-title p {
+    color: #777;
+    font-size: 14px;
+}
+
+.earnings-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
+}
+
+.movie-card {
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    transition: transform 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.movie-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+}
+
+.movie-poster {
+    position: relative;
+    height: 200px;
+    overflow: hidden;
+}
+
+.movie-poster img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.poster-placeholder {
+    width: 100%;
+    height: 100%;
+    background: #eaeaea;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    color: #bbb;
+}
+
+.movie-status {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.movie-status.active {
+    background: rgba(40, 167, 69, 0.9);
+    color: white;
+}
+
+.movie-status.inactive {
+    background: rgba(220, 53, 69, 0.9);
+    color: white;
+}
+
+.movie-details {
+    padding: 20px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.movie-details h3 {
+    margin: 0 0 15px 0;
+    font-size: 18px;
+    color: #333;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #f9f9f9;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+.stat-item .label {
+    font-size: 11px;
+    color: #777;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.stat-item .value {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+}
+
+.earnings-box {
+    background: #fdfdfd;
+    border-left: 4px solid #ff4d2d;
+    padding: 15px;
+    border-radius: 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.earnings-box .label {
+    color: #555;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.earnings-box .amount {
+    color: #ff4d2d;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.view-btn {
+    display: block;
+    width: 100%;
+    text-align: center;
+    background: #ff4d2d;
+    color: white;
+    padding: 14px;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: 0.3s;
+    margin-top: auto;
+    border: none;
+}
+
+.view-btn:hover {
+    background: #e63e1f;
+}
+
+.no-data {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 40px;
+    background: #fff;
+    border-radius: 12px;
+    color: #777;
+}
+
+@media (max-width: 768px) {
+    .earnings-grid {
+        grid-template-columns: 1fr;
+    }
+}
