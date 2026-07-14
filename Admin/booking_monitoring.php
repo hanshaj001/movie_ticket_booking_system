@@ -14,8 +14,6 @@ if(!$conn)
 
 ?>
 
-
-
 <?php
 //session_start();
  require_once '../Includes/db_conn.php'; 
