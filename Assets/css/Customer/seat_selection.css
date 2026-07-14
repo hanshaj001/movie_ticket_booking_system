@@ -769,3 +769,17 @@ body.seat-selection-body {
     transform: translateY(-2px);
     box-shadow: 0 10px 24px rgba(255, 77, 45, 0.4);
 }
+
+/* Notification Modal Icon Accent Colors */
+.exit-confirm-icon.success {
+    color: var(--success);
+}
+.exit-confirm-icon.error {
+    color: #dc2626;
+}
+.exit-confirm-icon.warning {
+    color: #f59f00;
+}
+.exit-confirm-icon.info {
+    color: #3b82f6;
+}
