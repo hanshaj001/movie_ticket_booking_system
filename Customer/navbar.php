@@ -2,10 +2,10 @@
 session_start();
 
 // Security Access and Session Tracking
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 'CUSTOMER') {
-    header("Location: ../Includes/login.php");
-    exit();
-}
+// if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 'CUSTOMER') {
+//     header("Location: ../login.php");
+//     exit();
+// }
 
 // Customer Name
 $customer_name = isset($_SESSION['name']) ? $_SESSION['name'] : 'Customer';
@@ -19,7 +19,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Customer Panel - MTBS</title>
 
-    <link rel="stylesheet" href="../Assets/Customer/navbar.css">
+    <link rel="stylesheet" href="../Assets/css/Customer/navbar.css?v=<?= time(); ?>">
 
     <link rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -71,7 +71,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
             <span><?= htmlspecialchars($customer_name); ?></span>
         </div>
 
-        <a href="../Includes/logout.php" class="logout-btn">
+        <a href="../logout.php" class="logout-btn">
             <i class="fa-solid fa-right-from-bracket"></i>
             Logout
         </a>

@@ -57,7 +57,7 @@ body{
     color:white;
 }
 
-.user-section{
+.right{
     display:flex;
     align-items:center;
     gap:20px;
@@ -100,7 +100,7 @@ body{
         justify-content:center;
     }
 
-    .user-section{
+    .right{
         flex-direction:column;
     }
 }
