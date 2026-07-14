@@ -1,6 +1,6 @@
 <?php
 session_start();
-include '../Includes/db_conn.php';
+include 'Includes/db_conn.php';
 
 $error = "";
 
@@ -35,19 +35,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             // Role-based redirection
             if ($user['role_name'] == "ADMIN") {
-                header("Location: ../Admin/dashboard.php");
+                header("Location: Admin/dashboard.php");
             } else {
-                header("Location: ../Customer/home.php");
+                header("Location: Customer/home.php");
             }
             exit();
 
-        } else {
-            $error = "Invalid password!";
-        }
+       } else {
+    $error = "Invalid email or password!";
+}
 
-    } else {
-        $error = "User not found!";
-    }
+} else {
+    $error = "Invalid email or password!";
+}
 }
 ?>
 
@@ -55,7 +55,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <html lang="en">
 <head>
     <title>Login - Movie Ticket System</title>
-    <link rel="stylesheet" href="../Assets/login.css">
+    <link rel="stylesheet" href="Assets/login.css">
 </head>
 
 <body>
@@ -75,7 +75,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <input type="email" name="email" placeholder="Enter email" required>
 
             <label>Password</label>
-            <input type="password" name="password" placeholder="Enter password" required>
+
+<div class="password-container">
+    <input type="password"
+           id="password"
+           name="password"
+           placeholder="Enter password"
+           required>
+
+    <span class="toggle-password" onclick="togglePassword()">
+        👁
+    </span>
+</div>
 
             <button type="submit">Login</button>
         </form>
@@ -86,6 +97,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </div>
 
 </div>
+<script>
+function togglePassword() {
+    const password = document.getElementById("password");
+
+    if (password.type === "password") {
+        password.type = "text";
+    } else {
+        password.type = "password";
+    }
+}
+</script>
 
 </body>
 </html>
