@@ -96,12 +96,13 @@ body{
 
 .movie-grid{
     display:grid;
-
     grid-template-columns:
     repeat(auto-fit,minmax(280px,1fr));
 
     gap:25px;
 }
+
+/* Entire card clickable */
 
 .movie-card-link{
     text-decoration:none;
@@ -110,18 +111,20 @@ body{
 
 .movie-card{
     background:white;
-
     border-radius:15px;
     overflow:hidden;
 
     box-shadow:
-    0 4px 12px rgba(0,0,0,.08);
+    0 4px 12px rgba(0,0,0,0.08);
 
     transition:.3s;
 }
 
 .movie-card:hover{
-    transform:translateY(-8px);
+    transform:translateY(-6px);
+
+    box-shadow:
+    0 10px 20px rgba(0,0,0,0.15);
 }
 
 .movie-card img{
@@ -141,34 +144,67 @@ body{
 
 .movie-info p{
     margin-bottom:10px;
+    font-size:14px;
+    color:#374151;
 }
 
 .details-btn{
     display:block;
+    text-align:center;
 
     margin-top:15px;
     padding:12px;
-
-    text-align:center;
 
     background:#f93535;
     color:white;
 
     border-radius:8px;
+
+    font-weight:600;
 }
+
+.movie-card:hover .details-btn{
+    background:#f93535;
+}
+
+/* =========================
+   EMPTY STATE
 
 .empty-state{
     grid-column:1/-1;
+
     text-align:center;
-    padding:60px;
+
+    padding:60px 20px;
 }
 
 .empty-state img{
-    width:150px;
+    width:180px;
+    opacity:.7;
     margin-bottom:20px;
 }
 
-/* RESPONSIVE */
+.empty-state h3{
+    color:#f93535;
+    margin-bottom:10px;
+}
+
+.empty-state p{
+    color:#6b7280;
+}
+
+/* =========================
+   NO MOVIES
+
+.no-movie{
+    grid-column:1/-1;
+    text-align:center;
+    font-size:20px;
+    padding:50px;
+}
+
+/* =========================
+   RESPONSIVE
 
 @media(max-width:768px){
 
@@ -178,6 +214,10 @@ body{
 
     .hero-content h1{
         font-size:32px;
+    }
+
+    .hero-content p{
+        font-size:16px;
     }
 
     .movies-section{

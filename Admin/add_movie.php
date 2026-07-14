@@ -325,7 +325,7 @@ if (isset($_POST['add_movie'])) {
                 </div>
 
                 <div class="movie-meta">
-                    <span><i class="fas fa-theater-masks"></i> &nbsp; <?= htmlspecialchars($movie['genre']); ?></span>
+                    <span><i class="fas fa-theater-masks"></i> &nbsp; <?= htmlspecialchars($movie['genre'] ?? ''); ?></span>
                     <span><i class="fas fa-globe"></i> &nbsp; <?= htmlspecialchars($movie['language']); ?></span>
                 </div>
 
@@ -343,7 +343,7 @@ if (isset($_POST['add_movie'])) {
                 </p>
 
                 <div class="action-buttons">
-                    <a href="view_movie.php?id=<?= $movie['movie_id']; ?>" class="view-btn">View</a>
+
                     <a href="edit_movie.php?id=<?= $movie['movie_id']; ?>" class="edit-btn">Edit</a>
                     <a href="cancel_movie.php?id=<?= $movie['movie_id']; ?>" class="cancel-btn" onclick="return confirm('Delete this movie?');">Delete</a>
                 </div>
