@@ -2,10 +2,10 @@
 session_start();
 
 // Security Access and Session Tracking
-// if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 'CUSTOMER') {
-//     header("Location: ../login.php");
-//     exit();
-// }
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 'CUSTOMER') {
+    header("Location: ../login.php");
+    exit();
+}
 
 // Customer Name
 $customer_name = isset($_SESSION['name']) ? $_SESSION['name'] : 'Customer';

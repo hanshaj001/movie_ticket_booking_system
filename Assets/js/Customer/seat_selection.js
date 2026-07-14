@@ -10,6 +10,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const bookingForm = document.getElementById('bookingForm');
     const sessionPopup = document.getElementById('sessionPopup');
     const exitConfirmModal = document.getElementById('exitConfirmModal');
+    const notificationModal = document.getElementById('notificationModal');
+    const notificationIconEl = document.getElementById('notificationIcon');
+    const notificationTitleEl = document.getElementById('notificationTitle');
+    const notificationDescEl = document.getElementById('notificationDesc');
+    const notificationCloseBtn = document.getElementById('notificationCloseBtn');
+    const notificationOkBtn = document.getElementById('notificationOkBtn');
 
     let selectedSeats = [];
     let totalPrice = 0;
@@ -18,6 +24,42 @@ document.addEventListener('DOMContentLoaded', () => {
     let refreshInterval = null;
     let pendingNavigationUrl = null;
     let allowPageExit = false;
+    let notificationCallback = null;
+
+    window.showNotificationModal = function(title, message, type = 'info', callback = null) {
+        if (!notificationTitleEl || !notificationDescEl || !notificationIconEl || !notificationModal) return;
+
+        notificationTitleEl.textContent = title;
+        notificationDescEl.textContent = message;
+        notificationCallback = callback;
+
+        notificationIconEl.className = 'exit-confirm-icon ' + type;
+        
+        let iconHtml = '<i class="fa-solid fa-circle-info"></i>';
+        if (type === 'success') {
+            iconHtml = '<i class="fa-solid fa-circle-check"></i>';
+        } else if (type === 'error') {
+            iconHtml = '<i class="fa-solid fa-circle-xmark"></i>';
+        } else if (type === 'warning') {
+            iconHtml = '<i class="fa-solid fa-circle-exclamation"></i>';
+        }
+        notificationIconEl.innerHTML = iconHtml;
+
+        notificationModal.style.display = 'flex';
+        notificationModal.setAttribute('aria-hidden', 'false');
+    };
+
+    function hideNotificationModal() {
+        if (notificationModal) {
+            notificationModal.style.display = 'none';
+            notificationModal.setAttribute('aria-hidden', 'true');
+        }
+        if (notificationCallback) {
+            const cb = notificationCallback;
+            notificationCallback = null;
+            cb();
+        }
+    }
 
     function init() {
         // Initialize state directly from what PHP rendered on the page
@@ -55,7 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
         bookingForm?.addEventListener('submit', (e) => {
             if (selectedSeats.length === 0) {
                 e.preventDefault();
-                alert('Please select at least one seat before confirming!');
+                showNotificationModal('No Seats Selected', 'Please select at least one seat before confirming!', 'warning');
             } else {
                 allowPageExit = true;
                 clearInterval(countdownInterval);
@@ -85,7 +127,21 @@ document.addEventListener('DOMContentLoaded', () => {
             exitConfirmModal.querySelector('.btn-exit-confirm')?.addEventListener('click', handleExitConfirm);
         }
 
-        // Beforeunload prompt (native browser message)
+        // Notification Modal Action Handlers
+        notificationCloseBtn?.addEventListener('click', hideNotificationModal);
+        notificationOkBtn?.addEventListener('click', hideNotificationModal);
+
+        // Intercept F5, Ctrl+R, and Ctrl+Shift+R for refresh confirmation
+        document.addEventListener('keydown', (e) => {
+            const isF5 = e.key === 'F5';
+            const isCtrlR = e.ctrlKey && (e.key === 'r' || e.key === 'R');
+            if ((isF5 || isCtrlR) && selectedSeats.length > 0 && !allowPageExit) {
+                e.preventDefault();
+                showExitModal(window.location.href);
+            }
+        });
+
+        // Beforeunload prompt (native browser message for refresh button and page close)
         window.addEventListener('beforeunload', (e) => {
             if (selectedSeats.length > 0 && !allowPageExit) {
                 e.preventDefault();
@@ -145,7 +201,11 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
         if (pendingNavigationUrl) {
-            window.location.href = pendingNavigationUrl;
+            if (pendingNavigationUrl === window.location.href) {
+                window.location.reload();
+            } else {
+                window.location.href = pendingNavigationUrl;
+            }
         } else {
             window.location.href = `movie_details.php?movie_id=${movieId}`;
         }
@@ -159,7 +219,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (isSelected) {
             if (selectedSeats.length >= 5) {
                 checkbox.checked = false;
-                alert('You can select a maximum of 5 seats at once.');
+                showNotificationModal('Seat Limit Reached', 'You can select a maximum of 5 seats at once.', 'warning');
                 return;
             }
             addSeatToState(seatId, checkbox);
@@ -192,13 +252,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             } else {
                 revertSeatState(checkbox, seatId, isSelected);
-                alert(data.error || 'Seat is no longer available.');
+                if (data.error === 'auth_required') {
+                    showAuthModal();
+                } else {
+                    showNotificationModal('Seat Unavailable', data.error || 'Seat is no longer available.', 'error');
+                }
             }
         } catch (error) {
             console.error('Error:', error);
             revertSeatState(checkbox, seatId, isSelected);
-            // If an error occurs (likely not logged in), show a centered modal
-            // prompting the user to Login or Register instead of a simple alert.
             showAuthModal();
         }
     }
@@ -257,8 +319,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const diff = expiryTimestamp - Date.now();
             if (diff <= 0) {
                 clearInterval(countdownInterval);
-                alert("Your booking session has expired!");
-                window.location.href = `movie_details.php?movie_id=${movieId}`;
+                showNotificationModal('Session Expired', 'Your booking session has expired!', 'error', () => {
+                    window.location.href = `movie_details.php?movie_id=${movieId}`;
+                });
                 return;
             }
             const mins = Math.floor(diff / 60000);
@@ -285,7 +348,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (isSelectedByMe && !seat.is_locked_by_me && seat.seat_status !== 'AVAILABLE') {
                         removeSeatFromState(seat.show_seat_id);
                         checkbox.checked = false;
-                        alert(`Seat ${seat.seat_number} reservation timed out or was claimed by another customer.`);
+                        showNotificationModal('Seat Timeout / Reclaimed', `Seat ${seat.seat_number} reservation timed out or was claimed by another customer.`, 'warning');
                     }
 
                     if (label) {

@@ -46,9 +46,29 @@ $current_page = basename($_SERVER['PHP_SELF']);
             </a>
         </li>
 
+        <li class="<?= $current_page == 'manage_screens.php' ? 'active' : '' ?>">
+            <a href="manage_screens.php">
+                <i class="fa-solid fa-tv"></i> Manage Screens
+            </a>
+        </li>
+        <li class="<?= $current_page == 'manage_genres.php' ? 'active' : '' ?>">
+            <a href="manage_genres.php">
+                <i class="fa-solid fa-tags"></i> Manage Genres
+            </a>
+        </li>
         <li class="<?= $current_page == 'booking_monitoring.php' ? 'active' : '' ?>">
             <a href="booking_monitoring.php">
                 <i class="fa-solid fa-ticket"></i> Booking Monitoring
+            </a>
+        </li>
+        <li class="<?= ($current_page == 'earnings.php' || $current_page == 'movie_earnings.php') ? 'active' : '' ?>">
+            <a href="earnings.php">
+                <i class="fa-solid fa-chart-bar"></i> Earnings
+            </a>
+        </li>
+        <li class="<?= $current_page == 'ledger.php' ? 'active' : '' ?>">
+            <a href="ledger.php">
+                <i class="fa-solid fa-book"></i> Ledger
             </a>
         </li>
         <li class="logout-menu">
