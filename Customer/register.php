@@ -1,4 +1,6 @@
-<<<<<<< HEAD
+aryan/customer/register
+﻿<?php
+ HEAD
 ﻿<?php
 session_start();
 include '../Includes/db_conn.php';
@@ -7,12 +9,21 @@ $errors = [];
 $success = "";
 $full_name = '';
 $email = '';
-=======
 <?php
+ main
 session_start();
 include '../Includes/db_conn.php';
 
 // If already logged in, redirect to appropriate home.
+ aryan/customer/register
+if (isset($_SESSION['user_id'])) {
+    if (!empty($_SESSION['role']) && $_SESSION['role'] === 'ADMIN') {
+        header('Location: ../Admin/dashboard.php');
+    } else {
+      //  header('Location: ../Customer/home.php');
+    }
+    exit;
+}
 // if (isset($_SESSION['user_id'])) {
 //     if (!empty($_SESSION['role']) && $_SESSION['role'] === 'ADMIN') {
 //         header('Location: ../Admin/dashboard.php');
@@ -21,15 +32,16 @@ include '../Includes/db_conn.php';
 //     }
 //     exit;
 // }
+main
 
 $error = '';
 $success = '';
->>>>>>> main
+ main
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $full_name = trim($_POST['full_name'] ?? '');
     $email = trim($_POST['email'] ?? '');
-<<<<<<< HEAD
+ HEAD
     $password = $_POST['password'] ?? '';
     $confirm_password = $_POST['confirm_password'] ?? '';
 
@@ -87,7 +99,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $full_name = $email = '';
             } else {
                 $errors[] = 'Registration failed. Please try again later.';
-=======
+
     $phone = trim($_POST['phone'] ?? '');
     $password = $_POST['password'] ?? '';
     $confirm_password = $_POST['confirm_password'] ?? '';
@@ -152,7 +164,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $conn->rollback();
                     $error = 'Registration failed: ' . $e->getMessage();
                 }
->>>>>>> main
+ main
             }
         }
     }
@@ -162,7 +174,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<<<<<<< HEAD
+ HEAD
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Customer Register - Movie Ticket Booking System</title>
@@ -294,25 +306,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </script>
 </body>
 </html>
-=======
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Register - Movie Ticket System</title>
     <link rel="stylesheet" href="../Assets/Customer/register.css"/>
-    <link rel="stylesheet" href="../Assets/sidebar.css"/>
+<?php /* guest register should not depend on admin sidebar css */ ?>
+
 </head>
 <body>
 
-<header class="public-navbar">
-    <div class="public-brand">Movie Ticket System</div>
+<?php
+// Public navbar/footer (works for guests too)
+?>
+<?php include_once 'components/navbar.php'; ?>
 
-    <nav class="public-nav">
-        <a href="../Customer/movie_details.php">Movies</a>
-        <a href="../Customer/seat_selection.php">Seat Selection</a>
-        <a href="../Includes/login.php">Login</a>
-        <a href="../Customer/register.php" class="active">Register</a>
-    </nav>
-</header>
 
 <main class="register-container">
     <div class="register-box">
@@ -351,11 +358,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 </main>
 
-<footer class="public-footer">
-    <div>© <?= date('Y'); ?> Movie Ticket Booking System</div>
-</footer>
+<?php include_once 'components/footer.php'; ?>
+
 
 </body>
 </html>
 
->>>>>>> main
+main
