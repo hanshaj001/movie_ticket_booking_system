@@ -1,7 +1,7 @@
 <?php
 
 require_once '../Includes/db_conn.php';
-include '../Includes/sidebar.php';
+include 'components/sidebar.php';
 
 if (!isset($_GET['id'])) {
     echo "<script>
@@ -31,7 +31,7 @@ $row = mysqli_fetch_assoc($result);
 <head>
     <meta charset="UTF-8">
     <title>Add Movie - Admin Panel</title>
-    <link rel="stylesheet" href="../Assets/add_movie.css">
+    <link rel="stylesheet" href="../Assets/css/Admin/add_movie.css">
 </head>
 <body>
 <div class="main-container">
@@ -86,12 +86,43 @@ $row = mysqli_fetch_assoc($result);
                 <div class="form-group">
                     <label>Genre</label>
 
-                    <input
-                        type="text"
-                        name="genre"
-                        class="form-control"
-                        value="<?php echo htmlspecialchars($row['genre']); ?>">
+                    <div style="display: flex; gap: 15px; flex-wrap: wrap; padding: 10px 0;">
+                        <?php
+                        $available_genres = [
+                            'Action', 'Adventure', 'Animation', 'Comedy', 'Crime', 'Documentary', 'Drama', 
+                            'Family', 'Fantasy', 'History', 'Horror', 'Music', 'Mystery', 'Romance', 
+                            'Sci-Fi', 'Superhero', 'Thriller', 'War', 'Western'
+                        ];
+                        $selected_genres = array_map('trim', explode(',', $row['genre'] ?? ''));
+                        foreach ($available_genres as $g) {
+                            $checked = in_array($g, $selected_genres) ? 'checked' : '';
+                            echo "<label style='font-weight: normal; display: flex; align-items: center; gap: 5px;'>
+                                    <input type='checkbox' name='genre[]' value='$g' class='genre-checkbox' $checked> $g
+                                  </label>";
+                        }
+                        ?>
+                    </div>
+                    <div style="margin-top: 10px; font-style: italic; color: #666;">
+                        Selected: <span id="selected-genres-display">None</span>
+                    </div>
                 </div>
+
+                <script>
+                    document.addEventListener("DOMContentLoaded", function() {
+                        const checkboxes = document.querySelectorAll('.genre-checkbox');
+                        const display = document.getElementById('selected-genres-display');
+
+                        function updateDisplay() {
+                            const selected = Array.from(checkboxes)
+                                .filter(cb => cb.checked)
+                                .map(cb => cb.value);
+                            display.textContent = selected.length > 0 ? selected.join(', ') : 'None';
+                        }
+
+                        checkboxes.forEach(cb => cb.addEventListener('change', updateDisplay));
+                        updateDisplay();
+                    });
+                </script>
 
                 <!-- Language -->
                 <div class="form-group">
@@ -146,12 +177,41 @@ $row = mysqli_fetch_assoc($result);
                     name="poster"
                     class="form-control">
 
-                <?php
-                if(!empty($row['poster']))
-                {
-                    echo "<br><img src='../uploads/".$row['poster']."' width='120'>";
-                }
-                ?>
+<?php
+if (!empty($row['poster_url'])) {
+?>
+    <br>
+    <img src="../Assets/uploads/movie_posters/<?php echo htmlspecialchars($row['poster_url']); ?>"
+         width="120"
+         alt="Movie Poster">
+<?php
+}
+?>
+
+
+<div class="form-group full-width">
+
+    <label>Hero Banner (16:9)</label>
+
+    <input
+        type="file"
+        name="banner"
+        class="form-control"
+        accept=".jpg,.jpeg,.png,.webp">
+
+    <?php
+    if (!empty($row['banner_url'])) {
+    ?>
+        <br>
+        <img src="../Assets/uploads/movie_banners/<?php echo htmlspecialchars($row['banner_url']); ?>"
+             width="300"
+             style="border-radius:8px;"
+             alt="Hero Banner">
+    <?php
+    }
+    ?>
+
+</div>
 
             </div>
 

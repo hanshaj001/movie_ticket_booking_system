@@ -1,6 +1,6 @@
 <?php
 require_once '../Includes/db_conn.php'; 
-include '../Includes/sidebar.php';
+include 'components/sidebar.php';
 
 $page = isset($_GET['page']) ? intval($_GET['page']) : 1;
 $page = max(1, $page);
@@ -61,8 +61,13 @@ if (isset($_POST['add_show'])) {
 
     if (empty($show_time)) {
         $errors['show_time'] = "Please select show time.";
-    } elseif ($show_date == date("Y-m-d") && strtotime($show_time) <= strtotime(date("H:i"))) {
-        $errors['show_time'] = "Past time not allowed for today.";
+    } elseif ($show_date == date("Y-m-d")) {
+        $selected_show_datetime = strtotime($show_date . ' ' . $show_time);
+        $minimum_allowed_datetime = strtotime('+1 hour');
+
+        if ($selected_show_datetime < $minimum_allowed_datetime) {
+            $errors['show_time'] = "Show time must be at least 1 hour after the current time.";
+        }
     }
 
     if (empty($ticket_price)) {
@@ -135,7 +140,7 @@ if (isset($_POST['add_show'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Movie Shows</title>
-    <link rel="stylesheet" href="../Assets/add_show.css">
+    <link rel="stylesheet" href="../Assets/css/Admin/add_show.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -438,6 +443,15 @@ if (isset($_POST['add_show'])) {
             if (!sTime) {
                 document.getElementById("show_time").nextElementSibling.textContent = "Please select show time.";
                 isValid = false;
+            }
+            if (sDate && sTime) {
+                const selectedDateTime = new Date(`${sDate}T${sTime}`);
+                const minimumAllowedTime = new Date(Date.now() + 60 * 60 * 1000);
+
+                if (selectedDateTime < minimumAllowedTime) {
+                    document.getElementById("show_time").nextElementSibling.textContent = "Show time must be at least 1 hour after the current time.";
+                    isValid = false;
+                }
             }
             if (!price || isNaN(price) || parseFloat(price) <= 0) {
                 document.getElementById("ticket_price").nextElementSibling.textContent = "Price must be greater than 0.";
