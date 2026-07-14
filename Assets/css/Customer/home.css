@@ -10,16 +10,14 @@ body{
     color:#111827;
 }
 
-/* =========================
-   HERO SECTION
-========================= */
+/* HERO */
 
 .hero{
-    height:420px;
+    height:450px;
     background:
     linear-gradient(
-    rgba(0,0,0,0.65),
-    rgba(0,0,0,0.65)
+    rgba(0,0,0,.65),
+    rgba(0,0,0,.65)
     ),
     url('../../uploads/banner.jpg');
 
@@ -27,14 +25,9 @@ body{
     background-position:center;
 
     display:flex;
-    align-items:center;
     justify-content:center;
+    align-items:center;
     text-align:center;
-}
-
-.hero-content{
-    max-width:700px;
-    padding:20px;
 }
 
 .hero-content h1{
@@ -44,51 +37,45 @@ body{
 }
 
 .hero-content p{
+    color:white;
     font-size:20px;
-    color:#e5e7eb;
     margin-bottom:25px;
 }
 
 .book-btn{
     display:inline-block;
     padding:14px 35px;
+
     background:#f93535;
     color:white;
+
     text-decoration:none;
     border-radius:8px;
-    font-weight:600;
-    transition:.3s;
 }
 
 .book-btn:hover{
-    background:#f93535;
+    background:#dc2626;
 }
 
-/* =========================
-   DATE FILTER
-========================= */
+/* DATE FILTER */
 
 .date-filter{
-    padding:25px;
-    text-align:center;
     background:#e5e7eb;
+    text-align:center;
+    padding:25px;
 }
 
 .date-filter a{
     display:inline-block;
-    padding:12px 20px;
+
     margin:5px;
+    padding:12px 20px;
+
     background:white;
     color:#111827;
-    text-decoration:none;
-    border-radius:10px;
-    font-weight:500;
-    transition:.3s;
-}
 
-.date-filter a:hover{
-    background:#f93535;
-    color:white;
+    border-radius:10px;
+    text-decoration:none;
 }
 
 .date-filter a.active{
@@ -96,9 +83,7 @@ body{
     color:white;
 }
 
-/* =========================
-   MOVIES SECTION
-========================= */
+/* MOVIES */
 
 .movies-section{
     padding:50px;
@@ -107,8 +92,6 @@ body{
 .movies-section h2{
     text-align:center;
     margin-bottom:35px;
-    color:#111827;
-    font-size:30px;
 }
 
 .movie-grid{
@@ -186,7 +169,6 @@ body{
 
 /* =========================
    EMPTY STATE
-========================= */
 
 .empty-state{
     grid-column:1/-1;
@@ -213,7 +195,6 @@ body{
 
 /* =========================
    NO MOVIES
-========================= */
 
 .no-movie{
     grid-column:1/-1;
@@ -224,7 +205,6 @@ body{
 
 /* =========================
    RESPONSIVE
-========================= */
 
 @media(max-width:768px){
 
