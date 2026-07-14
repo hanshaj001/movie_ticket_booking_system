@@ -1,0 +1,273 @@
+/* Reset & basics */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', Arial, sans-serif;
+}
+
+body {
+    background: #f5f5f7;
+    color: #222;
+}
+
+/* Container layout fixed */
+.main-container {
+    display: flex;
+    width: 100%;
+    min-height: 100vh;
+    position: relative;
+}
+
+.content-area {
+    flex: 1;
+    min-width: 0;
+    padding: 40px;
+    margin-left: 220px;
+    position: relative; 
+    z-index: 1;
+    transition: margin-left 0.3s ease, padding 0.3s ease;
+}
+
+/* Headers */
+.page-header, .show-list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.page-title, .show-list-title {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.title-icon, .show-list-title i {
+    width: 60px;
+    height: 60px;
+    background: #ff6136;
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: white;
+}
+
+.show-list-title i {
+    background: #fff4f1;
+    color: #ff4d2d;
+}
+
+h1, h2 {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 4px;
+    color: #222;
+}
+
+h2 { font-size: 26px; }
+
+.page-title p, .show-list-title p {
+    color: #777;
+    font-size: 14px;
+}
+
+/* Form cards */
+.form-card {
+    background: white;
+    padding: 35px;
+    border-radius: 24px;
+    box-shadow: 0 5px 25px rgba(0,0,0,0.05);
+    margin-bottom: 25px;
+}
+
+/* Forms & grids */
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.full-width { grid-column: 1 / 3; }
+
+label {
+    margin-bottom: 8px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+input, select, textarea {
+    padding: 14px;
+    border: 1px solid #ddd;
+    border-radius: 14px;
+    outline: none;
+    font-size: 15px;
+    background: #fafafa;
+    transition: 0.3s;
+}
+
+input:focus, select:focus, textarea:focus {
+    border-color: #ff4d2d;
+    background: white;
+}
+
+/* Action buttons & form buttons */
+.form-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 25px;
+}
+
+.submit-btn, .reset-btn {
+    padding: 16px;
+    border: none;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 14px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.submit-btn {
+    flex: 1;
+    background: #ff4d2d;
+    color: white;
+}
+
+.submit-btn:hover { background: #e63e1f; }
+
+.reset-btn {
+    background: #f5f5f5;
+    color: #444;
+    padding-left: 30px;
+    padding-right: 30px;
+}
+
+.reset-btn:hover { background: #e0e0e0; }
+
+/* Table styling for Genres */
+.table-container {
+    background: white;
+    border-radius: 24px;
+    padding: 25px;
+    box-shadow: 0 5px 25px rgba(0,0,0,0.05);
+    overflow-x: auto;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-table th, .data-table td {
+    padding: 15px 20px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+.data-table th {
+    font-size: 14px;
+    font-weight: 600;
+    color: #777;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.data-table td {
+    font-size: 15px;
+    color: #333;
+}
+
+.data-table tbody tr {
+    transition: background-color 0.3s;
+}
+
+.data-table tbody tr:hover {
+    background-color: #fcfcfc;
+}
+
+/* Actions cell buttons */
+.actions-cell {
+    display: flex;
+    gap: 10px;
+}
+
+.action-btn {
+    padding: 8px 14px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.action-btn.edit {
+    background: #fff4e8;
+    color: #ff9500;
+}
+
+.action-btn.edit:hover {
+    background: #ffe8cc;
+}
+
+.action-btn.delete {
+    background: #ffe8e3;
+    color: #ff4d2d;
+}
+
+.action-btn.delete:hover {
+    background: #ffd0c7;
+}
+
+/* Validation Exceptions */
+.message {
+    padding: 14px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    font-weight: 500;
+    background: #e8fff1;
+    color: #14a44d;
+}
+.message.error-msg { background: #ffe8e3; color: #ff4d2d; }
+.error { color: #ff3b30; font-size: 13px; margin-top: 6px; display: block; }
+.no-data { text-align: center; padding: 40px; font-weight: 600; color: #888; }
+
+/* Breakpoint adjustments */
+@media(max-width: 992px) {
+    .content-area {
+        margin-left: 0;
+        padding: 30px;
+    }
+}
+
+@media(max-width: 768px) {
+    .content-area {
+        margin-left: 0;
+        padding: 20px;
+    }
+
+    .form-grid { grid-template-columns: 1fr; }
+    .full-width { grid-column: unset; }
+
+    .page-header, .show-list-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    h1 { font-size: 26px; }
+    .form-actions { flex-direction: column; }
+}
