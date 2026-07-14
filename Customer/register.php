@@ -3,14 +3,14 @@ session_start();
 include '../Includes/db_conn.php';
 
 // If already logged in, redirect to appropriate home.
-if (isset($_SESSION['user_id'])) {
-    if (!empty($_SESSION['role']) && $_SESSION['role'] === 'ADMIN') {
-        header('Location: ../Admin/dashboard.php');
-    } else {
-        header('Location: ../Customer/home.php');
-    }
-    exit;
-}
+// if (isset($_SESSION['user_id'])) {
+//     if (!empty($_SESSION['role']) && $_SESSION['role'] === 'ADMIN') {
+//         header('Location: ../Admin/dashboard.php');
+//     } else {
+//         header('Location: ../Customer/home.php');
+//     }
+//     exit;
+// }
 
 $error = '';
 $success = '';
@@ -77,7 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $success = 'Registration successful. Redirecting to Login...';
 
                     // Redirect to login
-                    header('refresh:1; url=../Includes/login.php');
+                    header('refresh:1; url=../login.php');
                 } catch (Throwable $e) {
                     $conn->rollback();
                     $error = 'Registration failed: ' . $e->getMessage();
@@ -142,7 +142,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </form>
 
         <p class="footer-text">
-            Already have an account? <a href="../Includes/login.php">Login</a>
+            Already have an account? <a href="../login.php">Login</a>
         </p>
     </div>
 </main>
