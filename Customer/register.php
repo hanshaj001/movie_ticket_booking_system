@@ -2,9 +2,21 @@
 session_start();
 include '../Includes/db_conn.php';
 
+// Capture redirect param into session on page load
+if (isset($_GET['redirect']) && !empty($_GET['redirect'])) {
+    $_SESSION['pending_redirect'] = $_GET['redirect'];
+}
+
 // Redirect if already logged in
 if (isset($_SESSION['user_id']) && isset($_SESSION['role'])) {
     if ($_SESSION['role'] === 'CUSTOMER') {
+        // Honor pending redirect if user is already logged in
+        if (!empty($_SESSION['pending_redirect'])) {
+            $redirect_url = $_SESSION['pending_redirect'];
+            unset($_SESSION['pending_redirect']);
+            header("Location: $redirect_url");
+            exit();
+        }
         header("Location: home.php");
         exit();
     } elseif ($_SESSION['role'] === 'ADMIN') {
@@ -164,9 +176,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <div class="alert alert-success">
                         <div><i class="fa-solid fa-circle-check"></i> <?= htmlspecialchars($success); ?></div>
                     </div>
-                    <script>
-                        setTimeout(function(){ window.location.href = '../login.php'; }, 2000);
-                    </script>
+    <?php
+        // Preserve redirect after registration — pass it to login.php via query param
+        // so login.php stores it into session
+        if (!empty($_SESSION['pending_redirect'])) {
+            $encoded = urlencode($_SESSION['pending_redirect']);
+            echo "<script>setTimeout(function(){ window.location.href = '../login.php?redirect={$encoded}'; }, 2000);</script>";
+        } else {
+            echo "<script>setTimeout(function(){ window.location.href = '../login.php'; }, 2000);</script>";
+        }
+?>
                 <?php endif; ?>
 
                 <form method="POST" action="">
@@ -222,7 +241,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </form>
 
                 <div class="auth-link">
-                    <p>Already have an account? <a href="../login.php">Login</a></p>
+                    <?php
+                        $login_url = '../login.php';
+                        if (!empty($_SESSION['pending_redirect'])) {
+                            $login_url .= '?redirect=' . urlencode($_SESSION['pending_redirect']);
+                        }
+                    ?>
+                    <p>Already have an account? <a href="<?= htmlspecialchars($login_url); ?>">Login</a></p>
                 </div>
             </div>
         </div>
