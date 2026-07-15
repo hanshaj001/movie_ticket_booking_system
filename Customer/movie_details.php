@@ -171,7 +171,7 @@ if ($shows_list_result && mysqli_num_rows($shows_list_result) > 0) {
 </head>
 <body class="movie-details-body">
 
-    <?php include_once 'navbar.php'; ?>
+    <?php include_once 'components/navbar.php'; ?>
 
     <main class="movie-details-container">
 
@@ -500,9 +500,9 @@ if ($shows_list_result && mysqli_num_rows($shows_list_result) > 0) {
 
     </main>
 
-    <?php if (file_exists(__DIR__ . '/footer.php')) { include_once 'footer.php'; } ?>
+    <?php if (file_exists(__DIR__ . '/components/footer.php')) { include_once 'components/footer.php'; } ?>
 
     <script src="../Assets/js/Customer/movie_details.js"></script>
 </body>
 </html>
-<?php mysqli_close($conn); ?>
+<?php mysqli_close($conn); ?>   

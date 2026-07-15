@@ -377,7 +377,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_booking'])) {
     <link rel="stylesheet" href="../Assets/css/Customer/auth_modal.css?v=<?= time(); ?>">
 </head>
 <body class="seat-selection-body">
-    <?php include_once 'navbar.php'; ?>
+    <?php include_once 'components/navbar.php'; ?>
 
     <main class="seat-selection-container">
         <nav class="breadcrumb-nav">
@@ -558,7 +558,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_booking'])) {
 
     <?php include_once __DIR__ . '/components/auth_modal.php'; ?>
 
-    <?php if (file_exists(__DIR__ . '/footer.php')) { include_once 'footer.php'; } ?>
+    <?php if (file_exists(__DIR__ . '/components/footer.php')) { include_once 'components/footer.php'; } ?>
 
     <script>
         // Global variables initialized cleanly via structural state rendering engines inside PHP

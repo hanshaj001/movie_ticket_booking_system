@@ -10,8 +10,8 @@
         const closeBtn = modal.querySelector('.auth-close');
 
         // Local paths relative to Customer/seat_selection.php
-        if (loginBtn) loginBtn.addEventListener('click', () => { window.location.href = '../login.php'; });
-        if (registerBtn) registerBtn.addEventListener('click', () => { window.location.href = 'register.php'; });
+        if (loginBtn) loginBtn.addEventListener('click', () => { const redirect = encodeURIComponent(window.location.pathname + window.location.search); window.location.href = `../login.php?redirect=${redirect}`; });
+        if (registerBtn) registerBtn.addEventListener('click', () => { const redirect = encodeURIComponent(window.location.pathname + window.location.search); window.location.href = `register.php?redirect=${redirect}`; });
         if (closeBtn) closeBtn.addEventListener('click', () => hide());
 
         modal.addEventListener('click', (ev) => { if (ev.target === modal) hide(); });
