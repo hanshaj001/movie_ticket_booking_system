@@ -1,35 +1,23 @@
 <?php
-
-$conn = mysqli_connect(
-    "localhost",
-    "root",
-    "",
-    "movie_ticket_booking_system"
-);
-
-if(!$conn)
-{
-    die("Database Connection Failed");
-}
-
-?>
-
-
-<?php
-
 require_once '../Includes/db_conn.php';
+session_start();
+
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 'ADMIN') {
+    die("Unauthorized");
+}
 
 if(!isset($_GET['id']))
 {
     die("Invalid Request");
 }
 
-$booking_id = $_GET['id'];
+$booking_id = intval($_GET['id']);
 
 $booking = mysqli_query($conn,"
-SELECT *
-FROM bookings
-WHERE booking_id='$booking_id'
+    SELECT b.*, s.movie_id 
+    FROM bookings b
+    JOIN shows s ON b.show_id = s.show_id
+    WHERE b.booking_id='$booking_id'
 ");
 
 $data = mysqli_fetch_assoc($booking);
@@ -39,25 +27,42 @@ if(!$data)
     die("Booking Not Found");
 }
 
-/* Update Booking Status */
+if ($data['booking_status'] === 'CONFIRMED') {
+    mysqli_begin_transaction($conn);
+    try {
+        /* Update Booking Status */
+        mysqli_query($conn,"
+            UPDATE bookings
+            SET booking_status='CANCELLED', cancellation_time=NOW()
+            WHERE booking_id='$booking_id'
+        ");
 
-mysqli_query($conn,"
-UPDATE bookings
-SET booking_status='CANCELLED'
-WHERE booking_id='$booking_id'
-");
+        /* Release Seats */
+        mysqli_query($conn,"
+            UPDATE show_seats ss
+            JOIN booking_details bd ON ss.show_seat_id=bd.show_seat_id
+            SET ss.seat_status='AVAILABLE'
+            WHERE bd.booking_id='$booking_id'
+        ");
 
-/* Release Seats */
+        /* Insert into Ledger */
+        $movie_id = $data['movie_id'];
+        $show_id = $data['show_id'];
+        $amount = -abs($data['total_amount']);
+        $ins_ledger = mysqli_prepare($conn, "INSERT INTO ledger (booking_id, movie_id, show_id, transaction_type, amount, remarks) VALUES (?, ?, ?, 'CANCELLATION', ?, 'Booking cancelled by Admin')");
+        mysqli_stmt_bind_param($ins_ledger, "iiid", $booking_id, $movie_id, $show_id, $amount);
+        if (!mysqli_stmt_execute($ins_ledger)) {
+            throw new Exception("Ledger insert failed");
+        }
 
-mysqli_query($conn,"
-UPDATE show_seats ss
-JOIN booking_details bd
-ON ss.show_seat_id=bd.show_seat_id
-SET ss.booking_status='AVAILABLE'
-WHERE bd.booking_id='$booking_id'
-");
-
-header("Location: booking_cancel_success.php?id=".$booking_id);
-exit();
-
+        mysqli_commit($conn);
+        header("Location: booking_cancel_success.php?id=".$booking_id);
+        exit();
+    } catch (Exception $e) {
+        mysqli_rollback($conn);
+        die("Error cancelling booking.");
+    }
+} else {
+    die("Booking is not in confirmed state.");
+}
 ?>
