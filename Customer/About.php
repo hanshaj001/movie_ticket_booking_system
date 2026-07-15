@@ -195,9 +195,11 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
 </section>
 
 <!-- Footer -->
-<?php include('includes/footer.php'); ?>
+<?php 
+include('../Assets/css/Customer/footer.css'); 
+?>
 
-<script src="js/about.js"></script>
+<script src="../Assets/js/Customer/about.js"></script>
 
 </body>
 </html>
