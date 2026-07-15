@@ -25,7 +25,7 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
 <body>
 
 <!-- Navbar -->
-<?php include('includes/header.php'); ?>
+<?php include('../Customer/navbar.php'); ?>
 
 <!-- Hero Section -->
 <section class="about-hero">
