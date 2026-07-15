@@ -65,7 +65,7 @@ while ($seat = mysqli_fetch_assoc($seats_result)) {
 
 </head>
 <body>
-    <?php include_once 'navbar.php'; ?>
+    <?php include_once 'components/navbar.php'; ?>
     <div class="container">
         <div class="success-card">
             <div class="success-icon">
@@ -143,7 +143,7 @@ while ($seat = mysqli_fetch_assoc($seats_result)) {
             </a>
         </div>
     </div>
-    <?php if (file_exists(__DIR__ . '/footer.php')) { include_once 'footer.php'; } ?>
+    <?php if (file_exists(__DIR__ . '/components/footer.php')) { include_once 'components/footer.php'; } ?>
 </body>
 </html>
 <?php mysqli_close($conn); ?>

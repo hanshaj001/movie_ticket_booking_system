@@ -37,6 +37,14 @@ if (isset($_GET['booking_id']) && is_numeric($_GET['booking_id'])) {
                 ";
                 mysqli_query($conn, $update_query);
                 
+                // Release Seats
+                mysqli_query($conn,"
+                    UPDATE show_seats ss
+                    JOIN booking_details bd ON ss.show_seat_id=bd.show_seat_id
+                    SET ss.seat_status='AVAILABLE'
+                    WHERE bd.booking_id='$booking_id'
+                ");
+
                 // Insert into Ledger
                 $movie_id = $booking['movie_id'];
                 $show_id = $booking['show_id'];
@@ -44,7 +52,9 @@ if (isset($_GET['booking_id']) && is_numeric($_GET['booking_id'])) {
                 
                 $ins_ledger = mysqli_prepare($conn, "INSERT INTO ledger (booking_id, movie_id, show_id, transaction_type, amount, remarks) VALUES (?, ?, ?, 'CANCELLATION', ?, 'Booking cancelled')");
                 mysqli_stmt_bind_param($ins_ledger, "iiid", $booking_id, $movie_id, $show_id, $amount);
-                mysqli_stmt_execute($ins_ledger);
+                if (!mysqli_stmt_execute($ins_ledger)) {
+                    throw new Exception("Ledger insert failed");
+                }
                 
                 mysqli_commit($conn);
                 header("Location: booking_history.php?cancel=success");
