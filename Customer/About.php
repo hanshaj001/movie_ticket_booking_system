@@ -15,7 +15,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>About Us | Movie Ticket Booking System</title>
 
-<link rel="stylesheet" href="../Assets/Customer/about.css">
+<link rel="stylesheet" href="../Assets/css/Customer/about.css">
+
 
 <!-- Font Awesome -->
 <link rel="stylesheet"
@@ -25,7 +26,9 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
 <body>
 
 <!-- Navbar -->
-<?php include('../Customer/navbar.php'); ?>
+<?php
+ include('../Customer/components/navbar.php'); 
+ ?>
 
 <!-- Hero Section -->
 <section class="about-hero">
