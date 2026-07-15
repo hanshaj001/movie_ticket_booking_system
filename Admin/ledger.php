@@ -65,8 +65,8 @@ $stmt_count->execute();
 $total_records = $stmt_count->get_result()->fetch_assoc()['total'];
 $total_pages = ceil($total_records / $records_per_page);
 
-// Main Query with Running Balance
-$order_sql = $sort == 'asc' ? 'ASC' : 'DESC';
+// Main Query without subquery
+$order_sql = $sort == 'asc' ? 'l.transaction_date ASC, l.ledger_id ASC' : 'l.transaction_date DESC, l.ledger_id DESC';
 
 $query = "
     SELECT l.*, 
@@ -74,8 +74,7 @@ $query = "
            m.title as movie_name,
            s.show_date, s.show_time, 
            sc.screen_name,
-           u.full_name as customer_name,
-           (SELECT SUM(amount) FROM ledger WHERE ledger_id <= l.ledger_id) as running_balance
+           u.full_name as customer_name
     FROM ledger l
     JOIN bookings b ON l.booking_id = b.booking_id
     JOIN movies m ON l.movie_id = m.movie_id
@@ -83,7 +82,7 @@ $query = "
     JOIN screens sc ON s.screen_id = sc.screen_id
     JOIN users u ON b.user_id = u.user_id
     WHERE $where_sql
-    ORDER BY l.ledger_id $order_sql
+    ORDER BY $order_sql
     LIMIT ?, ?
 ";
 
@@ -99,6 +98,34 @@ if (!empty($params)) {
 }
 $stmt->execute();
 $ledger_records = $stmt->get_result();
+
+$records = [];
+while ($row = $ledger_records->fetch_assoc()) {
+    $records[] = $row;
+}
+
+// Calculate running balance precisely in PHP
+if (count($records) > 0) {
+    $first_row = $records[0];
+    
+    // Get the absolute balance up to the first displayed row
+    $stmt_bal = $conn->prepare("SELECT COALESCE(SUM(amount), 0) as total FROM ledger WHERE transaction_date < ? OR (transaction_date = ? AND ledger_id <= ?)");
+    $stmt_bal->bind_param("ssi", $first_row['transaction_date'], $first_row['transaction_date'], $first_row['ledger_id']);
+    $stmt_bal->execute();
+    $current_balance = $stmt_bal->get_result()->fetch_assoc()['total'];
+
+    foreach ($records as $index => &$row) {
+        if ($sort == 'asc' && $index > 0) {
+            $current_balance += $row['amount'];
+        }
+        
+        $row['running_balance'] = $current_balance;
+        
+        if ($sort == 'desc') {
+            $current_balance -= $row['amount'];
+        }
+    }
+}
 
 // Fetch movies for filter dropdown
 $movies = $conn->query("SELECT movie_id, title FROM movies ORDER BY title ASC");
@@ -206,8 +233,8 @@ $qs = http_build_query($qs_array);
                     </tr>
                 </thead>
                 <tbody>
-                    <?php if ($ledger_records->num_rows > 0): ?>
-                        <?php while ($row = $ledger_records->fetch_assoc()): ?>
+                    <?php if (count($records) > 0): ?>
+                        <?php foreach ($records as $row): ?>
                             <tr>
                                 <td class="nowrap"><?= date("Y-m-d H:i", strtotime($row['transaction_date'])) ?></td>
                                 <td>BK<?= str_pad($row['bk_display_id'], 4, '0', STR_PAD_LEFT) ?></td>
@@ -232,7 +259,7 @@ $qs = http_build_query($qs_array);
                                     Rs. <?= number_format($row['running_balance'], 2) ?>
                                 </td>
                             </tr>
-                        <?php endwhile; ?>
+                        <?php endforeach; ?>
                     <?php else: ?>
                         <tr>
                             <td colspan="8" style="text-align: center; padding: 20px;">No ledger transactions found.</td>

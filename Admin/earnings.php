@@ -65,10 +65,10 @@ $movies = $stmt->get_result();
                     <div class="movie-card">
                         <div class="movie-poster">
                             <?php
-                            $poster_path = "../" . $movie['poster_url'];
+                            $poster_path = "../Assets/uploads/movie_posters/" . $movie['poster_url'];
                             if (!empty($movie['poster_url']) && file_exists($poster_path)): 
                             ?>
-                                <img src="<?= htmlspecialchars($movie['poster_url']) ?>" alt="<?= htmlspecialchars($movie['title']) ?>">
+                                <img src="<?= htmlspecialchars("../Assets/uploads/movie_posters/" . $movie['poster_url']) ?>" alt="<?= htmlspecialchars($movie['title']) ?>">
                             <?php else: ?>
                                 <div class="poster-placeholder">
                                     <i class="fas fa-film"></i>
