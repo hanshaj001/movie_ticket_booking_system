@@ -82,10 +82,10 @@ $shows = $s_stmt->get_result();
         <div class="summary-card">
             <div class="poster-container">
                 <?php
-                $poster_path = "../" . $movie['poster_url'];
+                $poster_path = "../Assets/uploads/movie_posters/" . $movie['poster_url'];
                 if (!empty($movie['poster_url']) && file_exists($poster_path)): 
                 ?>
-                    <img src="<?= htmlspecialchars($movie['poster_url']) ?>" alt="Poster">
+                    <img src="<?= htmlspecialchars("../Assets/uploads/movie_posters/" . $movie['poster_url']) ?>" alt="Poster">
                 <?php else: ?>
                     <div class="poster-placeholder">
                         <i class="fas fa-film"></i>
