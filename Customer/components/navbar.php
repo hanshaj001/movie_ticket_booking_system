@@ -6,7 +6,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
 
 // Check login status
 $is_logged_in = isset($_SESSION['user_id']) && isset($_SESSION['role']) && $_SESSION['role'] === 'CUSTOMER';
-$customer_name = $is_logged_in ? $_SESSION['name'] : '';
+$customer_name = $is_logged_in ? $_SESSION['full_name'] : '';
 
 // Resolve base URL for links depending on where the navbar is included
 // If we're in login.php (root), we need to adjust paths differently than if we're in Customer/home.php
@@ -44,9 +44,22 @@ $customer_path = $in_customer_dir ? '' : 'Customer/';
                 </span>
             </li>
         <?php else: ?>
+            <?php
+            // Determine redirect URL for navbar buttons
+            $redirect_qs = '';
+            if ($current_page !== 'login.php' && $current_page !== 'register.php') {
+                $redirect_qs = '?redirect=' . urlencode($_SERVER['REQUEST_URI']);
+            } else {
+                if (!empty($_SESSION['pending_redirect'])) {
+                    $redirect_qs = '?redirect=' . urlencode($_SESSION['pending_redirect']);
+                } elseif (!empty($_GET['redirect'])) {
+                    $redirect_qs = '?redirect=' . urlencode($_GET['redirect']);
+                }
+            }
+            ?>
             <li class="nav-auth">
-                <a href="<?= $base_path ?>login.php" class="login-btn <?= $current_page == 'login.php' ? 'active' : '' ?>">Login</a>
-                <a href="<?= $customer_path ?>register.php" class="register-btn">Register</a>
+                <a href="<?= $base_path ?>login.php<?= $redirect_qs ?>" class="login-btn <?= $current_page == 'login.php' ? 'active' : '' ?>">Login</a>
+                <a href="<?= $customer_path ?>register.php<?= $redirect_qs ?>" class="register-btn">Register</a>
             </li>
         <?php endif; ?>
     </ul>

@@ -2,9 +2,21 @@
 session_start();
 include 'Includes/db_conn.php';
 
+// Capture redirect param into session on initial page load (GET request)
+if (isset($_GET['redirect']) && !empty($_GET['redirect'])) {
+    $_SESSION['pending_redirect'] = $_GET['redirect'];
+}
+
 // Redirect if already logged in
 if (isset($_SESSION['user_id']) && isset($_SESSION['role'])) {
     if ($_SESSION['role'] === 'CUSTOMER') {
+        // Honor pending redirect if user is already logged in
+        if (!empty($_SESSION['pending_redirect'])) {
+            $redirect_url = $_SESSION['pending_redirect'];
+            unset($_SESSION['pending_redirect']);
+            header("Location: $redirect_url");
+            exit();
+        }
         header("Location: Customer/home.php");
         exit();
     } elseif ($_SESSION['role'] === 'ADMIN') {
@@ -48,27 +60,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         } 
         // Secure verify update mapping standard password_verify validation check
         elseif (password_verify($password, $user['password_hash'])) {
-            
-            // Set dynamic global session profile variables
+            // Set session variables after successful authentication
             $_SESSION['user_id'] = $user['user_id'];
-            $_SESSION['name'] = $user['full_name'];
-            $_SESSION['role'] = strtoupper($user['role_name']); // Normalizes text string casing
-            $_SESSION['login_time'] = time();
+            $_SESSION['full_name'] = $user['full_name'];
+            $_SESSION['role'] = $user['role_name'];
 
-            // Optional: Update last login timestamp field if tracked
-            $update_login = $conn->prepare("UPDATE users SET last_login = NOW() WHERE user_id = ?");
-            $update_login->bind_param("i", $user['user_id']);
-            $update_login->execute();
-
-            // Dynamic RBAC Role Authorization Router Redirects
+            // Default role-based redirects
             if ($_SESSION['role'] === 'ADMIN') {
                 header("Location: Admin/dashboard.php");
                 exit();
             } elseif ($_SESSION['role'] === 'CUSTOMER') {
+                // Honor pending redirect for customers (e.g., returning to seat selection)
+                if (!empty($_SESSION['pending_redirect'])) {
+                    $redirect_url = $_SESSION['pending_redirect'];
+                    unset($_SESSION['pending_redirect']);
+                    // Safety: only allow relative paths (no scheme/host)
+                    $parsed = parse_url($redirect_url);
+                    if (!isset($parsed['scheme']) && !isset($parsed['host'])) {
+                        header("Location: $redirect_url");
+                        exit();
+                    }
+                }
                 header("Location: Customer/home.php");
                 exit();
             } else {
-                // Fail-safe protection fallback route
                 $error = "Access Denied: Unrecognized organizational permission assignment.";
             }
 
@@ -125,7 +140,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </form>
 
                 <div class="auth-link">
-                    <p>Don't have an account? <a href="Customer/register.php">Register</a></p>
+                    <?php
+                        $register_url = 'Customer/register.php';
+                        if (!empty($_SESSION['pending_redirect'])) {
+                            $register_url .= '?redirect=' . urlencode($_SESSION['pending_redirect']);
+                        }
+                    ?>
+                    <p>Don't have an account? <a href="<?= htmlspecialchars($register_url); ?>">Register</a></p>
                 </div>
             </div>
         </div>
