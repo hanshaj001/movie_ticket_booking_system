@@ -1,16 +1,16 @@
 <?php
 // Securely initialize or resume the session context
-// if (session_status() === PHP_SESSION_NONE) {
-//     session_start();
-// }
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
-// // Enforce authentication context boundaries
+// Enforce authentication context boundaries
 // if (!isset($_SESSION['user_id'])) {
 //     header("Location: home.php");
 //     exit();
 // }
 
-// // Enforce role-based structural access boundaries
+// Enforce role-based structural access boundaries
 // if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'CUSTOMER') {
 //     header("Location: home.php");
 //     exit();
@@ -18,13 +18,11 @@
 
 require_once '../Includes/db_conn.php';
 
-$_SESSION['user_id'] = 1;         // Gives you a fake customer ID
-$_SESSION['role'] = 'CUSTOMER';
 
 // Configure contextual operational time boundaries
 date_default_timezone_set('Asia/Kathmandu');
 $current_datetime = date('Y-m-d H:i:s');
-$user_id = intval($_SESSION['user_id']);
+$user_id = isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : 0;
 
 // Secure CSRF Token Layer
 if (empty($_SESSION['_csrf_token'])) {
@@ -63,7 +61,10 @@ if (isset($_GET['action'])) {
         $show_id = intval($_GET['show_id']);
         $my_locked_seats = [];
         
-        $session_stmt = mysqli_prepare($conn, "SELECT session_id FROM booking_sessions WHERE user_id = ? AND show_id = ? AND session_status = 'ACTIVE' AND expiry_time > ?");
+        if ($user_id === 0) {
+            // User not logged in, just return seats without locked_by_me data
+        } else {
+            $session_stmt = mysqli_prepare($conn, "SELECT session_id FROM booking_sessions WHERE user_id = ? AND show_id = ? AND session_status = 'ACTIVE' AND expiry_time > ?");
         mysqli_stmt_bind_param($session_stmt, "iis", $user_id, $show_id, $current_datetime);
         mysqli_stmt_execute($session_stmt);
         $session_res = mysqli_stmt_get_result($session_stmt);
@@ -75,6 +76,7 @@ if (isset($_GET['action'])) {
             $lock_res = mysqli_stmt_get_result($lock_stmt);
             while ($lock = mysqli_fetch_assoc($lock_res)) {
                 $my_locked_seats[] = $lock['show_seat_id'];
+            }
             }
         }
 
@@ -101,6 +103,11 @@ if (isset($_GET['action'])) {
         
         if (empty($received_token) || !hash_equals($csrf_token, $received_token)) {
             echo json_encode(['error' => 'Invalid security token verification context.']);
+            exit;
+        }
+        
+        if ($user_id === 0) {
+            echo json_encode(['error' => 'auth_required']);
             exit;
         }
 
@@ -177,6 +184,11 @@ if (isset($_GET['action'])) {
             echo json_encode(['error' => 'Security token verification context failed.']);
             exit;
         }
+        
+        if ($user_id === 0) {
+            echo json_encode(['error' => 'auth_required']);
+            exit;
+        }
 
         $show_id = intval($_POST['show_id']);
         
@@ -210,11 +222,15 @@ if (!isset($_GET['show_id']) || !is_numeric($_GET['show_id'])) {
 }
 
 $show_id = intval($_GET['show_id']);
-$show_query = "SELECT s.*, scr.screen_name, m.title, m.poster_url, m.movie_format, m.genre, m.duration_minutes, m.language 
+$show_query = "SELECT s.*, scr.screen_name, m.title, m.poster_url, m.movie_format, m.duration_minutes, m.language,
+                     GROUP_CONCAT(DISTINCT g.genre_name SEPARATOR ', ') AS genre_names
               FROM shows s 
               JOIN screens scr ON s.screen_id = scr.screen_id 
               JOIN movies m ON s.movie_id = m.movie_id 
-              WHERE s.show_id = $show_id AND s.show_status = 'ACTIVE' AND m.status = 'ACTIVE'";
+              LEFT JOIN movie_genres mg ON mg.movie_id = m.movie_id
+              LEFT JOIN genres g ON g.genre_id = mg.genre_id
+              WHERE s.show_id = $show_id AND s.show_status = 'ACTIVE' AND m.status = 'ACTIVE'
+              GROUP BY s.show_id";
 $show_result = mysqli_query($conn, $show_query);
 
 if (mysqli_num_rows($show_result) === 0) {
@@ -222,6 +238,10 @@ if (mysqli_num_rows($show_result) === 0) {
     exit();
 }
 $show = mysqli_fetch_assoc($show_result);
+$show_genres = [];
+if (!empty($show['genre_names'])) {
+    $show_genres = array_map('trim', explode(',', $show['genre_names']));
+}
 
 if (strtotime($show['show_date'] . ' ' . $show['show_time']) < strtotime($current_datetime)) {
     header("Location: home.php?error=show_started");
@@ -279,6 +299,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_booking'])) {
         if (empty($selected_seats)) {
             $message = "Please select at least one seat!";
             $message_type = 'error';
+        } else if (count($selected_seats) > 5) {
+            $message = "You can only book up to 5 seats at once.";
+            $message_type = 'error';
         } else {
             mysqli_begin_transaction($conn);
             try {
@@ -324,6 +347,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_booking'])) {
                 mysqli_query($conn, "DELETE FROM seat_locks WHERE session_id = $session_id");
                 mysqli_query($conn, "UPDATE booking_sessions SET session_status = 'COMPLETED' WHERE session_id = $session_id");
 
+                // Insert into Ledger
+                $movie_id = intval($show['movie_id']);
+                $ins_ledger = mysqli_prepare($conn, "INSERT INTO ledger (booking_id, movie_id, show_id, transaction_type, amount, remarks) VALUES (?, ?, ?, 'BOOKING', ?, 'Booking confirmed')");
+                mysqli_stmt_bind_param($ins_ledger, "iiid", $booking_id, $movie_id, $show_id, $total_amount);
+                mysqli_stmt_execute($ins_ledger);
+
                 mysqli_commit($conn);
                 header("Location: booking_success.php?booking_id=$booking_id");
                 exit;
@@ -344,10 +373,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_booking'])) {
     <title>Select Seats - <?php echo htmlspecialchars($show['title']); ?></title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="../Assets/Customer/seat_selection.css">
+    <link rel="stylesheet" href="../Assets/css/Customer/seat_selection.css?v=<?= time(); ?>">
+    <link rel="stylesheet" href="../Assets/css/Customer/auth_modal.css?v=<?= time(); ?>">
 </head>
 <body class="seat-selection-body">
-    <?php include_once 'navbar.php'; ?>
+    <?php include_once 'components/navbar.php'; ?>
 
     <main class="seat-selection-container">
         <nav class="breadcrumb-nav">
@@ -361,14 +391,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_booking'])) {
         <section class="movie-info-card">
             <div class="movie-info-content">
                 <?php if (!empty($show['poster_url'])): ?>
+                    <?php $show_poster_path = '../Assets/uploads/movie_posters/' . ltrim($show['poster_url'], '/'); ?>
                     <div class="poster-wrapper">
-                        <img src="<?php echo htmlspecialchars($show['poster_url']); ?>" alt="<?php echo htmlspecialchars($show['title']); ?>" class="movie-poster">
+                        <img src="<?php echo htmlspecialchars($show_poster_path); ?>" alt="<?php echo htmlspecialchars($show['title']); ?>" class="movie-poster">
                     </div>
                 <?php endif; ?>
                 <div class="info-wrapper">
                     <h1 class="movie-title"><?php echo htmlspecialchars($show['title']); ?></h1>
                     <div class="show-details">
-                        <div class="detail-item"><i class="fa-solid fa-layer-group"></i> <span><?php echo htmlspecialchars($show['genre']); ?></span></div>
+                        <div class="detail-item"><i class="fa-solid fa-layer-group"></i> <span><?php echo htmlspecialchars(!empty($show_genres) ? implode(' | ', $show_genres) : 'N/A'); ?></span></div>
                         <div class="detail-item"><i class="fa-solid fa-language"></i> <span><?php echo htmlspecialchars($show['language']); ?></span></div>
                         <div class="detail-item"><i class="fa-solid fa-clock"></i> <span><?php echo intval($show['duration_minutes']); ?> mins</span></div>
                         <div class="detail-item"><i class="fa-solid fa-tv"></i> <span><?php echo htmlspecialchars($show['screen_name']); ?></span></div>
@@ -494,7 +525,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_booking'])) {
         <span>Booking session started! You have 5 minutes to complete your booking.</span>
     </div>
 
-    <?php include_once 'footer.php'; ?>
+    <!-- Exit Confirmation Modal -->
+    <div id="exitConfirmModal" class="exit-confirm-modal" aria-hidden="true" style="display:none;">
+        <div class="exit-confirm-card">
+            <button class="exit-confirm-close" aria-label="Close">&times;</button>
+            <div class="exit-confirm-icon">
+                <i class="fa-solid fa-circle-question"></i>
+            </div>
+            <h3 class="exit-confirm-title">Exit Seat Selection?</h3>
+            <p class="exit-confirm-desc">You have selected seats. If you exit now, your selected seats will be released and made available for other customers.</p>
+            <div class="exit-confirm-actions">
+                <button class="btn-exit-cancel" type="button">No, Keep Selecting</button>
+                <button class="btn-exit-confirm" type="button">Yes, Exit</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification/Acknowledgement Modal -->
+    <div id="notificationModal" class="exit-confirm-modal" aria-hidden="true" style="display:none;">
+        <div class="exit-confirm-card">
+            <button class="exit-confirm-close" id="notificationCloseBtn" aria-label="Close">&times;</button>
+            <div class="exit-confirm-icon" id="notificationIcon">
+                <i class="fa-solid fa-circle-info"></i>
+            </div>
+            <h3 class="exit-confirm-title" id="notificationTitle">Notification</h3>
+            <p class="exit-confirm-desc" id="notificationDesc"></p>
+            <div class="exit-confirm-actions">
+                <button class="btn-exit-confirm" id="notificationOkBtn" type="button" style="width: 100%;">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <?php include_once __DIR__ . '/components/auth_modal.php'; ?>
+
+    <?php if (file_exists(__DIR__ . '/components/footer.php')) { include_once 'components/footer.php'; } ?>
 
     <script>
         // Global variables initialized cleanly via structural state rendering engines inside PHP
@@ -504,7 +568,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_booking'])) {
         const csrfToken = "<?php echo $csrf_token; ?>";
         const initialExpiryTime = <?php echo $initial_expiry_time ? '"'.date('Y/m/d H:i:s', strtotime($initial_expiry_time)).'"' : 'null'; ?>;
     </script>
-    <script src="../assets/js/seat_selection.js"></script>
+    <script src="../Assets/js/Customer/auth_modal.js"></script>
+    <script src="../Assets/js/Customer/seat_selection.js?v=<?= time(); ?>"></script>
+    <?php if ($message): ?>
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const title = "<?php echo ($message_type === 'error') ? 'Booking Error' : 'Booking Message'; ?>";
+                const type = "<?php echo ($message_type === 'error') ? 'error' : 'success'; ?>";
+                const msg = <?php echo json_encode($message); ?>;
+                if (typeof showNotificationModal === 'function') {
+                    showNotificationModal(title, msg, type);
+                }
+            });
+        </script>
+    <?php endif; ?>
 </body>
 </html>
 <?php mysqli_close($conn); ?>

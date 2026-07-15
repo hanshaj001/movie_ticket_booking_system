@@ -329,6 +329,7 @@ body.movie-details-body {
     padding-bottom: 8px;
     scrollbar-width: thin;
     scrollbar-color: var(--accent) #ececf3;
+    -webkit-overflow-scrolling: touch;
 }
 
 .date-tabs-scroll-container::-webkit-scrollbar {
@@ -942,6 +943,17 @@ body.movie-details-body {
         padding: 20px 15px;
     }
 
+    .details-layout-grid {
+        flex-direction: column;
+        gap: 24px;
+    }
+
+    .layout-main-column,
+    .layout-side-column {
+        flex: 1 1 100%;
+        width: 100%;
+    }
+
     .section-card,
     .movie-hero-banner {
         padding: 20px;
@@ -994,6 +1006,7 @@ body.movie-details-body {
         border-bottom: 2px solid var(--border);
         align-items: center;
         text-align: center;
+        justify-content: center;
     }
 
     .card-right-action {
