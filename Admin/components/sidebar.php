@@ -75,7 +75,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
             </a>
         </li>
         <li class="logout-menu">
-            <a href=" ../logout.php">
+            <a href="../logout.php" class="logout-btn" id="logoutBtnAdmin">
                 <i class="fa-solid fa-right-from-bracket"></i> Logout
             </a>
         </li>
@@ -109,7 +109,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
 <script>
 const sidebar = document.getElementById("sidebar");
 const toggleBtn = document.getElementById("toggleBtn");
-const overlay = document.getElementById("overlay");
+const overlay = document.querySelector(".modal-overlay");
 
 // Off-canvas mobile navigation drawer toggle routines
 toggleBtn.addEventListener("click", () => {
