@@ -1,6 +1,7 @@
 <?php
 session_start();
 
+
 /* Authentication Check */
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
@@ -61,7 +62,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </head>
 <body>
 
-<?php include 'navbar.php'; ?>
+<?php include '../Customer/components/navbar.php'; ?>
 
 <section class="contact-header">
     <h1>Contact Us</h1>
@@ -197,17 +198,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     <h2>Our Location</h2>
 
-    <iframe
+    <!-- <iframe
         src="https://www.google.com/maps/embed?pb=!1m18..."
         allowfullscreen=""
         loading="lazy">
-    </iframe>
+    </iframe> -->
 
 </section>
 
 <?php include 'footer.php'; ?>
 
-<script src="js/contact.js"></script>
+<script src="../Assets/js/contact.js"></script>
 
 </body>
 </html>
