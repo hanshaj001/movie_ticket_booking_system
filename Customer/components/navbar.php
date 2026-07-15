@@ -1,84 +1,40 @@
 <?php
-session_start();
+// Public navbar for guests/customers (no role-gated access control)
+// Replace any previous customer-only navbar to ensure Register is accessible.
 
-// Security Access and Session Tracking
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 'CUSTOMER') {
-    header("Location: ../login.php");
-    exit();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
 }
 
-// Customer Name
-$customer_name = isset($_SESSION['name']) ? $_SESSION['name'] : 'Customer';
+$customer_name = isset($_SESSION['name']) ? $_SESSION['name'] : null;
 $current_page = basename($_SERVER['PHP_SELF']);
 ?>
 
-<!DOCTYPE html> 
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Customer Panel - MTBS</title>
-
-    <link rel="stylesheet" href="../Assets/css/Customer/navbar.css?v=<?= time(); ?>">
-
-    <link rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-</head>
-<body>
-
 <header class="navbar">
-
-    <div class="logo">
-        MTBS
-    </div>
+    <div class="logo">MTBS</div>
 
     <ul class="nav-links">
-
         <li class="<?= $current_page == 'home.php' ? 'active' : '' ?>">
-            <a href="home.php">
-                <i class="fa-solid fa-house"></i>
-                Home
-            </a>
+            <a href="home.php"><i class="fa-solid fa-house"></i> Home</a>
         </li>
-
         <li class="<?= $current_page == 'about.php' ? 'active' : '' ?>">
-            <a href="about.php">
-                <i class="fa-solid fa-circle-info"></i>
-                About
-            </a>
+            <a href="about.php"><i class="fa-solid fa-circle-info"></i> About</a>
         </li>
-
         <li class="<?= $current_page == 'contact.php' ? 'active' : '' ?>">
-            <a href="contact.php">
-                <i class="fa-solid fa-phone"></i>
-                Contact
-            </a>
+            <a href="contact.php"><i class="fa-solid fa-phone"></i> Contact</a>
         </li>
-
         <li class="<?= $current_page == 'booking_history.php' ? 'active' : '' ?>">
-            <a href="booking_history.php">
-                <i class="fa-solid fa-ticket"></i>
-                Booking History
-            </a>
+            <a href="booking_history.php"><i class="fa-solid fa-ticket"></i> Booking History</a>
         </li>
-
     </ul>
 
     <div class="right">
-
-        <div class="customer">
-            <i class="fa-solid fa-circle-user"></i>
-            <span><?= htmlspecialchars($customer_name); ?></span>
-        </div>
-
-        <a href="../logout.php" class="logout-btn">
-            <i class="fa-solid fa-right-from-bracket"></i>
-            Logout
-        </a>
-
+        <?php if ($customer_name): ?>
+            <div class="customer"><i class="fa-solid fa-circle-user"></i><span><?= htmlspecialchars($customer_name); ?></span></div>
+            <a href="../logout.php" class="logout-btn"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+        <?php else: ?>
+            <a href="../Includes/login.php" class="logout-btn"><i class="fa-solid fa-arrow-right-to-bracket"></i> Login</a>
+        <?php endif; ?>
     </div>
-
 </header>
 
-</body>
-</html>
