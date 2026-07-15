@@ -93,7 +93,7 @@ $row = mysqli_fetch_assoc($result);
                             'Family', 'Fantasy', 'History', 'Horror', 'Music', 'Mystery', 'Romance', 
                             'Sci-Fi', 'Superhero', 'Thriller', 'War', 'Western'
                         ];
-                        $selected_genres = array_map('trim', explode(',', $row['genre']));
+                        $selected_genres = array_map('trim', explode(',', $row['genre'] ?? ''));
                         foreach ($available_genres as $g) {
                             $checked = in_array($g, $selected_genres) ? 'checked' : '';
                             echo "<label style='font-weight: normal; display: flex; align-items: center; gap: 5px;'>

@@ -167,7 +167,7 @@ if ($shows_list_result && mysqli_num_rows($shows_list_result) > 0) {
     <title><?php echo htmlspecialchars($movie_record['title']); ?> - Movie Details</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="../Assets/css/Customer/movie_details.css">
+    <link rel="stylesheet" href="../Assets/css/Customer/movie_details.css?v=<?= time(); ?>">
 </head>
 <body class="movie-details-body">
 

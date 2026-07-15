@@ -14,8 +14,6 @@ if(!$conn)
 
 ?>
 
-
-
 <?php
 //session_start();
  require_once '../Includes/db_conn.php'; 
@@ -59,7 +57,7 @@ if($date != '')
 /* Pagination */
 
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-$limit = 2; // records per page
+$limit = 10; // records per page
 $offset = ($page - 1) * $limit;
 
 
@@ -133,55 +131,13 @@ WHERE status='ACTIVE'
 </head>
 
 <body>
-  <script>
-
-function viewBooking(id)
-{
-    window.location='booking_details.php?id='+id;
-}
-
-function cancelBooking(id)
-{
-    if(confirm("Cancel this booking?"))
-    {
-        window.location='cancel_booking.php?id='+id;
-    }
-}
-
-function validateFilters()
-{
-    let movie = document.querySelector('select[name="movie"]').value;
-    let date  = document.querySelector('input[name="date"]').value;
-
-    if(movie === '')
-    {
-        alert("Please select a movie.");
-        return false;
-    }
-
-    if(date === '')
-    {
-        alert("Please select a date.");
-        return false;
-    }
-
-    return true;
-}
-
-setInterval(function(){
-
-    console.log("Refreshing booking data...");
-
-},30000);
-
-</script>
 
 <div class="container">
 
 <h1 class="heading">
 🎟 Booking Monitoring
 </h1>
-<form method="GET" onsubmit="return validateFilters()">
+<form method="GET">
 
 <div class="filters">
 
@@ -192,22 +148,26 @@ placeholder="Search booking..."
 value="<?php echo $search; ?>"
 >
 
-<select name="movie">
-
-<option value="">
-All Movies
-</option>
-
-<?php while($m=mysqli_fetch_assoc($movies)){ ?>
-
-<option
-value="<?php echo $m['movie_id']; ?>"
-<?php if($movie==$m['movie_id']) echo "selected"; ?>
+<select
+    name="movie"
+    required
+    oninvalid="this.setCustomValidity('Please Select Movie')"
+    onchange="this.setCustomValidity('')"
 >
-<?php echo $m['title']; ?>
-</option>
+    <option value="">
+       All movies
+    </option>
 
-<?php } ?>
+    <?php while($m=mysqli_fetch_assoc($movies)){ ?>
+
+    <option
+        value="<?php echo $m['movie_id']; ?>"
+        <?php if($movie==$m['movie_id']) echo "selected"; ?>
+    >
+        <?php echo $m['title']; ?>
+    </option>
+
+    <?php } ?>
 
 </select>
 
@@ -217,9 +177,13 @@ name="date"
 value="<?php echo $date; ?>"
 >
 
-<button class="search-btn">
-Search
+<button type="submit" class="search-btn">
+    Search
 </button>
+
+<a href="booking_monitoring.php" class="reset-btn">
+    Reset
+</a>
 
 </div>
 

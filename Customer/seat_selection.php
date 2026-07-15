@@ -22,7 +22,7 @@ require_once '../Includes/db_conn.php';
 // Configure contextual operational time boundaries
 date_default_timezone_set('Asia/Kathmandu');
 $current_datetime = date('Y-m-d H:i:s');
-$user_id = intval($_SESSION['user_id']);
+$user_id = isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : 0;
 
 // Secure CSRF Token Layer
 if (empty($_SESSION['_csrf_token'])) {
@@ -61,7 +61,10 @@ if (isset($_GET['action'])) {
         $show_id = intval($_GET['show_id']);
         $my_locked_seats = [];
         
-        $session_stmt = mysqli_prepare($conn, "SELECT session_id FROM booking_sessions WHERE user_id = ? AND show_id = ? AND session_status = 'ACTIVE' AND expiry_time > ?");
+        if ($user_id === 0) {
+            // User not logged in, just return seats without locked_by_me data
+        } else {
+            $session_stmt = mysqli_prepare($conn, "SELECT session_id FROM booking_sessions WHERE user_id = ? AND show_id = ? AND session_status = 'ACTIVE' AND expiry_time > ?");
         mysqli_stmt_bind_param($session_stmt, "iis", $user_id, $show_id, $current_datetime);
         mysqli_stmt_execute($session_stmt);
         $session_res = mysqli_stmt_get_result($session_stmt);
@@ -73,6 +76,7 @@ if (isset($_GET['action'])) {
             $lock_res = mysqli_stmt_get_result($lock_stmt);
             while ($lock = mysqli_fetch_assoc($lock_res)) {
                 $my_locked_seats[] = $lock['show_seat_id'];
+            }
             }
         }
 
@@ -99,6 +103,11 @@ if (isset($_GET['action'])) {
         
         if (empty($received_token) || !hash_equals($csrf_token, $received_token)) {
             echo json_encode(['error' => 'Invalid security token verification context.']);
+            exit;
+        }
+        
+        if ($user_id === 0) {
+            echo json_encode(['error' => 'auth_required']);
             exit;
         }
 
@@ -173,6 +182,11 @@ if (isset($_GET['action'])) {
         
         if (empty($received_token) || !hash_equals($csrf_token, $received_token)) {
             echo json_encode(['error' => 'Security token verification context failed.']);
+            exit;
+        }
+        
+        if ($user_id === 0) {
+            echo json_encode(['error' => 'auth_required']);
             exit;
         }
 
@@ -285,6 +299,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_booking'])) {
         if (empty($selected_seats)) {
             $message = "Please select at least one seat!";
             $message_type = 'error';
+        } else if (count($selected_seats) > 5) {
+            $message = "You can only book up to 5 seats at once.";
+            $message_type = 'error';
         } else {
             mysqli_begin_transaction($conn);
             try {
@@ -330,6 +347,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_booking'])) {
                 mysqli_query($conn, "DELETE FROM seat_locks WHERE session_id = $session_id");
                 mysqli_query($conn, "UPDATE booking_sessions SET session_status = 'COMPLETED' WHERE session_id = $session_id");
 
+                // Insert into Ledger
+                $movie_id = intval($show['movie_id']);
+                $ins_ledger = mysqli_prepare($conn, "INSERT INTO ledger (booking_id, movie_id, show_id, transaction_type, amount, remarks) VALUES (?, ?, ?, 'BOOKING', ?, 'Booking confirmed')");
+                mysqli_stmt_bind_param($ins_ledger, "iiid", $booking_id, $movie_id, $show_id, $total_amount);
+                mysqli_stmt_execute($ins_ledger);
+
                 mysqli_commit($conn);
                 header("Location: booking_success.php?booking_id=$booking_id");
                 exit;
@@ -350,8 +373,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_booking'])) {
     <title>Select Seats - <?php echo htmlspecialchars($show['title']); ?></title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="../Assets/css/Customer/seat_selection.css">
-    <link rel="stylesheet" href="../Assets/css/Customer/auth_modal.css">
+    <link rel="stylesheet" href="../Assets/css/Customer/seat_selection.css?v=<?= time(); ?>">
+    <link rel="stylesheet" href="../Assets/css/Customer/auth_modal.css?v=<?= time(); ?>">
 </head>
 <body class="seat-selection-body">
     <?php include_once 'navbar.php'; ?>
@@ -502,6 +525,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_booking'])) {
         <span>Booking session started! You have 5 minutes to complete your booking.</span>
     </div>
 
+    <!-- Exit Confirmation Modal -->
+    <div id="exitConfirmModal" class="exit-confirm-modal" aria-hidden="true" style="display:none;">
+        <div class="exit-confirm-card">
+            <button class="exit-confirm-close" aria-label="Close">&times;</button>
+            <div class="exit-confirm-icon">
+                <i class="fa-solid fa-circle-question"></i>
+            </div>
+            <h3 class="exit-confirm-title">Exit Seat Selection?</h3>
+            <p class="exit-confirm-desc">You have selected seats. If you exit now, your selected seats will be released and made available for other customers.</p>
+            <div class="exit-confirm-actions">
+                <button class="btn-exit-cancel" type="button">No, Keep Selecting</button>
+                <button class="btn-exit-confirm" type="button">Yes, Exit</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification/Acknowledgement Modal -->
+    <div id="notificationModal" class="exit-confirm-modal" aria-hidden="true" style="display:none;">
+        <div class="exit-confirm-card">
+            <button class="exit-confirm-close" id="notificationCloseBtn" aria-label="Close">&times;</button>
+            <div class="exit-confirm-icon" id="notificationIcon">
+                <i class="fa-solid fa-circle-info"></i>
+            </div>
+            <h3 class="exit-confirm-title" id="notificationTitle">Notification</h3>
+            <p class="exit-confirm-desc" id="notificationDesc"></p>
+            <div class="exit-confirm-actions">
+                <button class="btn-exit-confirm" id="notificationOkBtn" type="button" style="width: 100%;">OK</button>
+            </div>
+        </div>
+    </div>
+
     <?php include_once __DIR__ . '/components/auth_modal.php'; ?>
 
     <?php if (file_exists(__DIR__ . '/footer.php')) { include_once 'footer.php'; } ?>
@@ -515,7 +569,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_booking'])) {
         const initialExpiryTime = <?php echo $initial_expiry_time ? '"'.date('Y/m/d H:i:s', strtotime($initial_expiry_time)).'"' : 'null'; ?>;
     </script>
     <script src="../Assets/js/Customer/auth_modal.js"></script>
-    <script src="../Assets/js/Customer/seat_selection.js"></script>
+    <script src="../Assets/js/Customer/seat_selection.js?v=<?= time(); ?>"></script>
+    <?php if ($message): ?>
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const title = "<?php echo ($message_type === 'error') ? 'Booking Error' : 'Booking Message'; ?>";
+                const type = "<?php echo ($message_type === 'error') ? 'error' : 'success'; ?>";
+                const msg = <?php echo json_encode($message); ?>;
+                if (typeof showNotificationModal === 'function') {
+                    showNotificationModal(title, msg, type);
+                }
+            });
+        </script>
+    <?php endif; ?>
 </body>
 </html>
 <?php mysqli_close($conn); ?>
