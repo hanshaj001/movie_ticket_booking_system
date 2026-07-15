@@ -14,24 +14,26 @@ if(!$conn)
 
 ?>
 
+
 <?php
-session_start();
+//session_start();
 require_once "../Includes/db_conn.php";
+include "../Customer/navbar.php";
 
 /* Date Validation */
 $selected_date = date('Y-m-d');
 
 if(isset($_GET['date']))
 {
-    $input_date = $_GET['date'];
+    $date = $_GET['date'];
 
     if(
-        preg_match('/^\d{4}-\d{2}-\d{2}$/', $input_date)
+        preg_match('/^\d{4}-\d{2}-\d{2}$/',$date)
         &&
-        strtotime($input_date)
+        strtotime($date)
     )
     {
-        $selected_date = $input_date;
+        $selected_date = $date;
     }
 }
 
@@ -52,7 +54,7 @@ ON m.movie_id = s.movie_id
 WHERE
     m.status='ACTIVE'
     AND s.show_status='ACTIVE'
-    AND s.show_date = ?
+    AND s.show_date=?
     AND TIMESTAMP(s.show_date,s.show_time) > NOW()
 GROUP BY
     m.movie_id,
@@ -70,17 +72,12 @@ $stmt->bind_param("s",$selected_date);
 $stmt->execute();
 $result = $stmt->get_result();
 
-/* Heading */
-if($selected_date == date('Y-m-d'))
-{
-    $date_heading = "Showing Movies for Today";
-}
-else
-{
-    $date_heading =
-    "Showing Movies for "
-    . date('d F Y',strtotime($selected_date));
-}
+$heading =
+($selected_date == date('Y-m-d'))
+?
+"Showing Movies for Today"
+:
+"Showing Movies for ".date('d F Y',strtotime($selected_date));
 ?>
 
 <!DOCTYPE html>
@@ -88,30 +85,27 @@ else
 <head>
 
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Home</title>
+<title>Movie Ticket Booking System</title>
 
-<link rel="stylesheet"
-href="../Assets/Customer/homepage.css">
+<link rel="stylesheet" href="../Assets/css/Customer/home.css">
+<link rel="stylesheet" href="../Assets/css/Customer/navbar.css">
+
 
 </head>
 
 <body>
 
-<!-- HERO SECTION -->
+<!-- HERO -->
 
 <section class="hero">
 
 <div class="hero-content">
 
-<h1>
-Welcome to Movie Ticket Booking System
-</h1>
+<h1>Welcome to Movie Ticket Booking System</h1>
 
-<p>
-Book Your Favorite Movies Anytime
-</p>
+<p>Watch the Latest Movies Today</p>
 
 <a href="#movies" class="book-btn">
 Book Now
@@ -128,31 +122,16 @@ Book Now
 <?php
 for($i=0;$i<7;$i++)
 {
-    $date =
-    date(
-        'Y-m-d',
-        strtotime("+$i day")
-    );
+    $date=date('Y-m-d',strtotime("+$i day"));
 
-    $label =
-    date(
-        'd M',
-        strtotime($date)
-    );
+    $label=date('d M',strtotime($date));
 
-    if($i==0)
-    {
-        $label='Today';
-    }
-
-    if($i==1)
-    {
-        $label='Tomorrow';
-    }
+    if($i==0) $label='Today';
+    if($i==1) $label='Tomorrow';
 ?>
 
 <a
-href="homepage.php?date=<?=$date?>"
+href="home.php?date=<?=$date?>"
 class="<?=($selected_date==$date)?'active':'';?>">
 
 <?=$label?>
@@ -165,27 +144,23 @@ class="<?=($selected_date==$date)?'active':'';?>">
 
 <!-- MOVIES -->
 
-<section
-class="movies-section"
-id="movies">
+<section class="movies-section" id="movies">
 
-<h2><?=$date_heading?></h2>
+<h2><?=$heading?></h2>
 
 <div class="movie-grid">
 
-<?php if($result->num_rows > 0){ ?>
+<?php if($result->num_rows>0){ ?>
 
 <?php while($movie=$result->fetch_assoc()){ ?>
 
 <?php
-
 $image =
 !empty($movie['poster_url'])
 ?
 "../uploads/".$movie['poster_url']
 :
 "../uploads/default_movie.jpg";
-
 ?>
 
 <a
@@ -197,42 +172,23 @@ href="movie_details.php?movie_id=<?=$movie['movie_id']?>&date=<?=$selected_date?
 <img
 src="<?=$image?>"
 alt="<?=$movie['title']?>"
-onerror="
-this.src='../uploads/default_movie.jpg';
-">
+onerror="this.src='../uploads/default_movie.jpg'">
 
 <div class="movie-info">
 
-<h3>
-<?=$movie['title']?>
-</h3>
+<h3><?=$movie['title']?></h3>
 
-<p>
-<strong>Genre:</strong>
-<?=$movie['genre']?>
-</p>
+<p><strong>Genre:</strong> <?=$movie['genre']?></p>
 
-<p>
-<strong>Language:</strong>
-<?=$movie['language']?>
-</p>
+<p><strong>Language:</strong> <?=$movie['language']?></p>
 
-<p>
-<strong>Duration:</strong>
-<?=$movie['duration_minutes']?> mins
-</p>
+<p><strong>Duration:</strong> <?=$movie['duration_minutes']?> mins</p>
 
-<p>
-<strong>Format:</strong>
-<?=$movie['movie_format']?>
-</p>
+<p><strong>Format:</strong> <?=$movie['movie_format']?></p>
 
 <p>
 <strong>First Show:</strong>
-<?=date(
-'h:i A',
-strtotime($movie['earliest_show'])
-);?>
+<?=date('h:i A',strtotime($movie['earliest_show']))?>
 </p>
 
 <span class="details-btn">
@@ -251,18 +207,11 @@ View Details
 
 <div class="empty-state">
 
-<img
-src="../uploads/default_movie.jpg"
-alt="No Movies">
+<img src="../uploads/default_movie.jpg" alt="No Movies">
 
-<h3>
-No Movies Available
-</h3>
+<h3>No Movies Available</h3>
 
-<p>
-There are currently no movies
-scheduled for the selected date.
-</p>
+<p>No movies scheduled for the selected date.</p>
 
 </div>
 
@@ -271,7 +220,8 @@ scheduled for the selected date.
 </div>
 
 </section>
-<!-- Footer -->
-<?php include('includes/footer.php'); ?>
+
+<script src="../Assets/js/Customer/home.js"></script>
+
 </body>
 </html>

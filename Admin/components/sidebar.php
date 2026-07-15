@@ -1,9 +1,12 @@
 <?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+ob_start();
 
 // Security Access and Session Tracking
  if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 'ADMIN') {
-     header("Location: ../Includes/login.php");
+     header("Location: ../login.php");
     exit();
 }
 
@@ -17,7 +20,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Admin System Panel - MTBS</title>
-    <link rel="stylesheet" href="../Assets/sidebar.css"/>
+    <link rel="stylesheet" href="../Assets/css/Admin/sidebar.css"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
@@ -46,13 +49,33 @@ $current_page = basename($_SERVER['PHP_SELF']);
             </a>
         </li>
 
+        <li class="<?= $current_page == 'manage_screens.php' ? 'active' : '' ?>">
+            <a href="manage_screens.php">
+                <i class="fa-solid fa-tv"></i> Manage Screens
+            </a>
+        </li>
+        <li class="<?= $current_page == 'manage_genres.php' ? 'active' : '' ?>">
+            <a href="manage_genres.php">
+                <i class="fa-solid fa-tags"></i> Manage Genres
+            </a>
+        </li>
         <li class="<?= $current_page == 'booking_monitoring.php' ? 'active' : '' ?>">
             <a href="booking_monitoring.php">
                 <i class="fa-solid fa-ticket"></i> Booking Monitoring
             </a>
         </li>
+        <li class="<?= ($current_page == 'earnings.php' || $current_page == 'movie_earnings.php') ? 'active' : '' ?>">
+            <a href="earnings.php">
+                <i class="fa-solid fa-chart-bar"></i> Earnings
+            </a>
+        </li>
+        <li class="<?= $current_page == 'ledger.php' ? 'active' : '' ?>">
+            <a href="ledger.php">
+                <i class="fa-solid fa-book"></i> Ledger
+            </a>
+        </li>
         <li class="logout-menu">
-            <a href="../Includes/logout.php">
+            <a href="../logout.php" class="logout-btn" id="logoutBtnAdmin">
                 <i class="fa-solid fa-right-from-bracket"></i> Logout
             </a>
         </li>
@@ -75,7 +98,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 <i class="fa-solid fa-circle-user"></i> <span><?= htmlspecialchars($admin_name); ?></span>
             </div>
             
-            <a href="../Includes/logout.php" class="logout-btn">
+            <a href="../logout.php" class="logout-btn">
                 <i class="fa-solid fa-power-off"></i> Logout
             </a>
         </div>
@@ -86,7 +109,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
 <script>
 const sidebar = document.getElementById("sidebar");
 const toggleBtn = document.getElementById("toggleBtn");
-const overlay = document.getElementById("overlay");
+const overlay = document.querySelector(".modal-overlay");
 
 // Off-canvas mobile navigation drawer toggle routines
 toggleBtn.addEventListener("click", () => {
