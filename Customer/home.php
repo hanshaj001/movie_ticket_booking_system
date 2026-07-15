@@ -92,6 +92,7 @@ $heading =
 
 <link rel="stylesheet" href="../Assets/css/Customer/home.css">
 <link rel="stylesheet" href="../Assets/css/Customer/navbar.css">
+<link rel="stylesheet" href="../Assets/css/Customer/footer.css">
 
 
 
@@ -223,6 +224,9 @@ View Details
 </div>
 
 </section>
+<?php include '../Customer/components/footer.php'; 
+
+?>
 
 <script src="../Assets/js/Customer/home.js"></script>
 
