@@ -16,46 +16,67 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 u.password_hash,
                 r.role_name
             FROM users u
-            JOIN user_roles ur
+            INNER JOIN user_roles ur
                 ON u.user_id = ur.user_id
-            JOIN roles r
+            INNER JOIN roles r
                 ON ur.role_id = r.role_id
-            WHERE u.email = ?
-            LIMIT 1";
+            WHERE u.email = ?";
 
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("s",$email);
+    $stmt->bind_param("s", $email);
     $stmt->execute();
 
     $result = $stmt->get_result();
 
-    if($result->num_rows == 1){
+    if ($result->num_rows > 0) {
 
         $user = $result->fetch_assoc();
 
-        // Plain password check
-        if(
-            $password === $user['password_hash']
-            &&
-            strtoupper($user['role_name']) == 'CUSTOMER'
-        ){
+        // Use password_verify() if passwords are hashed
+        // if(password_verify($password, $user['password_hash']))
+        if ($password === $user['password_hash']) {
 
             $_SESSION['user_id'] = $user['user_id'];
             $_SESSION['name'] = $user['full_name'];
-            $_SESSION['role'] = 'CUSTOMER';
-            $_SESSION['login_time'] = time();
+            $_SESSION['email'] = $user['email'];
+            $_SESSION['role'] = strtoupper($user['role_name']);
 
-            header("Location: home.php");
-            exit();
+            switch (strtoupper($user['role_name'])) {
 
-        }else{
+                case 'ADMIN':
+                    header("Location: ../Admin/dashboard.php");
+                    exit();
+<<<<<<< HEAD
+case 'CUSTOMER':
+    header("Location: home_page.php");
+    exit();
 
-            $error = "Invalid email or password";
+=======
+
+                case 'CUSTOMER':
+                    header("Location: ../Customer/home.php");
+                    exit();
+
+>>>>>>> main
+                case 'STAFF':
+                    header("Location: ../Staff/dashboard.php");
+                    exit();
+
+<<<<<<< HEAD
+                 default:
+=======
+                default:
+>>>>>>> main
+                    $error = "No role assigned.";
+                    break;
+            }
+
+        } else {
+            $error = "Invalid email or password.";
         }
 
-    }else{
-
-        $error = "Invalid email or password";
+    } else {
+        $error = "Invalid email or password.";
     }
 }
 ?>
@@ -85,7 +106,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <nav class="navbar">
             <ul>
                 <li>
-                    <a href="../login.php">
+                    <a href="../index.php">
                         Home
                     </a>
                 </li>
@@ -113,10 +134,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             <div class="login-card">
 
-                <h2>
-                    Customer Login
-                </h2>
-
+            
                 <?php if (!empty($error)) : ?>
                     <div class="error-message">
                         <?= htmlspecialchars($error); ?>
