@@ -2,6 +2,17 @@
 session_start();
 include 'Includes/db_conn.php';
 
+// Redirect if already logged in
+if (isset($_SESSION['user_id']) && isset($_SESSION['role'])) {
+    if ($_SESSION['role'] === 'CUSTOMER') {
+        header("Location: Customer/home.php");
+        exit();
+    } elseif ($_SESSION['role'] === 'ADMIN') {
+        header("Location: Admin/dashboard.php");
+        exit();
+    }
+}
+
 $error = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -62,10 +73,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
 
         } else {
-            $error = "Invalid email or password";
+            $error = "Invalid email or password"; // Generic error message
         }
     } else {
-        $error = "Invalid email or password";
+        $error = "Invalid email or password"; // Generic error message
     }
 }
 ?>
@@ -74,19 +85,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Gateway - Movie Ticket Booking System</title>
-    <link rel="stylesheet" href="Assets/login.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <title>Login - Movie Ticket Booking System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="Assets/css/login.css">
 </head>
 <body>
 
-    <main class="login-section">
-        <div class="login-container">
-            <div class="login-card">
-                <h2>Cinema Gateway Portal</h2>
+    <?php include 'Customer/components/navbar.php'; ?>
+
+    <main class="auth-section">
+        <div class="auth-container">
+            <div class="auth-card">
+                <h2>Welcome Back</h2>
 
                 <?php if (!empty($error)) : ?>
-                    <div class="error-message" style="background-color: #e74c3c; color: white; padding: 10px; border-radius: 4px; margin-bottom: 15px; font-size: 0.9rem; text-align: center;">
+                    <div class="alert alert-danger">
                         <?= htmlspecialchars($error); ?>
                     </div>
                 <?php endif; ?>
@@ -99,40 +113,44 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                     <div class="form-group">
                         <label for="password">Password</label>
-                        <div class="password-box" style="position: relative; display: flex; align-items: center;">
-                            <input type="password" id="password" name="password" placeholder="Enter your password" required style="width: 100%; padding-right: 40px;">
-                            <i class="fa-solid fa-eye" id="togglePassword" style="position: absolute; right: 15px; cursor: pointer; color: #aaa;"></i>
+                        <div class="password-box">
+                            <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                            <i class="fa-solid fa-eye" id="togglePassword"></i>
                         </div>
                     </div>
 
-                    <button type="submit" class="login-btn">
+                    <button type="submit" class="auth-btn">
                         <i class="fa-solid fa-right-to-bracket"></i> Login
                     </button>
                 </form>
 
-                <div class="register-link">
-                    <p>New to the theater? <a href="Customer/register.php">Register Account Here</a></p>
+                <div class="auth-link">
+                    <p>Don't have an account? <a href="Customer/register.php">Register</a></p>
                 </div>
             </div>
         </div>
     </main>
+
+    <?php include 'Customer/components/footer.php'; ?>
 
     <script>
     // Asynchronous UI Password Visibility Toggle Engine
     const passwordInput = document.getElementById("password");
     const toggleIcon = document.getElementById("togglePassword");
 
-    toggleIcon.addEventListener("click", function() {
-        if (passwordInput.type === "password") {
-            passwordInput.type = "text";
-            this.classList.remove("fa-eye");
-            this.classList.add("fa-eye-slash");
-        } else {
-            passwordInput.type = "password";
-            this.classList.remove("fa-eye-slash");
-            this.classList.add("fa-eye");
-        }
-    });
+    if(toggleIcon) {
+        toggleIcon.addEventListener("click", function() {
+            if (passwordInput.type === "password") {
+                passwordInput.type = "text";
+                this.classList.remove("fa-eye");
+                this.classList.add("fa-eye-slash");
+            } else {
+                passwordInput.type = "password";
+                this.classList.remove("fa-eye-slash");
+                this.classList.add("fa-eye");
+            }
+        });
+    }
     </script>
 </body>
 </html>
