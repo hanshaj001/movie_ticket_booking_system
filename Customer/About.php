@@ -1,12 +1,12 @@
 <?php
-session_start();
+//session_start();
 
 /* Customer Authentication */
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 'CUSTOMER') {
-    header("Location: login.php");
-    exit();
-}
-?>
+// if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 'CUSTOMER') {
+//     header("Location: login.php");
+//     exit();
+// }
+// ?>
 
 <!DOCTYPE html>
 <html lang="en">
