@@ -15,14 +15,14 @@ if(!$conn)
 ?>
 
 <?php
-session_start();
+//session_start();
 require_once "../Includes/db_conn.php";
 
 
-if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
-    exit();
-}
+// if (!isset($_SESSION['user_id'])) {
+//     header("Location: login.php");
+//     exit();
+// }
 
 //include 'config/db.php';
 
