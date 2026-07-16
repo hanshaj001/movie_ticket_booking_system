@@ -59,6 +59,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <title>Contact Us | Movie Ticket Booking System</title>
 
 <link rel="stylesheet" href="../Assets/Customer/contact.css">
+<link rel="stylesheet" href="../Assets/css/Customer/footer.css">
+
 </head>
 <body>
 
@@ -206,7 +208,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 </section>
 
-<?php include 'footer.php'; ?>
+<?php include '../Customer/components/footer.php'; 
+
+?>
 
 <script src="../Assets/js/contact.js"></script>
 
