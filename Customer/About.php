@@ -16,6 +16,8 @@
 <title>About Us | Movie Ticket Booking System</title>
 
 <link rel="stylesheet" href="../Assets/css/Customer/about.css">
+<link rel="stylesheet" href="../Assets/css/Customer/navbar.css">
+<link rel="stylesheet" href="../Assets/css/Customer/footer.css">
 
 
 <!-- Font Awesome -->
@@ -195,8 +197,8 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
 </section>
 
 <!-- Footer -->
-<?php 
-include('../Assets/css/Customer/footer.css'); 
+<?php include '../Customer/components/footer.php'; 
+
 ?>
 
 <script src="../Assets/js/Customer/about.js"></script>
