@@ -12,8 +12,8 @@ background:#f4f6f9;
 .contact-header{
 text-align:center;
 padding:60px 20px;
-background:#111827;
-color:white;
+background:#edeff2;
+color:rgb(24, 23, 23);
 }
 
 .contact-header h1{
@@ -35,13 +35,13 @@ gap:30px;
 background:white;
 padding:30px;
 border-radius:10px;
-box-shadow:0 4px 15px rgba(0,0,0,.1);
+box-shadow:0 4px 15px #eee9e9ee;
 }
 
 .contact-info h2,
 .contact-form h2{
 margin-bottom:20px;
-color:#111827;
+color:#151516;
 }
 
 .info-box{
@@ -113,7 +113,7 @@ background:white;
 padding:20px;
 margin-bottom:15px;
 border-radius:8px;
-box-shadow:0 3px 10px rgba(0,0,0,.08);
+box-shadow:0 3px 10px rgba(251, 249, 249, 0.919);
 }
 
 .location-section{
