@@ -22,54 +22,58 @@ $current_page = basename($_SERVER['PHP_SELF']);
     <title>Admin System Panel - MTBS</title>
     <link rel="stylesheet" href="../Assets/css/Admin/sidebar.css"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
 <div class="overlay" id="overlay"></div>
 
 <nav class="sidebar" id="sidebar">
-    <div class="logo">
+    <a href="dashboard.php" class="logo" style="text-decoration: none; color: #ff4d2d;">
         MTBS Admin
-    </div>
+        <button class="close-sidebar-btn" id="closeSidebarBtn" aria-label="Close Navigation" onclick="event.preventDefault();">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+    </a>
 
     <ul>
-        <li class="<?= $current_page == 'dashboard.php' ? 'active' : '' ?>">
+        <li class="<?= $current_page == 'dashboard.php' ? 'nav-active' : '' ?>">
             <a href="dashboard.php">
                 <i class="fa-solid fa-chart-line"></i> Dashboard
             </a>
         </li>
-        <li class="<?= $current_page == 'add_movie.php' ? 'active' : '' ?>">
+        <li class="<?= $current_page == 'add_movie.php' ? 'nav-active' : '' ?>">
             <a href="add_movie.php">
                 <i class="fa-solid fa-film"></i> Add Movie
             </a>
         </li>
-        <li class="<?= $current_page == 'add_show.php' ? 'active' : '' ?>">
+        <li class="<?= $current_page == 'add_show.php' ? 'nav-active' : '' ?>">
             <a href="add_show.php">
                 <i class="fa-solid fa-calendar-plus"></i> Add Show
             </a>
         </li>
 
-        <li class="<?= $current_page == 'manage_screens.php' ? 'active' : '' ?>">
+        <li class="<?= $current_page == 'manage_screens.php' ? 'nav-active' : '' ?>">
             <a href="manage_screens.php">
                 <i class="fa-solid fa-tv"></i> Manage Screens
             </a>
         </li>
-        <li class="<?= $current_page == 'manage_genres.php' ? 'active' : '' ?>">
+        <li class="<?= $current_page == 'manage_genres.php' ? 'nav-active' : '' ?>">
             <a href="manage_genres.php">
                 <i class="fa-solid fa-tags"></i> Manage Genres
             </a>
         </li>
-        <li class="<?= $current_page == 'booking_monitoring.php' ? 'active' : '' ?>">
+        <li class="<?= $current_page == 'booking_monitoring.php' ? 'nav-active' : '' ?>">
             <a href="booking_monitoring.php">
                 <i class="fa-solid fa-ticket"></i> Booking Monitoring
             </a>
         </li>
-        <li class="<?= ($current_page == 'earnings.php' || $current_page == 'movie_earnings.php') ? 'active' : '' ?>">
+        <li class="<?= ($current_page == 'earnings.php' || $current_page == 'movie_earnings.php') ? 'nav-active' : '' ?>">
             <a href="earnings.php">
                 <i class="fa-solid fa-chart-bar"></i> Earnings
             </a>
         </li>
-        <li class="<?= $current_page == 'ledger.php' ? 'active' : '' ?>">
+        <li class="<?= $current_page == 'ledger.php' ? 'nav-active' : '' ?>">
             <a href="ledger.php">
                 <i class="fa-solid fa-book"></i> Ledger
             </a>
@@ -109,12 +113,18 @@ $current_page = basename($_SERVER['PHP_SELF']);
 <script>
 const sidebar = document.getElementById("sidebar");
 const toggleBtn = document.getElementById("toggleBtn");
-const overlay = document.querySelector(".modal-overlay");
+const closeBtn = document.getElementById("closeSidebarBtn");
+const overlay = document.getElementById("overlay");
 
 // Off-canvas mobile navigation drawer toggle routines
 toggleBtn.addEventListener("click", () => {
     sidebar.classList.toggle("active");
     overlay.classList.toggle("active");
+});
+
+closeBtn.addEventListener("click", () => {
+    sidebar.classList.remove("active");
+    overlay.classList.remove("active");
 });
 
 overlay.addEventListener("click", () => {

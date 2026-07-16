@@ -208,11 +208,17 @@ if (isset($_POST['add_movie'])) {
                 <label>Genre</label>
                 <div style="display: flex; gap: 15px; flex-wrap: wrap; padding: 10px 0;">
                     <?php
-                    $available_genres = [
-                        'Action', 'Adventure', 'Animation', 'Comedy', 'Crime', 'Documentary', 'Drama', 
-                        'Family', 'Fantasy', 'History', 'Horror', 'Music', 'Mystery', 'Romance', 
-                        'Sci-Fi', 'Superhero', 'Thriller', 'War', 'Western'
-                    ];
+                    $genres_query = $conn->query("SELECT genre_name FROM genres ORDER BY genre_name ASC");
+                    $available_genres = [];
+                    if($genres_query) {
+                        while($g_row = $genres_query->fetch_assoc()) {
+                            $available_genres[] = $g_row['genre_name'];
+                        }
+                    }
+                    
+                    if(empty($available_genres)) {
+                        echo "<span style='color:#777; font-size:14px;'>No genres available. Please add them in Manage Genres.</span>";
+                    }
                     $selected_genres = array_map('trim', explode(',', $genre));
                     foreach ($available_genres as $g) {
                         $checked = in_array($g, $selected_genres) ? 'checked' : '';
@@ -298,7 +304,18 @@ if (isset($_POST['add_movie'])) {
     </form>
 </div>
 
-<?php $movieQuery = $conn->query("SELECT * FROM movies ORDER BY created_at DESC"); ?>
+<?php 
+$movies_per_page = 10;
+$current_page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+if ($current_page < 1) $current_page = 1;
+$offset = ($current_page - 1) * $movies_per_page;
+
+$count_movies_res = $conn->query("SELECT COUNT(*) as total FROM movies");
+$total_movies = $count_movies_res->fetch_assoc()['total'];
+$total_movie_pages = ceil($total_movies / $movies_per_page);
+
+$movieQuery = $conn->query("SELECT * FROM movies ORDER BY created_at DESC LIMIT $offset, $movies_per_page"); 
+?>
 
 <div class="show-list-header">
     <div class="show-list-title">
@@ -354,6 +371,18 @@ if (isset($_POST['add_movie'])) {
     <div class="no-data">No movies available.</div>
 <?php endif; ?>
 </div>
+
+<?php if ($total_movie_pages > 1): ?>
+<div class="pagination-container" style="margin-top: 25px; display: flex; justify-content: center; gap: 10px;">
+    <?php for ($i = 1; $i <= $total_movie_pages; $i++): ?>
+        <a href="add_movie.php?page=<?= $i; ?>" 
+           style="padding: 8px 14px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px; transition: 0.2s;
+           <?= $i == $current_page ? 'background: #ff4d2d; color: white;' : 'background: white; color: #555; border: 1px solid #ddd;'; ?>">
+            <?= $i; ?>
+        </a>
+    <?php endfor; ?>
+</div>
+<?php endif; ?>
 
     </div>
 </div>

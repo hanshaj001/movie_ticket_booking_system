@@ -70,7 +70,15 @@ if(!$booking)
 
 <div class="container">
 
-<h1>🎟 Booking Details</h1>
+<div class="page-header">
+    <div class="page-title">
+        <i class="fa-solid fa-ticket"></i>
+        <div>
+            <h1>Booking Details</h1>
+            <p>View detailed information for this booking</p>
+        </div>
+    </div>
+</div>
 
 <div class="card">
 
@@ -116,7 +124,8 @@ if(!$booking)
 
 <div class="row">
 <label>Status</label>
-<span class="status">
+<?php $status_cls = 'status-' . strtolower($booking['booking_status']); ?>
+<span class="status <?= $status_cls; ?>">
 <?php echo $booking['booking_status']; ?>
 </span>
 </div>
