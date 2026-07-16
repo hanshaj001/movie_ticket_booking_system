@@ -18,7 +18,8 @@ if(!$conn)
 <?php
 //session_start();
 require_once "../Includes/db_conn.php";
-include "../Customer/navbar.php";
+include "../Customer/components/navbar.php";
+
 
 /* Date Validation */
 $selected_date = date('Y-m-d');
@@ -91,6 +92,9 @@ $heading =
 
 <link rel="stylesheet" href="../Assets/css/Customer/home.css">
 <link rel="stylesheet" href="../Assets/css/Customer/navbar.css">
+<link rel="stylesheet" href="../Assets/css/Customer/footer.css">
+
+
 
 
 </head>
@@ -220,6 +224,9 @@ View Details
 </div>
 
 </section>
+<?php include '../Customer/components/footer.php'; 
+
+?>
 
 <script src="../Assets/js/Customer/home.js"></script>
 
