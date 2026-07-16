@@ -1,3 +1,114 @@
+
+.footer {
+    background: #111827;
+    color: #ffffff;
+    margin-top: 50px;
+    width: 100%;
+}
+
+.footer-container {
+    max-width: 1200px;
+    margin: auto;
+    padding: 30px 20px;
+    text-align: center;
+}
+
+/* Brand Section */
+
+.footer-brand h3 {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.footer-brand p {
+    color: #d1d5db;
+    margin-bottom: 20px;
+}
+
+/* Navigation Links */
+
+.footer-links {
+    margin-bottom: 20px;
+}
+
+.footer-links a {
+    color: #ffffff;
+    text-decoration: none;
+    margin: 0 15px;
+    font-size: 15px;
+    transition: 0.3s;
+}
+
+.footer-links a:hover {
+    color: #f59e0b;
+}
+
+.active-link {
+    color: #f59e0b !important;
+    font-weight: bold;
+}
+
+/* Copyright */
+
+.footer-copy {
+    border-top: 1px solid #374151;
+    padding-top: 15px;
+    font-size: 14px;
+    color: #9ca3af;
+}
+
+/* ==========================
+   RESPONSIVE DESIGN
+
+/* Tablet */
+
+@media (max-width: 768px) {
+
+    .footer-brand h3 {
+        font-size: 22px;
+    }
+
+    .footer-links {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .footer-links a {
+        margin: 5px;
+    }
+}
+
+/* Mobile */
+
+@media (max-width: 480px) {
+
+    .footer-container {
+        padding: 20px 10px;
+    }
+
+    .footer-brand h3 {
+        font-size: 18px;
+    }
+
+    .footer-brand p {
+        font-size: 14px;
+    }
+
+    .footer-links {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .footer-links a {
+        margin: 0;
+    }
+
+    .footer-copy {
+        font-size: 12px;
+    }
 /* ==========================================================================
    FOOTER - MODERN DESIGN
    ========================================================================== */
