@@ -75,12 +75,12 @@ body {
 }
 
 /* Sidebar Navigation Highlight Indicators */
-.sidebar ul li.active a {
+.sidebar ul li.nav-active a {
     background-color: #ff4d2d; /* Primary Orange Token */
     color: #ffffff;
 }
 
-.sidebar ul li.active a i {
+.sidebar ul li.nav-active a i {
     color: #ffffff;
 }
 
@@ -184,8 +184,9 @@ body {
 }
 
 .navbar .logout-btn:hover {
-    background-color: #ff4d2d; /* Primary Orange Token */
-    color: #ffffff;
+    background-color: var(--accent-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(255,77,45,0.3);
 }
 
 /* ==========================================================================
@@ -225,8 +226,24 @@ input:focus, select:focus, textarea:focus {
     .navbar .toggle-btn {
         display: block; /* Unveils hamburger toggle button */
     }
+
+    .navbar .logout-btn {
+        background-color: var(--accent);
+        color: #ffffff !important;
+        padding: 8px 30px;
+        border-radius: 30px; /* Oval shape */
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: background-color 0.3s, transform 0.2s, box-shadow 0.2s;
+        border: none;
+        box-shadow: 0 4px 12px rgba(255,77,45,0.2);
+    }
     
-    #datetime, .navbar .logout-btn {
+    #datetime {
         display: none; /* Collapses text tracking to clean up compact layouts */
     }
     
@@ -247,6 +264,35 @@ input:focus, select:focus, textarea:focus {
     }
     
     .overlay.active {
+        display: block;
+    }
+
+    /* Global Modal Styles for Admin */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 2000;
+        padding: 20px;
+    }
+
+    .modal-content {
+        background: #fff;
+        padding: 30px 40px;
+        border-radius: 12px;
+        text-align: center;
+        max-width: 380px;
+        width: 100%;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        position: relative;
+    }
+
         display: block;
     }
 }

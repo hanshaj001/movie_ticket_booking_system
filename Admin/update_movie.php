@@ -31,6 +31,7 @@ if ($result->num_rows == 0) {
 }
 
 $movie = $result->fetch_assoc();
+$stmt->close();
 
 $poster_name = $movie['poster_url'];
 $banner_name = $movie['banner_url'];
@@ -88,7 +89,11 @@ if (isset($_FILES['banner']) && $_FILES['banner']['error'] == 0) {
 }
 
 // Update movie
-$stmt = $conn->prepare("UPDATE movies SET title=?,description=?,duration_minutes=?,genre=?,language=?,release_date=?,movie_format=?,poster_url=?,banner_url=? WHERE movie_id=?");
+$stmt = $conn->prepare("UPDATE `movies` SET `title`=?, `description`=?, `duration_minutes`=?, `genre`=?, `language`=?, `release_date`=?, `movie_format`=?, `poster_url`=?, `banner_url`=? WHERE `movie_id`=?");
+
+if (!$stmt) {
+    die("Prepare failed: " . $conn->error);
+}
 
 $stmt->bind_param(
     "ssissssssi",
