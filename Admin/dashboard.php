@@ -195,18 +195,18 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
 
     <!-- HEADER -->
 
-    <div class="dashboard-header">
-
-        <div>
-            <h1>Admin Dashboard</h1>
-            <p>Monitor cinema activities and performance.</p>
+    <div class="page-header">
+        <div class="page-title">
+            <i class="fa-solid fa-chart-line"></i>
+            <div>
+                <h1>Admin Dashboard</h1>
+                <p>Monitor cinema activities and performance.</p>
+            </div>
         </div>
-
         <div class="admin-info">
             Welcome,
             <strong><?= htmlspecialchars($adminName) ?></strong>
         </div>
-
     </div>
 
     <!-- DASHBOARD CARDS -->
@@ -411,12 +411,12 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
 
             <?php if(mysqli_num_rows($recentBookings) > 0): ?>
 
-                <?php while($booking = mysqli_fetch_assoc($recentBookings)): ?>
+                <?php $sn = 1; while($booking = mysqli_fetch_assoc($recentBookings)): ?>
 
                     <tr>
 
                         <td>
-                            #<?= $booking['booking_id']; ?>
+                            #<?= $sn++; ?>
                         </td>
 
                         <td>
@@ -449,13 +449,10 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
                         </td>
 
                         <td>
-
-                            <span class="status-badge">
-
+                            <?php $status_cls = 'status-' . strtolower($booking['booking_status']); ?>
+                            <span class="status-badge <?= $status_cls; ?>">
                                 <?= $booking['booking_status']; ?>
-
                             </span>
-
                         </td>
 
                     </tr>

@@ -88,11 +88,17 @@ $row = mysqli_fetch_assoc($result);
 
                     <div style="display: flex; gap: 15px; flex-wrap: wrap; padding: 10px 0;">
                         <?php
-                        $available_genres = [
-                            'Action', 'Adventure', 'Animation', 'Comedy', 'Crime', 'Documentary', 'Drama', 
-                            'Family', 'Fantasy', 'History', 'Horror', 'Music', 'Mystery', 'Romance', 
-                            'Sci-Fi', 'Superhero', 'Thriller', 'War', 'Western'
-                        ];
+                        $genres_query = $conn->query("SELECT genre_name FROM genres ORDER BY genre_name ASC");
+                        $available_genres = [];
+                        if($genres_query) {
+                            while($g_row = $genres_query->fetch_assoc()) {
+                                $available_genres[] = $g_row['genre_name'];
+                            }
+                        }
+                        
+                        if(empty($available_genres)) {
+                            echo "<span style='color:#777; font-size:14px;'>No genres available. Please add them in Manage Genres.</span>";
+                        }
                         $selected_genres = array_map('trim', explode(',', $row['genre'] ?? ''));
                         foreach ($available_genres as $g) {
                             $checked = in_array($g, $selected_genres) ? 'checked' : '';

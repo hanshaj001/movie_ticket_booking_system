@@ -16,6 +16,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $fullname = trim($_POST['fullname']);
     $email = trim($_POST['email']);
     $phone = trim($_POST['phone']);
+    
     $subject = trim($_POST['subject']);
     $message = trim($_POST['message']);
 
@@ -31,11 +32,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $errors[] = "Please enter a valid Email Address.";
     }
 
-    if (empty($phone)) {
-        $errors[] = "Phone Number is required.";
-    } elseif (!preg_match('/^[0-9]{7,15}$/', $phone)) {
-        $errors[] = "Phone Number must contain only numbers.";
-    }
+   if (empty($phone)) {
+    $errors[] = "Phone Number is required.";
+}
+elseif (!preg_match('/^[0-9]{7,15}$/', $phone)) {
+    $errors[] = "Phone Number must contain only numbers.";
+}
 
     if (empty($subject)) {
         $errors[] = "Subject is required.";
@@ -196,15 +198,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 <!-- Optional Google Map -->
 
-<section class="map-section">
+<section class="location-section">
 
     <h2>Our Location</h2>
 
-    <!-- <iframe
-        src="https://www.google.com/maps/embed?pb=!1m18..."
-        allowfullscreen=""
-        loading="lazy">
-    </iframe> -->
+    <div class="locations">
+
+        <div class="location-box">
+            <i class="fa-solid fa-location-dot"></i>
+            <h3>Koteshwor</h3>
+        </div>
+
+        <div class="location-box">
+            <i class="fa-solid fa-location-dot"></i>
+            <h3>New Baneshwor</h3>
+        </div>
+
+        <div class="location-box">
+            <i class="fa-solid fa-location-dot"></i>
+            <h3>Maitighar</h3>
+        </div>
+
+    </div>
 
 </section>
 
