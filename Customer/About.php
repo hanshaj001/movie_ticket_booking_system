@@ -1,12 +1,12 @@
 <?php
-session_start();
+//session_start();
 
 /* Customer Authentication */
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 'CUSTOMER') {
-    header("Location: login.php");
-    exit();
-}
-?>
+// if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 'CUSTOMER') {
+//     header("Location: login.php");
+//     exit();
+// }
+// ?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -15,7 +15,10 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 'CUSTOMER') {
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>About Us | Movie Ticket Booking System</title>
 
-<link rel="stylesheet" href="css/about.css">
+<link rel="stylesheet" href="../Assets/css/Customer/about.css">
+<link rel="stylesheet" href="../Assets/css/Customer/navbar.css">
+<link rel="stylesheet" href="../Assets/css/Customer/footer.css">
+
 
 <!-- Font Awesome -->
 <link rel="stylesheet"
@@ -25,7 +28,9 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
 <body>
 
 <!-- Navbar -->
-<?php include('includes/header.php'); ?>
+<?php
+ include('../Customer/components/navbar.php'); 
+ ?>
 
 <!-- Hero Section -->
 <section class="about-hero">
@@ -192,9 +197,11 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
 </section>
 
 <!-- Footer -->
-<?php include('includes/footer.php'); ?>
+<?php include '../Customer/components/footer.php'; 
 
-<script src="js/about.js"></script>
+?>
+
+<script src="../Assets/js/Customer/about.js"></script>
 
 </body>
 </html>

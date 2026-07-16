@@ -1,14 +1,15 @@
 <?php
 session_start();
 
-/* Authentication Check */
-if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
-    exit();
-}
 
-$success = "";
-$errors = [];
+/* Authentication Check */
+// if (!isset($_SESSION['user_id'])) {
+//     header("Location: login.php");
+//     exit();
+// }
+
+// $success = "";
+// $errors = [];
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
@@ -57,11 +58,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Contact Us | Movie Ticket Booking System</title>
 
-<link rel="stylesheet" href="css/contact.css">
+<link rel="stylesheet" href="../Assets/Customer/contact.css">
+<link rel="stylesheet" href="../Assets/css/Customer/footer.css">
+
 </head>
 <body>
 
-<?php include 'navbar.php'; ?>
+<?php include '../Customer/components/navbar.php'; ?>
 
 <section class="contact-header">
     <h1>Contact Us</h1>
@@ -197,17 +200,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     <h2>Our Location</h2>
 
-    <iframe
+    <!-- <iframe
         src="https://www.google.com/maps/embed?pb=!1m18..."
         allowfullscreen=""
         loading="lazy">
-    </iframe>
+    </iframe> -->
 
 </section>
 
-<?php include 'footer.php'; ?>
+<?php include '../Customer/components/footer.php'; 
 
-<script src="js/contact.js"></script>
+?>
+
+<script src="../Assets/js/contact.js"></script>
 
 </body>
 </html>
