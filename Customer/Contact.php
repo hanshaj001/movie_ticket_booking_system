@@ -58,7 +58,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Contact Us | Movie Ticket Booking System</title>
 
-<link rel="stylesheet" href="../Assets/Customer/contact.css">
+<link rel="stylesheet" href="../Assets/css/Customer/contact.css">
 <link rel="stylesheet" href="../Assets/css/Customer/footer.css">
 
 </head>
