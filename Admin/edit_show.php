@@ -167,124 +167,56 @@ if(isset($_POST['update_show']))
 
    // overlapping show validation
 
-    if(
-        empty($errors)
-        &&
-        !$has_bookings
-    )
-    {
-
-        $movie_query = mysqli_query(
-            $conn,
-            "SELECT duration_minutes
-             FROM movies
-             WHERE movie_id='$movie_id'"
-        );
-
-        $movie = mysqli_fetch_assoc($movie_query);
-
-        $duration = $movie['duration_minutes'];
+    // overlapping show validation
+    if (empty($errors) && !$has_bookings) {
+        $movie_stmt = $conn->prepare("SELECT duration_minutes FROM movies WHERE movie_id = ?");
+        $movie_stmt->bind_param("i", $movie_id);
+        $movie_stmt->execute();
+        $movie_res = $movie_stmt->get_result()->fetch_assoc();
+        $duration = $movie_res['duration_minutes'] ?? 0;
+        $movie_stmt->close();
 
         $new_start = strtotime($show_date . ' ' . $show_time);
+        $new_end = strtotime('+' . $duration . ' minutes', $new_start);
 
-        $new_end = strtotime('+' . $duration . ' minutes',$new_start);
+        $existing_stmt = $conn->prepare("
+            SELECT sh.show_id, sh.show_date, sh.show_time, m.duration_minutes
+            FROM shows sh
+            INNER JOIN movies m ON sh.movie_id = m.movie_id
+            WHERE sh.screen_id = ? AND sh.show_date = ? AND sh.show_status != 'CANCELLED' AND sh.show_id != ?
+        ");
+        $existing_stmt->bind_param("isi", $screen_id, $show_date, $show_id);
+        $existing_stmt->execute();
+        $existing_shows = $existing_stmt->get_result();
 
-        $existing_shows = mysqli_query(
-            $conn,
-            "SELECT
-                sh.show_id,
-                sh.show_date,
-                sh.show_time,
-                m.duration_minutes
+        while ($existing = $existing_shows->fetch_assoc()) {
+            $existing_start = strtotime($existing['show_date'] . ' ' . $existing['show_time']);
+            $existing_end = strtotime('+' . $existing['duration_minutes'] . ' minutes', $existing_start);
 
-             FROM shows sh
-
-             INNER JOIN movies m
-             ON sh.movie_id = m.movie_id
-
-             WHERE sh.screen_id='$screen_id'
-             AND sh.show_date='$show_date'
-             AND sh.show_status!='CANCELLED'
-             AND sh.show_id != '$show_id'"
-        );
-
-
-
-        while(
-            $existing =
-            mysqli_fetch_assoc($existing_shows)
-        )
-        {
-
-            $existing_start = strtotime(
-                $existing['show_date']
-                .' '.
-                $existing['show_time']
-            );
-
-            $existing_end = strtotime(
-                '+' .
-                $existing['duration_minutes']
-                .
-                ' minutes',
-                $existing_start
-            );
-
-
-
-            if(
-                ($new_start < $existing_end)
-                &&
-                ($new_end > $existing_start)
-            )
-            {
-                $errors['show_time']
-                =
-                "This show overlaps with another show on the selected screen.";
-
+            if (($new_start < $existing_end) && ($new_end > $existing_start)) {
+                $errors['show_time'] = "This show overlaps with another show on the selected screen.";
                 break;
             }
         }
+        $existing_stmt->close();
     }
 
-
     // if no errors, update show
+    if (empty($errors)) {
+        $update_stmt = $conn->prepare("
+            UPDATE shows
+            SET movie_id = ?, screen_id = ?, show_date = ?, show_time = ?, ticket_price = ?
+            WHERE show_id = ?
+        ");
+        $update_stmt->bind_param("iissdi", $movie_id, $screen_id, $show_date, $show_time, $ticket_price, $show_id);
 
-    if(empty($errors))
-    {
-
-        $update = mysqli_query(
-            $conn,
-            "UPDATE shows
-             SET
-                movie_id='$movie_id',
-                screen_id='$screen_id',
-                show_date='$show_date',
-                show_time='$show_time',
-                ticket_price='$ticket_price'
-             WHERE show_id='$show_id'"
-        );
-
-        if($update)
-        {
-            $message =
-            "Show updated successfully.";
-
-            $show = mysqli_fetch_assoc(
-                mysqli_query(
-                    $conn,
-                    "SELECT *
-                     FROM shows
-                     WHERE show_id='$show_id'"
-                )
-            );
-        header("Location: add_show.php?msg=Show updated successfully&type=success");
-        exit();
-        }
-        else
-        {
-            $message =
-            "Failed to update show.";
+        if ($update_stmt->execute()) {
+            $update_stmt->close();
+            header("Location: add_show.php?msg=Show updated successfully&type=success");
+            exit();
+        } else {
+            $update_stmt->close();
+            $message = "Failed to update show.";
         }
     }
 }

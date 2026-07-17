@@ -94,52 +94,84 @@ if (isset($_POST['add_movie'])) {
     $poster_name = "";
     $banner_name = "";
             
-        // Banner validation
-        if (isset($_FILES['banner']) && $_FILES['banner']['error'] == 0) {
+    // Poster validation
+    if (isset($_FILES['poster']) && $_FILES['poster']['error'] == 0) {
+        $allowed_types = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+        $file_type = mime_content_type($_FILES['poster']['tmp_name']);
+        $file_size = $_FILES['poster']['size'];
 
-            $allowed_types = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-
-            $file_type = mime_content_type($_FILES['banner']['tmp_name']);
-
-            $file_size = $_FILES['banner']['size'];
-
-            if (!in_array($file_type, $allowed_types)) {
-                $errors['banner'] = "Only JPG, PNG and WEBP images are allowed.";
-            }
-
-            if ($file_size > 3145728) {
-                $errors['banner'] = "Banner size must not exceed 3MB.";
-            }
-
-        } else {
-            $errors['banner'] = "Movie banner is required.";
+        if (!in_array($file_type, $allowed_types)) {
+            $errors['poster'] = "Only JPG, PNG and WEBP images are allowed for the poster.";
         }
+        if ($file_size > 3145728) {
+            $errors['poster'] = "Poster size must not exceed 3MB.";
+        }
+    } else {
+        $errors['poster'] = "Movie poster is required.";
+    }
+
+    // Banner validation
+    if (isset($_FILES['banner']) && $_FILES['banner']['error'] == 0) {
+        $allowed_types = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+        $file_type = mime_content_type($_FILES['banner']['tmp_name']);
+        $file_size = $_FILES['banner']['size'];
+
+        if (!in_array($file_type, $allowed_types)) {
+            $errors['banner'] = "Only JPG, PNG and WEBP images are allowed.";
+        }
+        if ($file_size > 3145728) {
+            $errors['banner'] = "Banner size must not exceed 3MB.";
+        }
+    } else {
+        $errors['banner'] = "Movie banner is required.";
+    }
 
     // Process image move and insert into database
     if (empty($errors)) {
-       $poster_extension = strtolower(pathinfo($_FILES['poster']['name'], PATHINFO_EXTENSION));
-
-                $banner_extension = strtolower(pathinfo($_FILES['banner']['name'], PATHINFO_EXTENSION));
-                $poster_name = time() . "_poster_" . uniqid() . "." . $poster_extension;
-                $banner_name = time() . "_banner_" . uniqid() . "." . $banner_extension;
-                $poster_path = "../Assets/uploads/movie_posters/" . $poster_name;
-                $banner_path = "../Assets/uploads/movie_banners/" . $banner_name;
+        $poster_extension = strtolower(pathinfo($_FILES['poster']['name'], PATHINFO_EXTENSION));
+        $banner_extension = strtolower(pathinfo($_FILES['banner']['name'], PATHINFO_EXTENSION));
+        $poster_name = time() . "_poster_" . uniqid() . "." . $poster_extension;
+        $banner_name = time() . "_banner_" . uniqid() . "." . $banner_extension;
+        $poster_path = "../Assets/uploads/movie_posters/" . $poster_name;
+        $banner_path = "../Assets/uploads/movie_banners/" . $banner_name;
+        
         if (move_uploaded_file($_FILES['poster']['tmp_name'], $poster_path) &&
-        move_uploaded_file($_FILES['banner']['tmp_name'], $banner_path)) {
-            $stmt = $conn->prepare("INSERT INTO movies(title,description,duration_minutes,genre,language,release_date,movie_format,poster_url,banner_url,status) VALUES(?,?,?,?,?,?,?,?,?,'ACTIVE')");
+            move_uploaded_file($_FILES['banner']['tmp_name'], $banner_path)) {
+            
+            $stmt = $conn->prepare("INSERT INTO movies(title,description,duration_minutes,language,release_date,movie_format,poster_url,banner_url,status) VALUES(?,?,?,?,?,?,?,?,'ACTIVE')");
             $stmt->bind_param(
-            "ssissssss",
-            $title,
-            $description,
-            $duration,
-            $genre,
-            $language,
-            $release_date,
-            $movie_format,
-            $poster_name,
-            $banner_name
+                "ssisssss",
+                $title,
+                $description,
+                $duration,
+                $language,
+                $release_date,
+                $movie_format,
+                $poster_name,
+                $banner_name
             );
+            
             if ($stmt->execute()) {
+                $new_movie_id = $stmt->insert_id;
+                
+                // Insert selected genres into movie_genres bridge table
+                if (isset($_POST['genre']) && is_array($_POST['genre'])) {
+                    foreach ($_POST['genre'] as $genre_name) {
+                        $genre_stmt = $conn->prepare("SELECT genre_id FROM genres WHERE genre_name = ?");
+                        $genre_stmt->bind_param("s", $genre_name);
+                        $genre_stmt->execute();
+                        $genre_res = $genre_stmt->get_result();
+                        if ($genre_row = $genre_res->fetch_assoc()) {
+                            $genre_id = $genre_row['genre_id'];
+                            $bridge_stmt = $conn->prepare("INSERT INTO movie_genres (movie_id, genre_id) VALUES (?, ?)");
+                            $bridge_stmt->bind_param("ii", $new_movie_id, $genre_id);
+                            $bridge_stmt->execute();
+                            $bridge_stmt->close();
+                        }
+                        $genre_stmt->close();
+                    }
+                }
+
                 $_SESSION['success_message'] = "Movie added successfully.";
                 header("Location: add_movie.php");
                 exit();
@@ -314,7 +346,15 @@ $count_movies_res = $conn->query("SELECT COUNT(*) as total FROM movies");
 $total_movies = $count_movies_res->fetch_assoc()['total'];
 $total_movie_pages = ceil($total_movies / $movies_per_page);
 
-$movieQuery = $conn->query("SELECT * FROM movies ORDER BY created_at DESC LIMIT $offset, $movies_per_page"); 
+$movieQuery = $conn->query("
+    SELECT m.*, GROUP_CONCAT(DISTINCT g.genre_name ORDER BY g.genre_name SEPARATOR ', ') as genre 
+    FROM movies m 
+    LEFT JOIN movie_genres mg ON m.movie_id = mg.movie_id 
+    LEFT JOIN genres g ON mg.genre_id = g.genre_id 
+    GROUP BY m.movie_id 
+    ORDER BY m.created_at DESC 
+    LIMIT $offset, $movies_per_page
+"); 
 ?>
 
 <div class="show-list-header">

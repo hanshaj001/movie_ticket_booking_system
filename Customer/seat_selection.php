@@ -217,7 +217,7 @@ if (isset($_GET['action'])) {
 
 // Main View Logic Row Definitions
 if (!isset($_GET['show_id']) || !is_numeric($_GET['show_id'])) {
-    header("Location: home.php");
+    header("Location: ../index.php");
     exit();
 }
 
@@ -234,7 +234,7 @@ $show_query = "SELECT s.*, scr.screen_name, m.title, m.poster_url, m.movie_forma
 $show_result = mysqli_query($conn, $show_query);
 
 if (mysqli_num_rows($show_result) === 0) {
-    header("Location: home.php");
+    header("Location: ../index.php");
     exit();
 }
 $show = mysqli_fetch_assoc($show_result);
@@ -244,7 +244,7 @@ if (!empty($show['genre_names'])) {
 }
 
 if (strtotime($show['show_date'] . ' ' . $show['show_time']) < strtotime($current_datetime)) {
-    header("Location: home.php?error=show_started");
+    header("Location: ../index.php?error=show_started");
     exit();
 }
 
@@ -381,7 +381,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_booking'])) {
 
     <main class="seat-selection-container">
         <nav class="breadcrumb-nav">
-            <a href="home.php" class="bc-link"><i class="fa-solid fa-house"></i> Home</a>
+            <a href="../index.php" class="bc-link"><i class="fa-solid fa-house"></i> Home</a>
             <span class="bc-sep"><i class="fa-solid fa-chevron-right"></i></span>
             <a href="movie_details.php?movie_id=<?php echo $show['movie_id']; ?>" class="bc-link"><?php echo htmlspecialchars($show['title']); ?></a>
             <span class="bc-sep"><i class="fa-solid fa-chevron-right"></i></span>

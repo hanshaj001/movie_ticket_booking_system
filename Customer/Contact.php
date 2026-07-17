@@ -71,7 +71,7 @@ elseif (!preg_match('/^[0-9]{7,15}$/', $phone)) {
 
     <div class="contact-page-header">
         <nav class="breadcrumb-nav">
-            <a href="home.php" class="bc-link"><i class="fa-solid fa-house"></i> Home</a>
+            <a href="../index.php" class="bc-link"><i class="fa-solid fa-house"></i> Home</a>
             <span class="bc-sep"><i class="fa-solid fa-chevron-right"></i></span>
             <span class="bc-current">Contact Us</span>
         </nav>

@@ -45,6 +45,13 @@ if (isset($_GET['booking_id']) && is_numeric($_GET['booking_id'])) {
                     WHERE bd.booking_id='$booking_id'
                 ");
 
+                // Cancel Seats in Booking Details
+                mysqli_query($conn,"
+                    UPDATE booking_details
+                    SET seat_status='CANCELLED', cancellation_time=NOW()
+                    WHERE booking_id='$booking_id'
+                ");
+
                 // Insert into Ledger
                 $movie_id = $booking['movie_id'];
                 $show_id = $booking['show_id'];

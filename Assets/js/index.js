@@ -1,4 +1,4 @@
-/* Assets/js/Customer/home.js */
+/* Assets/js/index.js */
 document.addEventListener("DOMContentLoaded", function() {
     
     // ==========================================
@@ -113,7 +113,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 gridContainer.style.opacity = "0.4";
                 gridContainer.style.transition = "opacity 0.2s ease";
                 
-                fetch(`home.php?ajax=1&date=${encodeURIComponent(dateVal)}`)
+                fetch(`index.php?ajax=1&date=${encodeURIComponent(dateVal)}`)
                     .then(response => {
                         if (!response.ok) throw new Error("HTTP error " + response.status);
                         return response.text();
@@ -123,7 +123,7 @@ document.addEventListener("DOMContentLoaded", function() {
                         gridContainer.style.opacity = "1";
                         
                         // 3. Update URL in browser query string without reloading
-                        history.pushState(null, '', `home.php?date=${encodeURIComponent(dateVal)}`);
+                        history.pushState(null, '', `index.php?date=${encodeURIComponent(dateVal)}`);
                     })
                     .catch(err => {
                         console.error("AJAX movie fetch failed: ", err);
