@@ -29,13 +29,13 @@ $current_date_marker = date('Y-m-d');
 $current_datetime_string = date('Y-m-d H:i:s');
 
 if (!isset($_GET['movie_id']) || !is_numeric($_GET['movie_id'])) {
-    header("Location: home.php");
+    header("Location: ../index.php");
     exit();
 }
 
 $movie_id = intval($_GET['movie_id']);
 if ($movie_id <= 0) {
-    header("Location: home.php");
+    header("Location: ../index.php");
     exit();
 }
 
@@ -44,7 +44,7 @@ if (isset($_GET['date'])) {
     $url_date = trim($_GET['date']);
     $date_regex_pattern = '/^\d{4}-\d{2}-\d{2}$/';
     if (!preg_match($date_regex_pattern, $url_date)) {
-        header("Location: home.php");
+        header("Location: ../index.php");
         exit();
     }
     // Date boundary check: reject any date older than today
@@ -66,7 +66,7 @@ $movie_query_string = "SELECT m.*, GROUP_CONCAT(DISTINCT g.genre_name SEPARATOR 
 $movie_query_result = mysqli_query($conn, $movie_query_string);
 
 if (!$movie_query_result || mysqli_num_rows($movie_query_result) === 0) {
-    header("Location: home.php");
+    header("Location: ../index.php");
     exit();
 }
 
@@ -177,7 +177,7 @@ if ($shows_list_result && mysqli_num_rows($shows_list_result) > 0) {
 
         <!-- BREADCRUMB NAVIGATION -->
         <nav class="breadcrumb-nav">
-            <a href="home.php" class="bc-link"><i class="fa-solid fa-house"></i> Home</a>
+            <a href="../index.php" class="bc-link"><i class="fa-solid fa-house"></i> Home</a>
             <span class="bc-sep"><i class="fa-solid fa-chevron-right"></i></span>
             <span class="bc-current"><?php echo htmlspecialchars($movie_record['title']); ?></span>
         </nav>
@@ -493,7 +493,7 @@ if ($shows_list_result && mysqli_num_rows($shows_list_result) > 0) {
 
         <!-- BACK LINK -->
         <div class="back-home-wrapper">
-            <a href="home.php" class="btn-back-home">
+            <a href="../index.php" class="btn-back-home">
                 <i class="fa-solid fa-arrow-left"></i> Back To Home
             </a>
         </div>

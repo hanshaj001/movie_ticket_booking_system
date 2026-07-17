@@ -6,7 +6,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
 // 1. Access Control Validation: Verify user login status
 if (!isset($_SESSION['user_id'])) {
-    header("Location: home.php");
+    header("Location: ../index.php");
     exit();
 }
 
@@ -14,7 +14,7 @@ require_once '../Includes/db_conn.php';
 
 // Check if booking_id is provided
 if (!isset($_GET['booking_id']) || !is_numeric($_GET['booking_id'])) {
-    header("Location: home.php");
+    header("Location: ../index.php");
     exit();
 }
 
@@ -30,7 +30,7 @@ $booking_query = "SELECT b.*, s.show_date, s.show_time, scr.screen_name, m.title
 $booking_result = mysqli_query($conn, $booking_query);
 
 if (mysqli_num_rows($booking_result) === 0) {
-    header("Location: home.php");
+    header("Location: ../index.php");
     exit();
 }
 
@@ -130,7 +130,7 @@ while ($seat = mysqli_fetch_assoc($seats_result)) {
         </div>
 
         <div class="btn-container">
-            <a href="home.php" class="btn btn-secondary">
+            <a href="../index.php" class="btn btn-secondary">
                 <i class="fas fa-home"></i>
                 Back to Home
             </a>

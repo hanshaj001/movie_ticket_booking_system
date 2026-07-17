@@ -4,6 +4,7 @@
 $in_customer_dir = (dirname($_SERVER['PHP_SELF']) !== '/' && strpos(dirname($_SERVER['PHP_SELF']), 'Customer') !== false);
 $base_path = $in_customer_dir ? '../' : '';
 $customer_path = $in_customer_dir ? '' : 'Customer/';
+$home_path = $in_customer_dir ? '../index.php' : 'index.php';
 ?>
 
 <link rel="stylesheet" href="<?= $base_path ?>Assets/css/Customer/footer.css?v=<?= time() ?>">
@@ -23,7 +24,7 @@ $customer_path = $in_customer_dir ? '' : 'Customer/';
         <div class="footer-col">
             <h3>Quick Links</h3>
             <ul class="footer-links">
-                <li><a href="<?= $customer_path ?>home.php">Home</a></li>
+                <li><a href="<?= $home_path ?>">Home</a></li>
                 <li><a href="<?= $customer_path ?>About.php">About Us</a></li>
                 <li><a href="<?= $customer_path ?>Contact.php">Contact Us</a></li>
             </ul>

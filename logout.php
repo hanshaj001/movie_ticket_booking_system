@@ -51,7 +51,7 @@ if ($role === 'ADMIN') {
 // should be sent to the public home page.
 // -----------------------------------------------------------------
 if ($role !== 'CUSTOMER') {
-    finalize_logout('Customer/home.php');
+    finalize_logout('index.php');
 }
 
 // -----------------------------------------------------------------
@@ -103,5 +103,5 @@ if ($stmt = mysqli_prepare($conn, $active_sql)) {
 // -----------------------------------------------------------------
 // Log the customer out and send them to the public home page.
 // -----------------------------------------------------------------
-finalize_logout('Customer/home.php');
+finalize_logout('index.php');
 ?>

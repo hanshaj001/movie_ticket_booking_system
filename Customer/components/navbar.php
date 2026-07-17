@@ -14,20 +14,21 @@ $customer_name = $is_logged_in ? $_SESSION['full_name'] : '';
 $in_customer_dir = (dirname($_SERVER['PHP_SELF']) !== '/' && strpos(dirname($_SERVER['PHP_SELF']), 'Customer') !== false);
 $base_path = $in_customer_dir ? '../' : '';
 $customer_path = $in_customer_dir ? '' : 'Customer/';
+$home_path = $in_customer_dir ? '../index.php' : 'index.php';
 ?>
 
 <link rel="stylesheet" href="<?= $base_path ?>Assets/css/Customer/navbar.css?v=<?= time() ?>">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <nav class="navbar">
-    <a href="<?= $customer_path ?>home.php" class="nav-brand">MTBS</a>
+    <a href="<?= $home_path ?>" class="nav-brand">MTBS</a>
     
     <div class="menu-toggle" id="mobile-menu">
         <i class="fa-solid fa-bars"></i>
     </div>
     
     <ul class="nav-links" id="nav-links">
-        <li><a href="<?= $customer_path ?>home.php" class="<?= $current_page == 'home.php' ? 'active' : '' ?>">Home</a></li>
+        <li><a href="<?= $home_path ?>" class="<?= $current_page == 'index.php' ? 'active' : '' ?>">Home</a></li>
         <li><a href="<?= $customer_path ?>About.php" class="<?= $current_page == 'About.php' ? 'active' : '' ?>">About</a></li>
         <li><a href="<?= $customer_path ?>Contact.php" class="<?= $current_page == 'Contact.php' ? 'active' : '' ?>">Contact</a></li>
         

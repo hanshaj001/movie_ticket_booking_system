@@ -17,7 +17,7 @@ if(!$conn)
 
 <?php
 session_start();
-require_once '../Includes/db_conn.php';
+require_once 'Includes/db_conn.php';
 
 // Validate selected date parameter
 $selected_date = date('Y-m-d');
@@ -62,12 +62,12 @@ if ($carousel_res && mysqli_num_rows($carousel_res) > 0) {
         $banner_path = '';
         if (!empty($row['banner_url'])) {
             $banner_file = basename($row['banner_url']);
-            $bp = '../Assets/uploads/movie_banners/' . $banner_file;
+            $bp = 'Assets/uploads/movie_banners/' . $banner_file;
             if (file_exists($bp)) $banner_path = $bp;
         }
         if (empty($banner_path) && !empty($row['poster_url'])) {
             $poster_file = basename($row['poster_url']);
-            $pp = '../Assets/uploads/movie_posters/' . $poster_file;
+            $pp = 'Assets/uploads/movie_posters/' . $poster_file;
             if (file_exists($pp)) $banner_path = $pp;
         }
         if (!empty($banner_path)) {
@@ -159,11 +159,11 @@ while ($row = $up_res->fetch_assoc()) {
 $svg_placeholder = "data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22300%22%20height%3D%22450%22%3E%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20fill%3D%22%23ff4d2d%22%2F%3E%3Ctext%20fill%3D%22%23ffffff%22%20font-family%3D%22sans-serif%22%20font-size%3D%2224%22%20dy%3D%2210.5%22%20font-weight%3D%22bold%22%20x%3D%2250%25%22%20y%3D%2250%25%22%20text-anchor%3D%22middle%22%3ENo%20Poster%3C%2Ftext%3E%3C%2Fsvg%3E";
 
 function renderCard($movie, $selected_date, $isUpcoming = false, $svg_placeholder) {
-    $details_url = "movie_details.php?movie_id=" . urlencode($movie['movie_id']) . "&date=" . urlencode($selected_date);
+    $details_url = "Customer/movie_details.php?movie_id=" . urlencode($movie['movie_id']) . "&date=" . urlencode($selected_date);
     
     $poster = $movie['poster_url'] ?? '';
     $poster_file = basename($poster);
-    $poster_path = '../Assets/uploads/movie_posters/' . $poster_file;
+    $poster_path = 'Assets/uploads/movie_posters/' . $poster_file;
     if (empty($poster) || !file_exists($poster_path)) {
         $poster_img_src = $svg_placeholder;
     } else {
@@ -218,18 +218,17 @@ function renderCard($movie, $selected_date, $isUpcoming = false, $svg_placeholde
     <title>Home - Movie Ticket Booking System</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="../Assets/css/Customer/home.css">
+    <link rel="stylesheet" href="Assets/css/index.css">
 </head>
 <body>
 
-    <?php include 'components/navbar.php'; ?>
+    <?php include 'Customer/components/navbar.php'; ?>
 
     <!-- Hero Banner (Carousel emulation) -->
     <header class="ta-hBanner">
-        <div class="ta-hBanner-wrapper">
-            <?php $hero = $carousel_movies[0]; ?>
+        <?php $hero = $carousel_movies[0]; ?>
+        <div class="ta-hBanner-wrapper" style="background-image: url('<?= htmlspecialchars(!empty($hero['banner_url']) ? $hero['banner_url'] : $svg_placeholder) ?>');">
             <div class="ta-fBanner-item-wrapper">
-                <img src="<?= htmlspecialchars(!empty($hero['banner_url']) ? $hero['banner_url'] : $svg_placeholder) ?>" alt="Banner" class="hero-bg" onerror="this.onerror=null; this.src='<?= $svg_placeholder ?>';">
                 
                 <div class="ta-overlay"></div>
                 
@@ -262,7 +261,7 @@ function renderCard($movie, $selected_date, $isUpcoming = false, $svg_placeholde
                     <div class="ta-showDaysWrapper">
                         <?php foreach ($filter_dates as $d): ?>
                             <div class="ta-showDays <?= ($selected_date === $d['date']) ? 'active' : '' ?>">
-                                <a href="home.php?date=<?= urlencode($d['date']) ?>#currently-showing"><?= htmlspecialchars($d['label']) ?></a>
+                                <a href="index.php?date=<?= urlencode($d['date']) ?>#currently-showing"><?= htmlspecialchars($d['label']) ?></a>
                             </div>
                         <?php endforeach; ?>
                     </div>
@@ -313,7 +312,7 @@ function renderCard($movie, $selected_date, $isUpcoming = false, $svg_placeholde
 
     </main>
 
-    <?php include 'components/footer.php'; ?>
+    <?php include 'Customer/components/footer.php'; ?>
 
 </body>
 </html>

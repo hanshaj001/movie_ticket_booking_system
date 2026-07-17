@@ -100,7 +100,7 @@ while ($row = mysqli_fetch_assoc($result)) {
     <div class="history-container">
         <!-- Breadcrumb Navigation -->
         <nav class="breadcrumb-nav">
-            <a href="home.php" class="bc-link"><i class="fa-solid fa-house"></i> Home</a>
+            <a href="../index.php" class="bc-link"><i class="fa-solid fa-house"></i> Home</a>
             <span class="bc-sep"><i class="fa-solid fa-chevron-right"></i></span>
             <span class="bc-current">Booking History</span>
         </nav>

@@ -17,7 +17,7 @@ if (isset($_SESSION['user_id']) && isset($_SESSION['role'])) {
             header("Location: $redirect_url");
             exit();
         }
-        header("Location: Customer/home.php");
+        header("Location: index.php");
         exit();
     } elseif ($_SESSION['role'] === 'ADMIN') {
         header("Location: Admin/dashboard.php");
@@ -81,7 +81,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         exit();
                     }
                 }
-                header("Location: Customer/home.php");
+                header("Location: index.php");
                 exit();
             } else {
                 $error = "Access Denied: Unrecognized organizational permission assignment.";

@@ -45,6 +45,13 @@ if ($data['booking_status'] === 'CONFIRMED') {
             WHERE bd.booking_id='$booking_id'
         ");
 
+        /* Cancel Seats in Booking Details */
+        mysqli_query($conn,"
+            UPDATE booking_details
+            SET seat_status='CANCELLED', cancellation_time=NOW()
+            WHERE booking_id='$booking_id'
+        ");
+
         /* Insert into Ledger */
         $movie_id = $data['movie_id'];
         $show_id = $data['show_id'];

@@ -17,7 +17,7 @@ if (isset($_SESSION['user_id']) && isset($_SESSION['role'])) {
             header("Location: $redirect_url");
             exit();
         }
-        header("Location: home.php");
+        header("Location: ../index.php");
         exit();
     } elseif ($_SESSION['role'] === 'ADMIN') {
         header("Location: ../Admin/dashboard.php");

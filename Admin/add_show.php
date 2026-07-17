@@ -80,21 +80,27 @@ if (isset($_POST['add_show'])) {
 
     // Overlap validation
     if (empty($errors)) {
-        $movie_query = mysqli_query($conn, "SELECT duration_minutes FROM movies WHERE movie_id='$movie_id'");
-        $movie_data = mysqli_fetch_assoc($movie_query);
-        $duration = $movie_data['duration_minutes'];
+        $movie_stmt = $conn->prepare("SELECT duration_minutes FROM movies WHERE movie_id = ?");
+        $movie_stmt->bind_param("i", $movie_id);
+        $movie_stmt->execute();
+        $movie_data = $movie_stmt->get_result()->fetch_assoc();
+        $duration = $movie_data['duration_minutes'] ?? 0;
+        $movie_stmt->close();
 
         $new_start = strtotime($show_date . ' ' . $show_time);
         $new_end = $new_start + ($duration * 60);
 
-        $existing_shows = mysqli_query($conn, "
+        $existing_stmt = $conn->prepare("
             SELECT sh.show_time, m.duration_minutes 
             FROM shows sh 
-            INNER JOIN movies m ON sh.movie_id=m.movie_id 
-            WHERE sh.screen_id='$screen_id' AND sh.show_date='$show_date' AND sh.show_status='ACTIVE'
+            INNER JOIN movies m ON sh.movie_id = m.movie_id 
+            WHERE sh.screen_id = ? AND sh.show_date = ? AND sh.show_status = 'ACTIVE'
         ");
+        $existing_stmt->bind_param("is", $screen_id, $show_date);
+        $existing_stmt->execute();
+        $existing_shows = $existing_stmt->get_result();
 
-        while ($existing = mysqli_fetch_assoc($existing_shows)) {
+        while ($existing = $existing_shows->fetch_assoc()) {
             $existing_start = strtotime($show_date . ' ' . $existing['show_time']);
             $existing_end = $existing_start + ($existing['duration_minutes'] * 60);
 
@@ -103,24 +109,35 @@ if (isset($_POST['add_show'])) {
                 break;
             }
         }
+        $existing_stmt->close();
     }
 
     // Insert data if clean
     if (empty($errors)) {
-        $insert_show = mysqli_query($conn, "
+        $insert_stmt = $conn->prepare("
             INSERT INTO shows (movie_id, screen_id, show_date, show_time, ticket_price, show_status) 
-            VALUES ('$movie_id', '$screen_id', '$show_date', '$show_time', '$ticket_price', 'ACTIVE')
+            VALUES (?, ?, ?, ?, ?, 'ACTIVE')
         ");
+        $insert_stmt->bind_param("iissd", $movie_id, $screen_id, $show_date, $show_time, $ticket_price);
 
-        if ($insert_show) {
-            $show_id = mysqli_insert_id($conn);
+        if ($insert_stmt->execute()) {
+            $show_id = $insert_stmt->insert_id;
+            $insert_stmt->close();
 
             // Populate show_seats entries based on layout templates
-            $seat_query = mysqli_query($conn, "SELECT * FROM seats WHERE screen_id='$screen_id'");
-            while ($seat = mysqli_fetch_assoc($seat_query)) {
+            $seat_stmt = $conn->prepare("SELECT seat_id FROM seats WHERE screen_id = ?");
+            $seat_stmt->bind_param("i", $screen_id);
+            $seat_stmt->execute();
+            $seats_res = $seat_stmt->get_result();
+            
+            $ins_seat_stmt = $conn->prepare("INSERT INTO show_seats (show_id, seat_id, seat_status) VALUES (?, ?, 'AVAILABLE')");
+            while ($seat = $seats_res->fetch_assoc()) {
                 $seat_id = $seat['seat_id'];
-                mysqli_query($conn, "INSERT INTO show_seats (show_id, seat_id, seat_status) VALUES ('$show_id', '$seat_id', 'AVAILABLE')");
+                $ins_seat_stmt->bind_param("ii", $show_id, $seat_id);
+                $ins_seat_stmt->execute();
             }
+            $ins_seat_stmt->close();
+            $seat_stmt->close();
 
             $notify_message = "Show added successfully.";
             $notify_type = "success";
@@ -128,6 +145,7 @@ if (isset($_POST['add_show'])) {
             // Reset inputs cleanly
             $movie_id = $screen_id = $show_date = $show_time = $ticket_price = "";
         } else {
+            $insert_stmt->close();
             $notify_message = "Failed to add show.";
             $notify_type = "error";
         }
