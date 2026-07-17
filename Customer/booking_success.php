@@ -4,9 +4,6 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-     include_once 'navbar.php'; 
-
-
 // 1. Access Control Validation: Verify user login status
 if (!isset($_SESSION['user_id'])) {
     header("Location: home.php");

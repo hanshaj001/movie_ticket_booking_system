@@ -6,7 +6,7 @@ $base_path = $in_customer_dir ? '../' : '';
 $customer_path = $in_customer_dir ? '' : 'Customer/';
 ?>
 
-<link rel="stylesheet" href="<?= $base_path ?>Assets/css/Customer/footer.css">
+<link rel="stylesheet" href="<?= $base_path ?>Assets/css/Customer/footer.css?v=<?= time() ?>">
 
 <footer class="footer">
     <div class="footer-container">

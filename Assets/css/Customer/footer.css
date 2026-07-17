@@ -1,119 +1,8 @@
+/* Assets/css/Customer/footer.css */
 
-.footer {
-    background: #111827;
-    color: #ffffff;
-    margin-top: 50px;
-    width: 100%;
-}
-
-.footer-container {
-    max-width: 1200px;
-    margin: auto;
-    padding: 30px 20px;
-    text-align: center;
-}
-
-/* Brand Section */
-
-.footer-brand h3 {
-    font-size: 24px;
-    margin-bottom: 10px;
-}
-
-.footer-brand p {
-    color: #d1d5db;
-    margin-bottom: 20px;
-}
-
-/* Navigation Links */
-
-.footer-links {
-    margin-bottom: 20px;
-}
-
-.footer-links a {
-    color: #ffffff;
-    text-decoration: none;
-    margin: 0 15px;
-    font-size: 15px;
-    transition: 0.3s;
-}
-
-.footer-links a:hover {
-    color: #f59e0b;
-}
-
-.active-link {
-    color: #f59e0b !important;
-    font-weight: bold;
-}
-
-/* Copyright */
-
-.footer-copy {
-    border-top: 1px solid #374151;
-    padding-top: 15px;
-    font-size: 14px;
-    color: #9ca3af;
-}
-
-/* ==========================
-   RESPONSIVE DESIGN
-
-/* Tablet */
-
-@media (max-width: 768px) {
-
-    .footer-brand h3 {
-        font-size: 22px;
-    }
-
-    .footer-links {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 10px;
-    }
-
-    .footer-links a {
-        margin: 5px;
-    }
-}
-
-/* Mobile */
-
-@media (max-width: 480px) {
-
-    .footer-container {
-        padding: 20px 10px;
-    }
-
-    .footer-brand h3 {
-        font-size: 18px;
-    }
-
-    .footer-brand p {
-        font-size: 14px;
-    }
-
-    .footer-links {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-    }
-
-    .footer-links a {
-        margin: 0;
-    }
-
-    .footer-copy {
-        font-size: 12px;
-    }
-/* ==========================================================================
-   FOOTER - MODERN DESIGN
-   ========================================================================== */
 :root {
     --accent: #ff4d2d;
+    --accent-hover: #e63e1f;
     --text-primary: #1a1a2e;
     --text-secondary: #4a4a6a;
     --text-muted: #9494a8;
@@ -122,10 +11,11 @@
 }
 
 .footer {
-    background-color: #ffffff;
-    color: var(--text-primary);
+    background-color: #ffffff !important;
+    color: var(--text-primary) !important; /* Black/Dark base text */
     padding: 60px 0 20px 0;
     margin-top: auto;
+    width: 100%;
     border-top: 1px solid var(--border);
     box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.05);
 }
@@ -140,17 +30,18 @@
 }
 
 .footer-col h3 {
-    color: var(--accent);
+    color: var(--accent) !important; /* Heading text "Movie Ticket Booking System" & "Quick Links" is RED */
     font-size: 1.2rem;
     margin-bottom: 20px;
     font-weight: 700;
 }
 
 .footer-col p {
-    color: var(--text-secondary);
+    color: var(--text-primary) !important; /* Black/Dark description text */
     line-height: 1.6;
     margin-bottom: 15px;
     font-size: 0.95rem;
+    opacity: 0.95;
 }
 
 .footer-links {
@@ -164,7 +55,7 @@
 }
 
 .footer-links a {
-    color: var(--text-secondary);
+    color: var(--text-primary) !important; /* Black/Dark quick link text */
     text-decoration: none;
     transition: color 0.3s, padding-left 0.3s;
     font-size: 0.95rem;
@@ -172,7 +63,7 @@
 }
 
 .footer-links a:hover {
-    color: var(--accent);
+    color: var(--accent) !important; /* Accent red color on hover */
     padding-left: 5px;
 }
 
@@ -189,7 +80,7 @@
     width: 40px;
     height: 40px;
     background-color: var(--bg-light);
-    color: var(--text-primary);
+    color: var(--text-primary) !important; /* Black/Dark icons */
     border-radius: 50%;
     transition: all 0.3s;
     text-decoration: none;
@@ -197,19 +88,19 @@
 }
 
 .footer-social a:hover {
-    background-color: var(--accent);
-    color: #fff;
-    border-color: var(--accent);
+    background-color: var(--accent) !important;
+    color: #ffffff !important;
+    border-color: var(--accent) !important;
     transform: translateY(-3px);
     box-shadow: 0 4px 10px rgba(255, 77, 45, 0.2);
 }
 
 .footer-bottom {
-    text-align: center;
+    text-align: center; /* Center copyright */
     margin-top: 50px;
     padding-top: 20px;
     border-top: 1px solid var(--border);
-    color: var(--text-muted);
+    color: var(--text-primary) !important; /* Black/Dark copyright text */
     font-size: 0.9rem;
     font-weight: 500;
 }
@@ -221,4 +112,21 @@ html, body {
 body {
     display: flex;
     flex-direction: column;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .footer-container {
+        grid-template-columns: 1fr;
+        gap: 30px;
+        text-align: center;
+    }
+    
+    .footer-social {
+        justify-content: center;
+    }
+    
+    .footer-links a:hover {
+        padding-left: 0;
+    }
 }

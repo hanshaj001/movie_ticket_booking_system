@@ -1,207 +1,144 @@
 <?php
-//session_start();
-
-/* Customer Authentication */
-// if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 'CUSTOMER') {
-//     header("Location: login.php");
-//     exit();
-// }
-// ?>
-
+session_start();
+require_once '../Includes/db_conn.php';
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>About Us | Movie Ticket Booking System</title>
-
-<link rel="stylesheet" href="../Assets/css/Customer/about.css">
-<link rel="stylesheet" href="../Assets/css/Customer/navbar.css">
-<link rel="stylesheet" href="../Assets/css/Customer/footer.css">
-
-
-<!-- Font Awesome -->
-<link rel="stylesheet"
-href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About Us | Movie Ticket Booking System</title>
+  <link rel="stylesheet" href="../Assets/css/Customer/about.css" />
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 </head>
-<body>
+<body class="about-body">
 
-<!-- Navbar -->
-<?php
- include('../Customer/components/navbar.php'); 
- ?>
+<?php include 'components/navbar.php'; ?>
 
-<!-- Hero Section -->
-<section class="about-hero">
-    <div class="hero-content">
-        <h1>About Our Cinema</h1>
-        <p>
-            Welcome to Movie Ticket Booking System (MTBS),
-            your convenient platform for discovering movies,
-            checking real-time seat availability, and booking tickets online.
-        </p>
-    </div>
-</section>
+<main class="about-main">
+  <div class="about-container">
+    <!-- Breadcrumbs Navigation -->
+    <nav class="breadcrumb-nav">
+        <a href="home.php" class="bc-link"><i class="fa-solid fa-house"></i> Home</a>
+        <span class="bc-sep"><i class="fa-solid fa-chevron-right"></i></span>
+        <span class="bc-current">About Us</span>
+    </nav>
 
-<!-- About Cinema -->
-<section class="section">
-    <div class="container">
-        <h2>About Our Cinema</h2>
-        <p>
-            Our cinema provides an enjoyable movie experience with modern
-            facilities, multiple screens, comfortable seating arrangements,
-            and the latest movie releases. We aim to deliver entertainment
-            in a convenient and customer-friendly environment.
-        </p>
-    </div>
-</section>
+    <!-- Intro & Mission -->
+    <section class="intro-mission-grid">
+      <div class="about-card intro-card">
+        <h2 class="card-title"><i class="fa-solid fa-film"></i> About Our Cinema</h2>
+        <p class="lead-text">Welcome to Movie Ticket Booking System (MTBS), a convenient platform for discovering movies, checking real‑time seat availability, and booking tickets online.</p>
+        <p class="body-text">Our cinema offers modern facilities, multiple screens, comfortable seating, and the latest releases. We aim to deliver entertainment in a customer‑friendly environment.</p>
+        <p class="body-text"><strong>Location:</strong> Baneshwor</p>
+      </div>
+      <div class="about-card mission-card">
+        <h2 class="card-title"><i class="fa-solid fa-bullseye"></i> Our Mission</h2>
+        <p class="lead-text">Empowering movie lovers with seamless access to premium cinema entertainment.</p>
+        <p class="body-text">Provide a fast, reliable, and secure booking experience while ensuring satisfaction through modern technology and excellent facilities.</p>
+        <p class="body-text"><strong>Location:</strong> Baneshwor</p>
+      </div>
+    </section>
 
-<!-- Mission -->
-<section class="section bg-light">
-    <div class="container">
-        <h2>Our Mission</h2>
-        <p>
-            To provide a fast, reliable, and secure movie ticket booking
-            experience while ensuring customer satisfaction through modern
-            technology and excellent cinema facilities.
-        </p>
-    </div>
-</section>
-
-<!-- Features -->
-<section class="section">
-    <div class="container">
-        <h2>System Features</h2>
-
-        <div class="feature-grid">
-
-            <div class="feature-card">
-                <i class="fa-solid fa-ticket"></i>
-                <h3>Online Movie Booking</h3>
-                <p>Book movie tickets anytime from anywhere.</p>
-            </div>
-
-            <div class="feature-card">
-                <i class="fa-solid fa-film"></i>
-                <h3>Multiple Screens</h3>
-                <p>Enjoy movies across different cinema screens.</p>
-            </div>
-
-            <div class="feature-card">
-                <i class="fa-solid fa-couch"></i>
-                <h3>Real-Time Seat Availability</h3>
-                <p>View available seats instantly before booking.</p>
-            </div>
-
-            <div class="feature-card">
-                <i class="fa-solid fa-lock"></i>
-                <h3>Secure Booking Process</h3>
-                <p>Safe booking system with authentication.</p>
-            </div>
-
-            <div class="feature-card">
-                <i class="fa-solid fa-clock-rotate-left"></i>
-                <h3>Booking History</h3>
-                <p>Access previous bookings anytime.</p>
-            </div>
-
-            <div class="feature-card">
-                <i class="fa-solid fa-ban"></i>
-                <h3>Easy Cancellation</h3>
-                <p>Cancel eligible bookings easily.</p>
-            </div>
-
+    <!-- System Features (4‑column boxes) -->
+    <section class="about-section">
+      <h2 class="section-heading">System Features</h2>
+      <div class="feature-list">
+        <div class="feature-card">
+          <div class="icon-wrapper"><i class="fa-solid fa-ticket"></i></div>
+          <h3>Online Booking</h3>
+          <p>Book tickets anytime, anywhere.</p>
         </div>
-    </div>
-</section>
-
-<!-- Why Choose Us -->
-<section class="section bg-light">
-    <div class="container">
-        <h2>Why Choose Us</h2>
-
-        <div class="why-grid">
-
-            <div class="why-box">
-                <i class="fa-solid fa-bolt"></i>
-                <h4>Fast Booking</h4>
-            </div>
-
-            <div class="why-box">
-                <i class="fa-solid fa-shield-halved"></i>
-                <h4>Secure Authentication</h4>
-            </div>
-
-            <div class="why-box">
-                <i class="fa-solid fa-mobile-screen"></i>
-                <h4>Simple Interface</h4>
-            </div>
-
-            <div class="why-box">
-                <i class="fa-solid fa-circle-check"></i>
-                <h4>Instant Confirmation</h4>
-            </div>
-
+        <div class="feature-card">
+          <div class="icon-wrapper"><i class="fa-solid fa-video"></i></div>
+          <h3>Multiple Screens</h3>
+          <p>Enjoy movies across different halls.</p>
         </div>
-    </div>
-</section>
-
-<!-- Facilities -->
-<section class="section">
-    <div class="container">
-
-        <h2>Our Facilities</h2>
-
-        <div class="facility-grid">
-
-            <div class="facility-card">
-                <i class="fa-solid fa-snowflake"></i>
-                <h3>Air Conditioned Halls</h3>
-            </div>
-
-            <div class="facility-card">
-                <i class="fa-solid fa-chair"></i>
-                <h3>Comfortable Seats</h3>
-            </div>
-
-            <div class="facility-card">
-                <i class="fa-solid fa-tv"></i>
-                <h3>Multiple Movie Screens</h3>
-            </div>
-
-            <div class="facility-card">
-                <i class="fa-solid fa-clapperboard"></i>
-                <h3>Latest Movies</h3>
-            </div>
-
+        <div class="feature-card">
+          <div class="icon-wrapper"><i class="fa-solid fa-couch"></i></div>
+          <h3>Real‑Time Seats</h3>
+          <p>View seat availability instantly.</p>
         </div>
+        <div class="feature-card">
+          <div class="icon-wrapper"><i class="fa-solid fa-lock"></i></div>
+          <h3>Secure Booking</h3>
+          <p>Robust authentication and data protection.</p>
+        </div>
+        <div class="feature-card">
+          <div class="icon-wrapper"><i class="fa-solid fa-clock-rotate-left"></i></div>
+          <h3>Booking History</h3>
+          <p>Access past bookings at a glance.</p>
+        </div>
+        <div class="feature-card">
+          <div class="icon-wrapper"><i class="fa-solid fa-ban"></i></div>
+          <h3>Easy Cancellation</h3>
+          <p>Cancel eligible bookings effortlessly.</p>
+        </div>
+      </div>
+    </section>
 
-    </div>
-</section>
+    <!-- Why Choose Us (4‑column boxes) -->
+    <section class="about-section">
+      <h2 class="section-heading">Why Choose Us</h2>
+      <div class="why-list">
+        <div class="why-card">
+          <div class="icon-wrapper"><i class="fa-solid fa-bolt"></i></div>
+          <h3>Fast Booking</h3>
+          <p>Reserve seats in under a minute.</p>
+        </div>
+        <div class="why-card">
+          <div class="icon-wrapper"><i class="fa-solid fa-shield-halved"></i></div>
+          <h3>Secure Login</h3>
+          <p>Strong user authentication and privacy.</p>
+        </div>
+        <div class="why-card">
+          <div class="icon-wrapper"><i class="fa-solid fa-mobile-screen"></i></div>
+          <h3>Responsive UI</h3>
+          <p>Optimized for desktop and mobile devices.</p>
+        </div>
+        <div class="why-card">
+          <div class="icon-wrapper"><i class="fa-solid fa-circle-check"></i></div>
+          <h3>Instant Ticket</h3>
+          <p>Real‑time confirmation with seat details.</p>
+        </div>
+      </div>
+    </section>
 
-<!-- Online Booking -->
-<section class="section booking-info">
-    <div class="container">
+    <!-- Facilities (4‑column boxes) -->
+    <section class="about-section">
+      <h2 class="section-heading">Our Facilities</h2>
+      <div class="facility-list">
+        <div class="facility-card">
+          <div class="icon-wrapper"><i class="fa-solid fa-snowflake"></i></div>
+          <h3>Air‑Conditioned Halls</h3>
+          <p>Comfortable climate‑controlled screens.</p>
+        </div>
+        <div class="facility-card">
+          <div class="icon-wrapper"><i class="fa-solid fa-chair"></i></div>
+          <h3>Premium Seats</h3>
+          <p>Luxury reclining leather chairs.</p>
+        </div>
+        <div class="facility-card">
+          <div class="icon-wrapper"><i class="fa-solid fa-tv"></i></div>
+          <h3>HD Projection</h3>
+          <p>High‑definition screens with Dolby sound.</p>
+        </div>
+        <div class="facility-card">
+          <div class="icon-wrapper"><i class="fa-solid fa-clapperboard"></i></div>
+          <h3>Latest Releases</h3>
+          <p>Fresh movies updated daily.</p>
+        </div>
+      </div>
+    </section>
 
-        <h2>Online Movie Booking</h2>
+  </div>
+</main>
 
-        <p>
-            MTBS allows customers to browse movies, check show schedules,
-            view real-time seat availability, select preferred seats,
-            and receive instant booking confirmation through a simple
-            and secure online booking process.
-        </p>
-
-    </div>
-</section>
-
-<!-- Footer -->
-<?php include '../Customer/components/footer.php'; 
-
-?>
+<?php include 'components/footer.php'; ?>
 
 <script src="../Assets/js/Customer/about.js"></script>
-
 </body>
 </html>
