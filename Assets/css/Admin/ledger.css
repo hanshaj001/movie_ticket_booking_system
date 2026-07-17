@@ -210,3 +210,210 @@ body { background: #f5f5f7; color: #222; }
     color: #dc3545;
     font-weight: bold;
 }
+
+/* for export  */
+        .export-btn {
+            background: #27ae60;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: 0.3s;
+            border: none;
+            display: inline-block;
+        }
+        .export-btn:hover {
+            background: #219653;
+        }
+        
+        /* Modal Overlay */
+        .export-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+        
+        /* Modal Card */
+        .export-modal-card {
+            background: #fff;
+            width: 90%;
+            max-width: 500px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .modal-header {
+            padding: 15px 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-header h3 {
+            margin: 0;
+            font-size: 16px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .modal-header h3 i {
+            color: #27ae60;
+        }
+        
+        .modal-close {
+            font-size: 24px;
+            color: #999;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        
+        .modal-close:hover {
+            color: #333;
+        }
+        
+        .modal-body {
+            padding: 20px;
+        }
+        
+        .form-group-modal {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .form-group-modal label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #555;
+            text-align: left;
+        }
+        
+        .form-group-modal input {
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+        }
+        
+        .form-group-modal input:focus {
+            border-color: #27ae60;
+        }
+        
+        .input-hint {
+            font-size: 12px;
+            color: #888;
+            margin: 0;
+            text-align: left;
+        }
+        
+        /* Recommendation alert box */
+        .export-recommendation-box {
+            background: #eef9f2;
+            border-left: 4px solid #27ae60;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 15px;
+            text-align: left;
+        }
+        
+        .recommendation-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #219653;
+            font-size: 14px;
+            margin-bottom: 6px;
+        }
+        
+        .export-recommendation-box p {
+            font-size: 13px;
+            color: #555;
+            margin: 0 0 6px 0;
+            line-height: 1.4;
+        }
+        
+        .export-recommendation-box p:last-child {
+            margin-bottom: 0;
+        }
+        
+        .filtered-only-msg {
+            color: #27ae60;
+        }
+        
+        .modal-footer {
+            padding: 15px 20px;
+            background: #f8f9fa;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        
+        .modal-btn-cancel, .modal-btn-confirm {
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+        }
+        
+        .modal-btn-cancel {
+            background: #f5f5f5;
+            color: #555;
+            border: 1px solid #ddd;
+        }
+        
+        .modal-btn-cancel:hover {
+            background: #ebebeb;
+        }
+        
+        .modal-btn-confirm {
+            background: #27ae60;
+            color: white;
+        }
+        
+        .modal-btn-confirm:hover {
+            background: #219653;
+        }
+        
+        /* Spinner */
+        .modal-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #27ae60;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Success Icon */
+        .success-icon {
+            font-size: 40px;
+            color: #27ae60;
+        }
