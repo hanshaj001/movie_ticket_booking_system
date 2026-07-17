@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+
 /* ==========================================================================
    NAVBAR - MODERN DESIGN
    ========================================================================== */
@@ -6,7 +8,14 @@
     --accent-hover: #e63e1f;
     --text-primary: #1a1a2e;
     --border: #e8e8f0;
-    --nav-bg: rgba(255, 255, 255, 0.98);
+    --nav-bg: #ffffff;
+}
+
+.navbar {
+    font-family: 'Poppins', Arial, sans-serif;
+}
+.navbar a, .navbar span, .navbar button {
+    font-family: 'Poppins', Arial, sans-serif;
 }
 
 .navbar {

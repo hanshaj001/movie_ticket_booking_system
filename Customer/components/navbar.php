@@ -16,7 +16,7 @@ $base_path = $in_customer_dir ? '../' : '';
 $customer_path = $in_customer_dir ? '' : 'Customer/';
 ?>
 
-<link rel="stylesheet" href="<?= $base_path ?>Assets/css/Customer/navbar.css">
+<link rel="stylesheet" href="<?= $base_path ?>Assets/css/Customer/navbar.css?v=<?= time() ?>">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <nav class="navbar">
@@ -64,3 +64,15 @@ $customer_path = $in_customer_dir ? '' : 'Customer/';
         <?php endif; ?>
     </ul>
 </nav>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const mobileMenu = document.getElementById("mobile-menu");
+    const navLinks = document.getElementById("nav-links");
+    if (mobileMenu && navLinks) {
+        mobileMenu.addEventListener("click", function() {
+            navLinks.classList.toggle("active");
+        });
+    }
+});
+</script>

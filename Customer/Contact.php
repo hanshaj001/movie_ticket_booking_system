@@ -61,20 +61,25 @@ elseif (!preg_match('/^[0-9]{7,15}$/', $phone)) {
 <title>Contact Us | Movie Ticket Booking System</title>
 
 <link rel="stylesheet" href="../Assets/css/Customer/contact.css">
-<link rel="stylesheet" href="../Assets/css/Customer/footer.css">
 
 </head>
 <body>
 
-<?php include '../Customer/components/navbar.php'; ?>
-
-<section class="contact-header">
-    <h1>Contact Us</h1>
-    <p>We're here to help with bookings, schedules, and cinema services.</p>
-</section>
+<?php include 'components/navbar.php'; ?>
 
 <div class="contact-container">
 
+    <div class="contact-page-header">
+        <nav class="breadcrumb-nav">
+            <a href="home.php" class="bc-link"><i class="fa-solid fa-house"></i> Home</a>
+            <span class="bc-sep"><i class="fa-solid fa-chevron-right"></i></span>
+            <span class="bc-current">Contact Us</span>
+        </nav>
+        <h1 class="page-title">Contact Us</h1>
+        <p class="page-subtitle">We're here to help with bookings, schedules, and cinema services.</p>
+    </div>
+
+    <div class="contact-grid">
     <!-- Contact Information -->
     <div class="contact-info">
 
@@ -166,6 +171,8 @@ elseif (!preg_match('/^[0-9]{7,15}$/', $phone)) {
 
     </div>
 
+    </div>
+
 </div>
 
 <!-- FAQ Section -->
@@ -223,9 +230,7 @@ elseif (!preg_match('/^[0-9]{7,15}$/', $phone)) {
 
 </section>
 
-<?php include '../Customer/components/footer.php'; 
-
-?>
+<?php include 'components/footer.php'; ?>
 
 <script src="../Assets/js/contact.js"></script>
 

@@ -20,7 +20,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Admin System Panel - MTBS</title>
-    <link rel="stylesheet" href="../Assets/css/Admin/sidebar.css"/>
+    <link rel="stylesheet" href="../Assets/css/Admin/sidebar.css?v=<?= time() ?>"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
@@ -80,7 +80,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
         </li>
         <li class="logout-menu">
             <a href="../logout.php" class="logout-btn" id="logoutBtnAdmin">
-                <i class="fa-solid fa-right-from-bracket"></i> Logout
+                <i class="fa-solid fa-right-from-bracket"></i> <span class="logout-text">Logout</span>
             </a>
         </li>
     </ul>
@@ -103,7 +103,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
             </div>
             
             <a href="../logout.php" class="logout-btn">
-                <i class="fa-solid fa-power-off"></i> Logout
+                <i class="fa-solid fa-power-off"></i> <span class="logout-text">Logout</span>
             </a>
         </div>
     </header>

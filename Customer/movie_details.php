@@ -355,7 +355,7 @@ if ($shows_list_result && mysqli_num_rows($shows_list_result) > 0) {
                                         <!-- Mid: Price, Seats, Status -->
                                         <div class="card-mid-price-seats">
                                             <div class="info-box price-box">
-                                                <i class="fa-solid fa-indian-rupee-sign"></i>
+                                               Rs.
                                                 <span><?php echo htmlspecialchars(number_format($show_row['ticket_price'], 2)); ?></span>
                                             </div>
 
