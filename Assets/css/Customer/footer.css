@@ -10,6 +10,10 @@
     --bg-light: #f8f9fc;
 }
 
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
 .footer {
     background-color: #ffffff !important;
     color: var(--text-primary) !important; /* Black/Dark base text */

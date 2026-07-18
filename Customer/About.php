@@ -9,6 +9,7 @@ require_once '../Includes/db_conn.php';
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>About Us | Movie Ticket Booking System</title>
   <link rel="stylesheet" href="../Assets/css/Customer/about.css" />
+  <link rel="icon" type="image/jpeg" href="../favicon.jpeg" />
   <!-- Google Font -->
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <!-- Font Awesome -->

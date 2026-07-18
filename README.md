@@ -234,6 +234,20 @@ The Movie Earnings module provides a detailed financial report for an individual
 Ledger Module
 System Definition
 The Ledger module maintains the financial transaction history of the Movie Ticket Booking System. Instead of storing only the current earnings, the module records every monetary transaction that affects the cinema's revenue, providing a complete audit trail of booking confirmations and booking cancellations (both full and partial). Whenever a customer successfully confirms a booking, the system automatically creates a BOOKING transaction in the ledger with a positive transaction amount. If a booking (or part of a booking) is cancelled, the system creates a corresponding CANCELLATION transaction with a negative value.
+
+Contact Us Module
+System Definition
+
+The Contact Us Module enables visitors and registered customers to communicate directly with the cinema administration by submitting inquiries, feedback, complaints, or support requests. The module provides an online contact form where users can enter their full name, email address, phone number, subject, and message. For authenticated customers, the system automatically retrieves and pre-fills their registered personal information while still allowing it to be edited before submission.
+
+When a contact form is submitted, the system validates the provided information and stores the inquiry in the Contact_Messages table for future reference and administration. If the inquiry is submitted by a logged-in customer, it is associated with the corresponding user account; otherwise, it is recorded as a guest inquiry. The system also records the submission date, inquiry status, priority level, and the client's IP address.
+
+After successfully submitting an inquiry, the system sends the inquiry details to the cinema's official support email and automatically sends an acknowledgment email to the customer confirming that the inquiry has been received.
+
+The administrator can access all submitted inquiries through the Contact Messages module in the administration panel. The module allows administrators to search, filter, and paginate inquiries based on status, priority, and submission date. Each inquiry can be viewed individually, where the administrator can review the customer's information and complete message.
+
+Administrators can assign priority levels, update the inquiry status, compose and send replies directly to customers, or save replies for later without sending an email. Once an inquiry has been resolved, the administrator may close the inquiry while preserving the complete communication record within the system. This module provides a centralized customer support mechanism and maintains a permanent history of all customer inquiries and administrative responses.
+   
 9. High-Level System Workflow
 The system follows the workflow below:
 Step 1: User Authentication
@@ -435,6 +449,13 @@ The application separates static seat layouts from show-specific seat availabili
 Customers can cancel confirmed bookings before the defined cancellation deadline, while administrators maintain full oversight and can cancel partial or full bookings at any time before a show starts. Cancelled seats seamlessly return to the available pool for future bookings. The system uses a normalized relational database with Role-Based Access Control (RBAC) to organize user authorization, movie management, show scheduling, and booking records. This design improves data consistency, reduces redundancy, and supports the functional requirements defined for the project.
 Database Tables (SQL)
 SQL
+
+
+
+
+
+
+
 CREATE DATABASE movie_ticket_booking_system;
 USE movie_ticket_booking_system;
 
@@ -656,6 +677,83 @@ CREATE TABLE ledger (
     FOREIGN KEY (movie_id) REFERENCES movies(movie_id),
     FOREIGN KEY (show_id) REFERENCES shows(show_id)
 );
+
+
+-- Partial Seat Cancellation Migration
+-- Run this script once on the movie_ticket_booking_system database
+
+USE movie_ticket_booking_system;
+
+-- 1. Add PARTIALLY_CANCELLED to bookings.booking_status enum
+ALTER TABLE bookings 
+  MODIFY COLUMN booking_status ENUM('CONFIRMED','PARTIALLY_CANCELLED','CANCELLED') DEFAULT 'CONFIRMED';
+
+-- 2. Add seat-level cancellation tracking to booking_details
+ALTER TABLE booking_details 
+  ADD COLUMN seat_status ENUM('CONFIRMED','CANCELLED') DEFAULT 'CONFIRMED';
+
+ALTER TABLE booking_details 
+  ADD COLUMN cancellation_time DATETIME NULL;
+
+
+
+
+CREATE TABLE contact_messages (
+
+    message_id INT AUTO_INCREMENT PRIMARY KEY,
+
+    user_id INT NULL,
+
+    full_name VARCHAR(100) NOT NULL,
+
+    email VARCHAR(100) NOT NULL,
+
+    phone VARCHAR(20) NOT NULL,
+
+    subject VARCHAR(200) NOT NULL,
+
+    message TEXT NOT NULL,
+
+    status ENUM(
+        'NEW',
+        'READ',
+        'REPLIED',
+        'CLOSED'
+    ) DEFAULT 'NEW',
+
+    priority ENUM(
+        'LOW',
+        'MEDIUM',
+        'HIGH'
+    ) DEFAULT 'MEDIUM',
+
+    assigned_to INT NULL,
+
+    admin_reply TEXT NULL,
+
+    replied_at DATETIME NULL,
+
+    ip_address VARCHAR(45) NULL,
+
+    submitted_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        ON UPDATE CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (user_id)
+        REFERENCES users(user_id)
+        ON DELETE SET NULL,
+
+    FOREIGN KEY (assigned_to)
+        REFERENCES users(user_id)
+        ON DELETE SET NULL
+
+);
+
+
+
+
+
 
 19. Business Rules
 The Movie Ticket Booking System follows the business rules below.

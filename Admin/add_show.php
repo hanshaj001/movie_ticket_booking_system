@@ -26,13 +26,13 @@ $errors = [];
 $movie_id = $screen_id = $show_date = $show_time = $ticket_price = "";
 
 // Capture notification queries coming from external action scripts (Edit, Delete, Cancel parameters)
-if (isset($_GET['msg'])) {
-    $notify_message = $_GET['msg'];
-    $notify_type = $_GET['type'] ?? 'success';
-}
+// Removed $_GET['msg'] handling because toast.js handles URL messages automatically.
 
-// Show addition logic
 if (isset($_POST['add_show'])) {
+
+    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== ($_SESSION['csrf_token'] ?? '')) {
+        die("CSRF Token Validation Failed.");
+    }
 
     $movie_id = trim($_POST['movie_id']);
     $screen_id = trim($_POST['screen_id']);
@@ -49,6 +49,17 @@ if (isset($_POST['add_show'])) {
 
     if (empty($screen_id)) {
         $errors['screen_id'] = "Please select screen.";
+    } else {
+        $seat_check_stmt = $conn->prepare("SELECT COUNT(*) as count FROM seats WHERE screen_id = ?");
+        $seat_check_stmt->bind_param("i", $screen_id);
+        $seat_check_stmt->execute();
+        $seat_count_res = $seat_check_stmt->get_result()->fetch_assoc();
+        $seat_count = $seat_count_res['count'] ?? 0;
+        $seat_check_stmt->close();
+
+        if ($seat_count === 0) {
+            $errors['screen_id'] = "The selected screen has no seats configured. Please add seats to this screen first.";
+        }
     }
 
     if (empty($show_date)) {
@@ -149,8 +160,13 @@ if (isset($_POST['add_show'])) {
             $notify_message = "Failed to add show.";
             $notify_type = "error";
         }
+    } else {
+        // Validation failed, set error toast
+        $notify_message = reset($errors); // Get first error message
+        $notify_type = "error";
     }
 }
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -163,30 +179,6 @@ if (isset($_POST['add_show'])) {
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         /* Floating Toast Notification CSS Configuration */
-        .toast-box {
-            position: fixed;
-            top: 25px;
-            right: -450px;
-            background-color: #ffffff;
-            padding: 16px 22px;
-            border-radius: 6px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            z-index: 10000;
-            transition: right 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
-            opacity: 0;
-        }
-        .toast-box.active {
-            right: 25px;
-            opacity: 1;
-        }
-        .toast-box.success { border-left: 6px solid #2ecc71; color: #27ae60; }
-        .toast-box.error { border-left: 6px solid #e74c3c; color: #c0392b; }
-        .toast-box .toast-icon { font-size: 22px; }
-        .toast-box .toast-msg-text { font-family: 'Poppins', sans-serif; font-weight: 500; font-size: 14px; }
-
         /* Mobile Responsive View Styling Sheets */
         @media screen and (max-width: 768px) {
             .main-container { padding: 8px; }
@@ -197,16 +189,10 @@ if (isset($_POST['add_show'])) {
             .date-tab { padding: 6px 10px; font-size: 11px; flex-shrink: 0; }
             .action-buttons { flex-direction: column; gap: 4px; }
             .edit-btn, .cancel-btn { padding: 4px 6px; font-size: 11px; width: 100%; text-align: center; }
-            .toast-box { width: 90%; max-width: 320px; top: 15px; }
-            .toast-box.active { right: 5%; }
         }
     </style>
 </head>
 <body>
-    <div id="popupToast" class="toast-box">
-        <div id="popupIcon" class="toast-icon"></div>
-        <div id="popupText" class="toast-msg-text"></div>
-    </div>
 
     <div class="main-container">
         <div class="content-area">
@@ -222,7 +208,8 @@ if (isset($_POST['add_show'])) {
             </div>
 
             <div class="form-card">
-                <form method="POST" id="addShowForm">
+                <form method="POST" id="addShowForm" data-loader-msg="Creating show schedule. Please wait...">
+                    <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
                     <div class="form-grid">
                         <div class="form-group">
                             <label>Select Movie</label>
@@ -279,9 +266,16 @@ if (isset($_POST['add_show'])) {
             </div>
 
             <?php
-            $where_clause = ($selected_date == 'ALL') ? "" : "WHERE sh.show_date='" . mysqli_real_escape_string($conn, $selected_date) . "'";
-            $count_query = mysqli_query($conn, "SELECT COUNT(*) total FROM shows sh $where_clause");
-            $total_rows = mysqli_fetch_assoc($count_query)['total'];
+            $where_clause = ($selected_date == 'ALL') ? "" : "WHERE sh.show_date=?";
+            $count_query = "SELECT COUNT(*) total FROM shows sh $where_clause";
+            $count_stmt = $conn->prepare($count_query);
+            if ($selected_date != 'ALL') {
+                $count_stmt->bind_param("s", $selected_date);
+            }
+            $count_stmt->execute();
+            $total_rows = $count_stmt->get_result()->fetch_assoc()['total'];
+            $count_stmt->close();
+            
             $total_pages = ceil($total_rows / $limit);
 
             $query = "SELECT sh.*, m.title, m.duration_minutes, sc.screen_name,
@@ -290,8 +284,16 @@ if (isset($_POST['add_show'])) {
                       INNER JOIN movies m ON sh.movie_id = m.movie_id
                       INNER JOIN screens sc ON sh.screen_id = sc.screen_id
                       $where_clause
-                      ORDER BY sh.created_at DESC LIMIT $offset, $limit";
-            $result = mysqli_query($conn, $query);
+                      ORDER BY sh.created_at DESC LIMIT ?, ?";
+            
+            $stmt = $conn->prepare($query);
+            if ($selected_date != 'ALL') {
+                $stmt->bind_param("sii", $selected_date, $offset, $limit);
+            } else {
+                $stmt->bind_param("ii", $offset, $limit);
+            }
+            $stmt->execute();
+            $result = $stmt->get_result();
             ?>
 
             <div class="show-list-header">
@@ -357,7 +359,7 @@ if (isset($_POST['add_show'])) {
                                 <div class="action-buttons">
                                     <?php if ($status == 'ACTIVE'): ?>
                                         <a href="edit_show.php?id=<?= $row['show_id'] ?>" class="edit-btn">Edit</a>
-                                        <a href="cancel_show.php?id=<?= $row['show_id'] ?>" class="cancel-btn" onclick="return confirm('Cancel this show?')">Cancel</a>
+                                        <a href="cancel_show.php?id=<?= $row['show_id'] ?>&csrf_token=<?= $_SESSION['csrf_token'] ?? '' ?>" class="cancel-btn" onclick="return confirm('Cancel this show?')">Cancel</a>
                                     <?php endif; ?>
                                 </div>
                             </td>
@@ -388,49 +390,22 @@ if (isset($_POST['add_show'])) {
     </div>
 
     <script>
-    // Unified function to throw clean toast notification alerts (disappears after 5 seconds)
-    function showNotification(message, type = 'success') {
-        const toast = document.getElementById("popupToast");
-        const icon = document.getElementById("popupIcon");
-        const text = document.getElementById("popupText");
-
-        toast.className = "toast-box";
-        
-        if (type === 'error') {
-            toast.classList.add("error");
-            icon.innerHTML = '<i class="fa-solid fa-circle-xmark"></i>';
-        } else {
-            toast.classList.add("success");
-            icon.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
-        }
-
-        text.textContent = message;
-        toast.classList.add("active");
-
-        setTimeout(() => {
-            toast.classList.remove("active");
-        }, 5000);
-    }
-
     document.addEventListener("DOMContentLoaded", function() {
-        // Trigger popup message if parsed from PHP database transaction execution
-        <?php if (!empty($notify_message)): ?>
-            showNotification("<?= addslashes($notify_message) ?>", "<?= $notify_type ?>");
+        // Trigger toast from session-based messages (from redirected action pages)
+        <?php if (isset($_SESSION['success_message'])) : ?>
+            showToast(<?= json_encode($_SESSION['success_message']) ?>, 'success');
+            <?php unset($_SESSION['success_message']); ?>
         <?php endif; ?>
 
-        // URL interceptor for incoming external redirections (Edit/Cancel success parameters)
-        const urlParams = new URLSearchParams(window.location.search);
-        const msg = urlParams.get('msg');
-        const mType = urlParams.get('type');
+        <?php if (isset($_SESSION['error_message'])) : ?>
+            showToast(<?= json_encode($_SESSION['error_message']) ?>, 'error');
+            <?php unset($_SESSION['error_message']); ?>
+        <?php endif; ?>
 
-        if (msg) {
-            // Trigger custom notification box safely
-            showNotification(msg, mType || 'success');
-            
-            // Clean up the URL state parameters instantly to control F5/refresh popup bugs
-            const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
-            window.history.replaceState({ path: cleanUrl }, '', cleanUrl);
-        }
+        // Trigger toast from inline form submission
+        <?php if (!empty($notify_message)): ?>
+            showToast("<?php echo addslashes($notify_message) ?>", "<?php echo $notify_type ?>");
+        <?php endif; ?>
 
         // JavaScript Client Form Validation 
         const form = document.getElementById("addShowForm");

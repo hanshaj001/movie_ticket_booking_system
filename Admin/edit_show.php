@@ -73,6 +73,9 @@ $ticket_price = $show['ticket_price'];
 
 if(isset($_POST['update_show']))
 {
+    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== ($_SESSION['csrf_token'] ?? '')) {
+        die("CSRF Token Validation Failed.");
+    }
 
     $ticket_price = trim($_POST['ticket_price']);
 
@@ -107,6 +110,19 @@ if(isset($_POST['update_show']))
     if(empty($screen_id))
     {
         $errors['screen_id'] = "Please select screen.";
+    }
+    else
+    {
+        $seat_check_stmt = $conn->prepare("SELECT COUNT(*) as count FROM seats WHERE screen_id = ?");
+        $seat_check_stmt->bind_param("i", $screen_id);
+        $seat_check_stmt->execute();
+        $seat_count_res = $seat_check_stmt->get_result()->fetch_assoc();
+        $seat_count = $seat_count_res['count'] ?? 0;
+        $seat_check_stmt->close();
+
+        if ($seat_count === 0) {
+            $errors['screen_id'] = "The selected screen has no seats configured. Please add seats to this screen first.";
+        }
     }
 
 
@@ -212,7 +228,8 @@ if(isset($_POST['update_show']))
 
         if ($update_stmt->execute()) {
             $update_stmt->close();
-            header("Location: add_show.php?msg=Show updated successfully&type=success");
+            $_SESSION['success_message'] = "Show updated successfully.";
+            header("Location: add_show.php");
             exit();
         } else {
             $update_stmt->close();
@@ -272,10 +289,8 @@ if(isset($_POST['update_show']))
 
             <?php endif; ?>
 
-
-
-            <form method="POST">
-
+            <form method="POST" id="editShowForm">
+                <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
                 <div class="form-grid">
 
 

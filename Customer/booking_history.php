@@ -92,6 +92,7 @@ while ($row = mysqli_fetch_assoc($result)) {
     <title>Booking History - Movie Ticket Booking System</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="icon" type="image/jpeg" href="../favicon.jpeg">
     <link rel="stylesheet" href="../Assets/css/Customer/booking_history.css?v=<?= time() ?>">
 </head>
 <body>
@@ -156,8 +157,9 @@ while ($row = mysqli_fetch_assoc($result)) {
                                     }
                                 ?>
                                 <tr>
-                                    <td>
+                                    <td data-label="Movie">
                                         <div class="movie-cell">
+
                                             <?php if (!empty($poster_url) && file_exists($poster_url)): ?>
                                                 <img src="<?php echo htmlspecialchars($poster_url); ?>" alt="<?php echo htmlspecialchars($booking['title']); ?>" class="movie-poster">
                                             <?php else: ?>
@@ -171,8 +173,9 @@ while ($row = mysqli_fetch_assoc($result)) {
                                             </div>
                                         </div>
                                     </td>
-                                    <td>
+                                    <td data-label="Seats">
                                         <div class="seats-cell">
+
                                             <?php foreach ($booking['seats'] as $seat): ?>
                                                 <?php if ($seat['seat_status'] === 'CONFIRMED'): ?>
                                                     <span class="seat-tag confirmed">
@@ -187,13 +190,15 @@ while ($row = mysqli_fetch_assoc($result)) {
                                             <?php endforeach; ?>
                                         </div>
                                     </td>
-                                    <td>
+                                    <td data-label="Show Date">
                                         <div class="date-cell">
+
                                             <span class="date"><?php echo date('d M Y', strtotime($booking['show_date'])); ?></span>
                                             <span class="time"><?php echo date('h:i A', strtotime($booking['show_time'])); ?></span>
                                         </div>
                                     </td>
-                                    <td>
+                                    <td data-label="Status">
+
                                         <?php if ($status === 'CONFIRMED'): ?>
                                             <div class="status-badge status-confirmed">
                                                 <i class="fas fa-check-circle status-icon"></i>
@@ -211,7 +216,8 @@ while ($row = mysqli_fetch_assoc($result)) {
                                             </div>
                                         <?php endif; ?>
                                     </td>
-                                    <td>
+                                    <td data-label="Action">
+
                                         <?php if ($booking['confirmed_count'] > 0 && in_array($status, ['CONFIRMED', 'PARTIALLY_CANCELLED'])): ?>
                                             <button class="btn-cancel-seats"
                                                     data-booking-id="<?php echo $booking['booking_id']; ?>"

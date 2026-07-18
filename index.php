@@ -1,19 +1,3 @@
-<?php
-
-$conn = mysqli_connect(
-    "localhost",
-    "root",
-    "",
-    "movie_ticket_booking_system"
-);
-
-if(!$conn)
-{
-    die("Database Connection Failed");
-}
-
-?>
-
 
 <?php
 session_start();
@@ -80,15 +64,45 @@ if ($carousel_res && mysqli_num_rows($carousel_res) > 0) {
 
 // Fallback banner
 if (empty($carousel_movies)) {
-    $carousel_movies[] = [
-        'movie_id' => 1,
-        'title' => "Experience the Magic of Cinema",
-        'description' => "Browse the latest movies and reserve your favorite seats.",
-        'banner_url' => "",
-        'movie_format' => "2D",
-        'language' => "English",
-        'duration_minutes' => 120
-    ];
+    // Attempt to find any active movie with a valid banner to display
+    $fallback_sql = "SELECT movie_id, title, banner_url, poster_url, description, movie_format, language, duration_minutes 
+                     FROM movies 
+                     WHERE status = 'ACTIVE' 
+                     ORDER BY movie_id DESC";
+    $fallback_res = mysqli_query($conn, $fallback_sql);
+    if ($fallback_res && mysqli_num_rows($fallback_res) > 0) {
+        while ($row = mysqli_fetch_assoc($fallback_res)) {
+            $banner_path = '';
+            if (!empty($row['banner_url'])) {
+                $banner_file = basename($row['banner_url']);
+                $bp = 'Assets/uploads/movie_banners/' . $banner_file;
+                if (file_exists($bp)) $banner_path = $bp;
+            }
+            if (empty($banner_path) && !empty($row['poster_url'])) {
+                $poster_file = basename($row['poster_url']);
+                $pp = 'Assets/uploads/movie_posters/' . $poster_file;
+                if (file_exists($pp)) $banner_path = $pp;
+            }
+            if (!empty($banner_path)) {
+                $row['banner_url'] = $banner_path;
+                $carousel_movies[] = $row;
+                break;
+            }
+        }
+    }
+    
+    // Hard fallback if no active movies have banners
+    if (empty($carousel_movies)) {
+        $carousel_movies[] = [
+            'movie_id' => 1,
+            'title' => "Experience the Magic of Cinema",
+            'description' => "Browse the latest movies and reserve your favorite seats.",
+            'banner_url' => "",
+            'movie_format' => "2D",
+            'language' => "English",
+            'duration_minutes' => 120
+        ];
+    }
 }
 
 // Fetch Currently Showing Movies
@@ -218,6 +232,7 @@ function renderCard($movie, $selected_date, $isUpcoming = false, $svg_placeholde
     <title>Home - Movie Ticket Booking System</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" type="image/jpeg" href="favicon.jpeg">
     <link rel="stylesheet" href="Assets/css/index.css">
 </head>
 <body>

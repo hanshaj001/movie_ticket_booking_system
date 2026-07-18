@@ -167,6 +167,7 @@ if ($shows_list_result && mysqli_num_rows($shows_list_result) > 0) {
     <title><?php echo htmlspecialchars($movie_record['title']); ?> - Movie Details</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="icon" type="image/jpeg" href="../favicon.jpeg">
     <link rel="stylesheet" href="../Assets/css/Customer/movie_details.css?v=<?= time(); ?>">
 </head>
 <body class="movie-details-body">
@@ -183,10 +184,10 @@ if ($shows_list_result && mysqli_num_rows($shows_list_result) > 0) {
         </nav>
 
         <!-- HERO BANNER -->
-        <section class="movie-hero-banner">
+        <header class="movie-hero-banner">
             <div class="hero-content-wrapper">
                 <!-- Poster -->
-                <div class="hero-poster-column">
+                <figure class="hero-poster-column">
                     <div class="poster-card">
                         <?php if (!empty($movie_record['poster_url'])): ?>
                             <img src="<?php echo htmlspecialchars($movie_record['poster_url']); ?>"
@@ -199,7 +200,7 @@ if ($shows_list_result && mysqli_num_rows($shows_list_result) > 0) {
                             <span>No Image Available</span>
                         </div>
                     </div>
-                </div>
+                </figure>
 
                 <!-- Details -->
                 <div class="hero-info-column">
@@ -243,12 +244,12 @@ if ($shows_list_result && mysqli_num_rows($shows_list_result) > 0) {
                     </div>
                 </div>
             </div>
-        </section>
+        </header>
 
         <div class="details-layout-grid">
 
             <!-- MAIN COLUMN -->
-            <div class="layout-main-column">
+            <article class="layout-main-column">
 
                 <!-- DATE SELECTION (sticky) -->
                 <section id="dateSelectionSection" class="section-card date-selection-card sticky-dates">
@@ -429,10 +430,10 @@ if ($shows_list_result && mysqli_num_rows($shows_list_result) > 0) {
                     <p class="about-description-text"><?php echo nl2br(htmlspecialchars($movie_record['description'])); ?></p>
                 </section>
 
-            </div>
+            </article>
 
             <!-- SIDE COLUMN -->
-            <div class="layout-side-column">
+            <aside class="layout-side-column">
 
                 <section class="section-card info-card">
                     <h3 class="section-title"><i class="fa-solid fa-circle-exclamation"></i> Important Information</h3>
@@ -444,7 +445,7 @@ if ($shows_list_result && mysqli_num_rows($shows_list_result) > 0) {
                     </ul>
                 </section>
 
-            </div>
+            </aside>
 
         </div>
 

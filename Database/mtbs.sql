@@ -236,3 +236,59 @@ ALTER TABLE booking_details
 
 ALTER TABLE booking_details 
   ADD COLUMN cancellation_time DATETIME NULL;
+
+
+
+
+
+CREATE TABLE contact_messages (
+
+    message_id INT AUTO_INCREMENT PRIMARY KEY,
+
+    user_id INT NULL,
+
+    full_name VARCHAR(100) NOT NULL,
+
+    email VARCHAR(100) NOT NULL,
+
+    phone VARCHAR(20) NOT NULL,
+
+    subject VARCHAR(200) NOT NULL,
+
+    message TEXT NOT NULL,
+
+    status ENUM(
+        'NEW',
+        'READ',
+        'REPLIED',
+        'CLOSED'
+    ) DEFAULT 'NEW',
+
+    priority ENUM(
+        'LOW',
+        'MEDIUM',
+        'HIGH'
+    ) DEFAULT 'MEDIUM',
+
+    assigned_to INT NULL,
+
+    admin_reply TEXT NULL,
+
+    replied_at DATETIME NULL,
+
+    ip_address VARCHAR(45) NULL,
+
+    submitted_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        ON UPDATE CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (user_id)
+        REFERENCES users(user_id)
+        ON DELETE SET NULL,
+
+    FOREIGN KEY (assigned_to)
+        REFERENCES users(user_id)
+        ON DELETE SET NULL
+
+);

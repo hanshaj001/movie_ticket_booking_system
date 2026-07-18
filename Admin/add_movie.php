@@ -21,6 +21,10 @@ $success = "";
 
 // Form submission validation & handling
 if (isset($_POST['add_movie'])) {
+    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== ($_SESSION['csrf_token'] ?? '')) {
+        die("CSRF Token Validation Failed.");
+    }
+    
     $title = trim($_POST['title']);
     $description = trim($_POST['description']);
     $duration = trim($_POST['duration']);
@@ -209,20 +213,22 @@ if (isset($_POST['add_movie'])) {
 </div>
 
 <?php if (isset($_SESSION['success_message'])) : ?>
-    <div class="message">
-        <i class="fas fa-check-circle"></i> <?= $_SESSION['success_message']; ?>
-    </div>
+    <script>document.addEventListener('DOMContentLoaded', () => showToast(<?= json_encode($_SESSION['success_message']) ?>, 'success'));</script>
     <?php unset($_SESSION['success_message']); ?>
 <?php endif; ?>
 
+<?php if (isset($_SESSION['error_message'])) : ?>
+    <script>document.addEventListener('DOMContentLoaded', () => showToast(<?= json_encode($_SESSION['error_message']) ?>, 'error'));</script>
+    <?php unset($_SESSION['error_message']); ?>
+<?php endif; ?>
+
 <?php if (isset($errors['general'])) : ?>
-    <div class="message error-msg">
-        <i class="fas fa-exclamation-circle"></i> <?= $errors['general']; ?>
-    </div>
+    <script>document.addEventListener('DOMContentLoaded', () => showToast(<?= json_encode($errors['general']) ?>, 'error'));</script>
 <?php endif; ?>
 
 <div class="form-card">
-    <form method="POST" enctype="multipart/form-data">
+    <form method="POST" enctype="multipart/form-data" data-loader-msg="Adding movie and uploading files. Please wait...">
+        <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
         <div class="form-grid">
             <div class="form-group">
                 <label>Movie Title</label>
@@ -378,7 +384,7 @@ $movieQuery = $conn->query("
             <div class="movie-content">
                 <div class="movie-top">
                     <h3><?= htmlspecialchars($movie['title']); ?></h3>
-                    <span class="status active"><?= htmlspecialchars($movie['status']); ?></span>
+                    <span class="status <?= strtolower($movie['status']) ?>"><?= htmlspecialchars($movie['status']); ?></span>
                 </div>
 
                 <div class="movie-meta">
@@ -400,9 +406,10 @@ $movieQuery = $conn->query("
                 </p>
 
                 <div class="action-buttons">
-
                     <a href="edit_movie.php?id=<?= $movie['movie_id']; ?>" class="edit-btn">Edit</a>
-                    <a href="cancel_movie.php?id=<?= $movie['movie_id']; ?>" class="cancel-btn" onclick="return confirm('Delete this movie?');">Delete</a>
+                    <?php if ($movie['status'] === 'ACTIVE'): ?>
+                        <a href="cancel_movie.php?id=<?= $movie['movie_id']; ?>&csrf_token=<?= $_SESSION['csrf_token'] ?? '' ?>" class="cancel-btn" onclick="return confirm('Cancel this movie? It will be set to inactive.');">Cancel</a>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>

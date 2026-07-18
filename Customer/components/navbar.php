@@ -18,52 +18,60 @@ $home_path = $in_customer_dir ? '../index.php' : 'index.php';
 ?>
 
 <link rel="stylesheet" href="<?= $base_path ?>Assets/css/Customer/navbar.css?v=<?= time() ?>">
+<link rel="stylesheet" href="<?= $base_path ?>Assets/css/global_loader.css">
+<link rel="stylesheet" href="<?= $base_path ?>Assets/css/toast.css">
+<script src="<?= $base_path ?>Assets/js/global_loader.js"></script>
+<script src="<?= $base_path ?>Assets/js/toast.js"></script>
+<link rel="icon" type="image/jpeg" href="<?= $base_path ?>favicon.jpeg">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <nav class="navbar">
-    <a href="<?= $home_path ?>" class="nav-brand">MTBS</a>
-    
-    <div class="menu-toggle" id="mobile-menu">
-        <i class="fa-solid fa-bars"></i>
-    </div>
-    
-    <ul class="nav-links" id="nav-links">
-        <li><a href="<?= $home_path ?>" class="<?= $current_page == 'index.php' ? 'active' : '' ?>">Home</a></li>
-        <li><a href="<?= $customer_path ?>About.php" class="<?= $current_page == 'About.php' ? 'active' : '' ?>">About</a></li>
-        <li><a href="<?= $customer_path ?>Contact.php" class="<?= $current_page == 'Contact.php' ? 'active' : '' ?>">Contact</a></li>
+    <div class="nav-container">
+        <a href="<?= $home_path ?>" class="nav-brand">MTBS</a>
         
-        <?php if ($is_logged_in): ?>
-            <li><a href="<?= $customer_path ?>booking_history.php" class="<?= $current_page == 'booking_history.php' ? 'active' : '' ?>">Booking History</a></li>
-            <li>
-            <a href="<?php echo $base_path; ?>logout.php" class="direct-logout-btn-rect">
-                <i class="fa-solid fa-right-from-bracket"></i> Logout
-            </a>
-        </li>
-            <li class="user-dropdown">
-                <span class="user-name">
-                    <i class="fa-regular fa-user-circle"></i> <?= htmlspecialchars($customer_name) ?>
-                </span>
+        <div class="menu-toggle" id="mobile-menu">
+            <i class="fa-solid fa-bars"></i>
+        </div>
+        
+        <ul class="nav-links" id="nav-links">
+            <li><a href="<?= $home_path ?>" class="<?= $current_page == 'index.php' ? 'active' : '' ?>">Home</a></li>
+            <li><a href="<?= $customer_path ?>About.php" class="<?= $current_page == 'About.php' ? 'active' : '' ?>">About</a></li>
+            <li><a href="<?= $customer_path ?>Contact.php" class="<?= $current_page == 'Contact.php' ? 'active' : '' ?>">Contact</a></li>
+            
+            <?php if ($is_logged_in): ?>
+                <li><a href="<?= $customer_path ?>booking_history.php" class="<?= $current_page == 'booking_history.php' ? 'active' : '' ?>">Booking History</a></li>
+                <li>
+                <a href="<?php echo $base_path; ?>logout.php" class="direct-logout-btn-rect">
+                    <i class="fa-solid fa-right-from-bracket"></i> Logout
+                </a>
             </li>
-        <?php else: ?>
-            <?php
-            // Determine redirect URL for navbar buttons
-            $redirect_qs = '';
-            if ($current_page !== 'login.php' && $current_page !== 'register.php') {
-                $redirect_qs = '?redirect=' . urlencode($_SERVER['REQUEST_URI']);
-            } else {
-                if (!empty($_SESSION['pending_redirect'])) {
-                    $redirect_qs = '?redirect=' . urlencode($_SESSION['pending_redirect']);
-                } elseif (!empty($_GET['redirect'])) {
-                    $redirect_qs = '?redirect=' . urlencode($_GET['redirect']);
+                <li class="user-dropdown">
+                    <span class="user-name">
+                        <i class="fa-solid fa-circle-user" style="font-size: 20px; vertical-align: middle; margin-right: 6px; color: #ff4d2d;"></i>
+                        <?= htmlspecialchars($customer_name) ?>
+                    </span>
+                </li>
+            <?php else: ?>
+                <?php
+                // Determine redirect URL for navbar buttons
+                $redirect_qs = '';
+                if ($current_page !== 'login.php' && $current_page !== 'register.php') {
+                    $redirect_qs = '?redirect=' . urlencode($_SERVER['REQUEST_URI']);
+                } else {
+                    if (!empty($_SESSION['pending_redirect'])) {
+                        $redirect_qs = '?redirect=' . urlencode($_SESSION['pending_redirect']);
+                    } elseif (!empty($_GET['redirect'])) {
+                        $redirect_qs = '?redirect=' . urlencode($_GET['redirect']);
+                    }
                 }
-            }
-            ?>
-            <li class="nav-auth">
-                <a href="<?= $base_path ?>login.php<?= $redirect_qs ?>" class="login-btn <?= $current_page == 'login.php' ? 'active' : '' ?>">Login</a>
-                <a href="<?= $customer_path ?>register.php<?= $redirect_qs ?>" class="register-btn">Register</a>
-            </li>
-        <?php endif; ?>
-    </ul>
+                ?>
+                <li class="nav-auth">
+                    <a href="<?= $base_path ?>login.php<?= $redirect_qs ?>" class="login-btn <?= $current_page == 'login.php' ? 'active' : '' ?>">Login</a>
+                    <a href="<?= $customer_path ?>register.php<?= $redirect_qs ?>" class="register-btn">Register</a>
+                </li>
+            <?php endif; ?>
+        </ul>
+    </div>
 </nav>
 
 <script>

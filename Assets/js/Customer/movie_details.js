@@ -1,6 +1,6 @@
 /**
  * MOVIE DETAILS PAGE - CLIENT SCRIPTS
- * Enhanced for better UX
+ * Enhanced for better UX and Mobile Performance
  */
 
 // Image fallback: called from onerror on <img> tags
@@ -16,21 +16,19 @@ function filterShows(format, btn) {
     document.querySelectorAll('.format-filter-btn').forEach(b => b.classList.remove('active-filter'));
     btn.classList.add('active-filter');
 
-    // Filter cards with smooth transitions
+    // Filter cards with smooth transitions without breaking mobile layout flow
     document.querySelectorAll('.showtime-row-card').forEach(card => {
         const cardFormat = card.getAttribute('data-format');
         if (format === 'all' || cardFormat === format) {
-            card.style.display = 'block';
+            card.style.display = 'flex'; // Use flex instead of block for the card layout
             setTimeout(() => {
                 card.style.opacity = '1';
-                card.style.transform = 'translateY(0)';
             }, 50);
         } else {
             card.style.opacity = '0';
-            card.style.transform = 'translateY(-10px)';
             setTimeout(() => {
                 card.style.display = 'none';
-            }, 300);
+            }, 300); // match standard transition timing
         }
     });
 }
@@ -69,15 +67,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 // Show success message
                 shareMsg.style.display = 'inline-flex';
-                shareMsg.style.animation = 'fadeIn 0.3s ease';
                 
                 // Hide message after 2.5 seconds
                 setTimeout(() => {
-                    shareMsg.style.animation = 'fadeOut 0.3s ease';
-                    setTimeout(() => {
-                        shareMsg.style.display = 'none';
-                        shareMsg.style.animation = '';
-                    }, 300);
+                    shareMsg.style.display = 'none';
                 }, 2500);
                 
             } catch (err) {
@@ -98,72 +91,31 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Add smooth hover effects to showtime cards
-    const showtimeCards = document.querySelectorAll('.showtime-row-card:not(.card-soldout)');
-    showtimeCards.forEach(card => {
-        card.addEventListener('mouseenter', () => {
-            // Optional: Add extra visual feedback
-        });
-        card.addEventListener('mouseleave', () => {
-            // Optional: Reset visual feedback
-        });
-    });
-
-    // Add fade-in animations for cards when they come into view
+    // Mobile friendly intersection observer (only fades in opacity, prevents layout shifts)
     const observerOptions = {
         threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
+        rootMargin: '50px' // Load slightly before it comes into view to prevent blank areas on fast scroll
     };
 
     const fadeInObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 entry.target.style.opacity = '1';
-                entry.target.style.transform = 'translateY(0)';
+                // Unobserve after fading in for better performance
+                fadeInObserver.unobserve(entry.target);
             }
         });
     }, observerOptions);
 
-    // Observe all showtime cards
-    document.querySelectorAll('.showtime-row-card').forEach(card => {
-        card.style.opacity = '0';
-        card.style.transform = 'translateY(20px)';
-        card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-        fadeInObserver.observe(card);
-    });
+    // Only apply animations if user prefers motion
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    // Add similar movie cards animation
-    document.querySelectorAll('.similar-movie-card').forEach((card, index) => {
-        card.style.opacity = '0';
-        card.style.transform = 'translateY(20px)';
-        card.style.transition = `opacity 0.5s ease ${index * 0.1}s, transform 0.5s ease ${index * 0.1}s`;
-        fadeInObserver.observe(card);
-    });
+    if (!prefersReducedMotion) {
+        // Observe all showtime cards
+        document.querySelectorAll('.showtime-row-card, .similar-movie-card').forEach(card => {
+            card.style.opacity = '0';
+            card.style.transition = 'opacity 0.6s ease';
+            fadeInObserver.observe(card);
+        });
+    }
 });
-
-// Add CSS keyframes for animations via JavaScript (to keep everything in one place)
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(-10px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-    
-    @keyframes fadeOut {
-        from {
-            opacity: 1;
-            transform: translateY(0);
-        }
-        to {
-            opacity: 0;
-            transform: translateY(-10px);
-        }
-    }
-`;
-document.head.appendChild(style);
