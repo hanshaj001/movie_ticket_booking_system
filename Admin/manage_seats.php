@@ -178,40 +178,25 @@ while ($row = $seats_result->fetch_assoc()) {
         </div>
 
         <?php if (isset($_SESSION['success_message'])) : ?>
-            <div class="message">
-                <i class="fas fa-check-circle"></i> <?= $_SESSION['success_message']; ?>
-            </div>
+            <script>document.addEventListener('DOMContentLoaded', () => showToast(<?= json_encode($_SESSION['success_message']) ?>, 'success'));</script>
             <?php unset($_SESSION['success_message']); ?>
         <?php endif; ?>
 
         <?php if (isset($_SESSION['error_message'])) : ?>
-            <div class="message error-msg" id="autoHideError">
-                <i class="fas fa-exclamation-circle"></i> <?= $_SESSION['error_message']; ?>
-            </div>
+            <script>document.addEventListener('DOMContentLoaded', () => showToast(<?= json_encode($_SESSION['error_message']) ?>, 'error'));</script>
             <?php unset($_SESSION['error_message']); ?>
         <?php endif; ?>
 
         <?php if (isset($errors['general'])) : ?>
-            <div class="message error-msg">
-                <i class="fas fa-exclamation-circle"></i> <?= $errors['general']; ?>
-            </div>
+            <script>document.addEventListener('DOMContentLoaded', () => showToast(<?= json_encode($errors['general']) ?>, 'error'));</script>
         <?php endif; ?>
-
-        <script>
-            setTimeout(function() {
-                var el = document.getElementById('autoHideError');
-                if(el) { el.style.display = 'none'; }
-            }, 5000);
-        </script>
 
         <div class="form-card">
             <h3>Add New Seats</h3>
             <p style="margin-bottom: 20px; color: #777; font-size: 14px;">Maximum 10 seats allowed per row group.</p>
             
             <?php if (isset($errors['add'])) : ?>
-                <div class="message error-msg">
-                    <i class="fas fa-exclamation-circle"></i> <?= $errors['add']; ?>
-                </div>
+                <script>document.addEventListener('DOMContentLoaded', () => showToast(<?= json_encode($errors['add']) ?>, 'error'));</script>
             <?php endif; ?>
 
             <form method="POST" action="manage_seats.php?screen_id=<?= $screen_id; ?>">

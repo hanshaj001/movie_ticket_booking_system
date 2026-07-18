@@ -20,7 +20,12 @@ $current_page = basename($_SERVER['PHP_SELF']);
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Admin System Panel - MTBS</title>
+    <link rel="icon" type="image/jpeg" href="../favicon.jpeg">
     <link rel="stylesheet" href="../Assets/css/Admin/sidebar.css?v=<?= time() ?>"/>
+    <link rel="stylesheet" href="../Assets/css/global_loader.css">
+    <link rel="stylesheet" href="../Assets/css/toast.css">
+    <script src="../Assets/js/global_loader.js"></script>
+    <script src="../Assets/js/toast.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
@@ -76,6 +81,11 @@ $current_page = basename($_SERVER['PHP_SELF']);
         <li class="<?= $current_page == 'ledger.php' ? 'nav-active' : '' ?>">
             <a href="ledger.php">
                 <i class="fa-solid fa-book"></i> Ledger
+            </a>
+        </li>
+        <li class="<?= $current_page == 'contact_messages.php' ? 'nav-active' : '' ?>">
+            <a href="contact_messages.php">
+                <i class="fa-solid fa-envelope"></i> Contact Messages
             </a>
         </li>
         <li class="logout-menu">

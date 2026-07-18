@@ -11,6 +11,10 @@
     --nav-bg: #ffffff;
 }
 
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
 .navbar {
     font-family: 'Poppins', Arial, sans-serif;
 }
@@ -22,15 +26,22 @@
     position: sticky;
     top: 0;
     z-index: 1000;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 50px;
+    padding: 15px 0;
     background-color: var(--nav-bg);
     backdrop-filter: blur(10px);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
     border-bottom: 1px solid var(--border);
 }
+
+.nav-container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
 
 .modal-content {
     background: #fff;
@@ -208,8 +219,13 @@
 
 @media (max-width: 768px) {
     .navbar {
-        padding: 15px 20px;
+        padding: 15px 0;
     }
+    
+    .nav-container {
+        padding: 0 20px;
+    }
+
     
     .nav-links {
         display: none;

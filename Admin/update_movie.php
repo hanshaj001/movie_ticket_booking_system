@@ -1,12 +1,21 @@
 <?php
 session_start();
-require_once '../Includes/db_conn.php';
 
-// Allow only POST request
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'ADMIN') {
+    header("Location: ../login.php");
+    exit();
+}
+
 if ($_SERVER['REQUEST_METHOD'] != 'POST') {
     header("Location: add_movie.php");
     exit();
 }
+
+if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== ($_SESSION['csrf_token'] ?? '')) {
+    die("CSRF Token Validation Failed.");
+}
+
+require_once '../Includes/db_conn.php';
 
 $id = intval($_POST['id']);
 $title = trim($_POST['title']);

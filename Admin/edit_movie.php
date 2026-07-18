@@ -76,6 +76,7 @@ $description = $form_data['description'] ?? $row['description'];
         <form action="update_movie.php" method="POST" enctype="multipart/form-data">
 
             <input type="hidden" name="id" value="<?php echo $row['movie_id']; ?>">
+            <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token'] ?? ''; ?>">
 
             <div class="form-grid">
 
