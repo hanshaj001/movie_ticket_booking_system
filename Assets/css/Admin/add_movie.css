@@ -293,6 +293,7 @@ input[type="file"] {
     white-space: nowrap;
 }
 .status.active { background: #e8fff1; color: #14a44d; }
+.status.inactive { background: #f0f0f0; color: #888; }
 
 /* System UI validation exceptions */
 .message {

@@ -3,7 +3,7 @@ require_once '../Includes/db_conn.php';
 include 'components/sidebar.php';
 
 // Authentication check
-if (!isset($_SESSION['user_id'])) {
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'ADMIN') {
     header("Location: ../login.php");
     exit();
 }
@@ -16,6 +16,9 @@ $is_editing = false;
 
 // Handle Delete Request
 if (isset($_GET['action']) && $_GET['action'] == 'delete' && isset($_GET['id'])) {
+    if (!isset($_GET['csrf_token']) || $_GET['csrf_token'] !== ($_SESSION['csrf_token'] ?? '')) {
+        die("CSRF Token Validation Failed.");
+    }
     $del_id = (int)$_GET['id'];
     
     // Validate if genre is linked to any movies
@@ -56,6 +59,9 @@ if (isset($_GET['action']) && $_GET['action'] == 'edit' && isset($_GET['id'])) {
 
 // Form submission validation & handling (Add or Update)
 if (isset($_POST['save_genre'])) {
+    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== ($_SESSION['csrf_token'] ?? '')) {
+        die("CSRF Token Validation Failed.");
+    }
     $genre_name = trim($_POST['genre_name']);
     if (isset($_POST['genre_id']) && !empty($_POST['genre_id'])) {
         $genre_id = (int)$_POST['genre_id'];
@@ -176,20 +182,17 @@ $genresQuery = $data_stmt->get_result();
         </div>
 
         <?php if (isset($_SESSION['success_message'])) : ?>
-            <div class="message">
-                <i class="fas fa-check-circle"></i> <?= $_SESSION['success_message']; ?>
-            </div>
+            <script>document.addEventListener('DOMContentLoaded', () => showToast(<?= json_encode($_SESSION['success_message']) ?>, 'success'));</script>
             <?php unset($_SESSION['success_message']); ?>
         <?php endif; ?>
 
         <?php if (isset($errors['general'])) : ?>
-            <div class="message error-msg">
-                <i class="fas fa-exclamation-circle"></i> <?= $errors['general']; ?>
-            </div>
+            <script>document.addEventListener('DOMContentLoaded', () => showToast(<?= json_encode($errors['general']) ?>, 'error'));</script>
         <?php endif; ?>
 
         <div class="form-card">
             <form method="POST" action="manage_genres.php">
+                <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
                 <?php if($is_editing): ?>
                     <input type="hidden" name="genre_id" value="<?= htmlspecialchars($genre_id); ?>">
                 <?php endif; ?>
@@ -255,7 +258,7 @@ $genresQuery = $data_stmt->get_result();
                                 <td><?= date("d M Y H:i", strtotime($genre['updated_at'])); ?></td>
                                 <td class="actions-cell">
                                     <a href="manage_genres.php?action=edit&id=<?= $genre['genre_id']; ?>" class="action-btn edit" title="Edit Genre"><i class="fas fa-edit"></i> Edit</a>
-                                    <button type="button" class="action-btn delete" onclick="confirmDelete(<?= $genre['genre_id']; ?>)" title="Delete Genre"><i class="fas fa-trash-alt"></i> Delete</button>
+                                    <button type="button" class="action-btn delete" onclick="confirmDelete(<?= $genre['genre_id']; ?>, '<?= $_SESSION['csrf_token'] ?? '' ?>')" title="Delete Genre"><i class="fas fa-trash-alt"></i> Delete</button>
                                 </td>
                             </tr>
                         <?php endwhile; ?>

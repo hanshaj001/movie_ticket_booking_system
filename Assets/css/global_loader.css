@@ -1,0 +1,47 @@
+/* Assets/css/global_loader.css */
+#global-loader-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 99999;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+#global-loader-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.loader-spinner {
+    width: 60px;
+    height: 60px;
+    border: 5px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: #ff4d2d; /* Primary theme color */
+    animation: spin 1s ease-in-out infinite;
+    margin-bottom: 20px;
+}
+
+.loader-text {
+    color: #ffffff;
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}

@@ -594,33 +594,240 @@ body {
     color: #ffffff;
 }
 
-/* Responsive */
+/* ═══════════════════════════════════════════════════════════
+   RESPONSIVE — 768px: Table → Card list
+   ═══════════════════════════════════════════════════════════ */
 @media (max-width: 768px) {
     .history-container {
-        padding: 20px 12px 40px;
+        padding: 16px 12px 40px;
     }
 
     .history-header {
         flex-direction: column;
         align-items: flex-start;
+        gap: 12px;
+        margin-bottom: 20px;
     }
 
     .history-header h1 {
         font-size: 1.5rem;
     }
 
-    .cancel-modal {
-        width: 95%;
-        max-height: 90vh;
+    .history-actions {
+        width: 100%;
     }
 
-    .modal-header {
-        padding: 18px 20px 14px;
+    .sort-select {
+        width: 100%;
+        box-sizing: border-box;
     }
 
-    .modal-body {
-        padding: 16px 20px 24px;
+    /* Info box */
+    .important-info-box {
+        padding: 14px 16px;
     }
+
+    .important-info-box h3  { font-size: 0.95rem; }
+    .important-info-box li  { font-size: 0.82rem; }
+
+    /* ── Remove table scrolling, show as cards ── */
+    .history-table-wrapper {
+        overflow-x: visible;
+    }
+
+    .history-table {
+        min-width: 0;
+        display: block;
+        width: 100%;
+    }
+
+    /* Hide column headers */
+    .history-table thead {
+        display: none;
+    }
+
+    .history-table tbody {
+        display: block;
+        width: 100%;
+    }
+
+    /* Each row = a card */
+    .history-table tbody tr {
+        display: block;
+        background: var(--bg-card);
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius);
+        margin-bottom: 14px;
+        padding: 0;
+        box-shadow: 0 2px 12px rgba(26,26,46,0.06);
+        overflow: hidden;
+    }
+
+    .history-table tbody tr:last-child {
+        border-bottom: 1px solid var(--border-light);
+        margin-bottom: 0;
+    }
+
+    .history-table tbody tr:hover {
+        background: #fafbfd;
+    }
+
+    /* Each cell = a grid row with label on the left and content on the right */
+    .history-table td {
+        display: grid;
+        grid-template-columns: 110px 1fr;
+        padding: 0;
+        border-bottom: 1px solid var(--border-light);
+        font-size: 0.88rem;
+    }
+
+    .history-table td:last-child {
+        border-bottom: none;
+    }
+
+    /* Label column */
+    .history-table td::before {
+        content: attr(data-label);
+        display: flex;
+        align-items: center;
+        font-size: 0.68rem;
+        font-weight: 700;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 12px 10px 12px 16px;
+        border-right: 1px dashed var(--border-light);
+        background: #fafbfd;
+    }
+
+    /* Data column inside td */
+    .history-table td > * {
+        padding: 12px 16px;
+        align-self: center;
+        justify-self: end; /* Aligns the actual element to the right edge */
+        text-align: right; /* Aligns internal text to the right */
+        box-sizing: border-box;
+    }
+
+    /* Movie cell — keeps poster+info side by side, label above */
+    .movie-cell {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        text-align: right;
+        gap: 12px;
+    }
+
+    .movie-poster {
+        width: 48px;
+        height: 70px;
+        flex-shrink: 0;
+        border-radius: 6px;
+    }
+
+    .movie-poster-fallback {
+        width: 48px;
+        height: 70px;
+        flex-shrink: 0;
+        border-radius: 6px;
+        font-size: 20px;
+    }
+
+    .movie-info h3   { font-size: 0.9rem; }
+    .movie-info span { font-size: 0.78rem; }
+
+    /* Seats cell */
+    .seats-cell {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 5px;
+    }
+
+    .seat-tag {
+        font-size: 0.74rem;
+        padding: 3px 8px;
+    }
+
+    /* Date cell */
+    .date-cell {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        justify-content: flex-end;
+        flex-wrap: wrap;
+    }
+
+    .date-cell .date { font-size: 0.88rem; font-weight: 600; }
+    .date-cell .time { font-size: 0.78rem; color: var(--text-muted); }
+
+    /* Status */
+    .status-badge {
+        font-size: 0.74rem;
+        padding: 5px 12px;
+    }
+
+    /* Action */
+    .btn-cancel-seats {
+        padding: 8px 16px;
+        font-size: 0.8rem;
+    }
+
+    /* Modal */
+    .cancel-modal    { width: 95%; max-height: 90vh; }
+    .modal-header    { padding: 18px 20px 14px; }
+    .modal-body      { padding: 16px 20px 24px; }
+
+    /* Pagination */
+    .pagination      { flex-wrap: wrap; gap: 6px; margin-top: 20px; }
+    .pagination a    { padding: 7px 12px; font-size: 0.82rem; min-width: 36px; height: 36px; }
+
+    /* Breadcrumb */
+    .breadcrumb-nav  { font-size: 13px; margin-bottom: 18px; }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   480px — small phones
+   ═══════════════════════════════════════════════════════════ */
+@media (max-width: 480px) {
+    .history-container  { padding: 12px 10px 30px; }
+    .history-header h1  { font-size: 1.3rem; }
+
+    .history-table tbody tr {
+        border-radius: 12px;
+        margin-bottom: 10px;
+    }
+
+    .history-table td {
+        grid-template-columns: 90px 1fr;
+        font-size: 0.82rem;
+    }
+
+    .history-table td::before {
+        font-size: 0.62rem;
+        padding: 10px 8px 10px 12px;
+    }
+
+    .history-table td > * {
+        padding: 10px 12px;
+    }
+
+    .movie-poster,
+    .movie-poster-fallback { width: 40px; height: 58px; }
+
+    .seat-tag       { font-size: 0.7rem; padding: 2px 7px; }
+    .status-badge   { font-size: 0.7rem; padding: 4px 9px; }
+
+    .btn-cancel-seats {
+        padding: 7px 13px;
+        font-size: 0.76rem;
+    }
+
+    .important-info-box li { font-size: 0.78rem; }
+    .cancel-modal  { width: 98%; }
+    .modal-header  { padding: 14px 16px 12px; }
+    .modal-body    { padding: 14px 16px 20px; }
+    .modal-header h2 { font-size: 1rem; }
 }
 
 /* Breadcrumbs Navigation */

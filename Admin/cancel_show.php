@@ -1,10 +1,21 @@
 <?php
+session_start();
+
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'ADMIN') {
+    header("Location: ../login.php");
+    exit();
+}
+
+if (!isset($_GET['csrf_token']) || $_GET['csrf_token'] !== ($_SESSION['csrf_token'] ?? '')) {
+    die("CSRF Token Validation Failed.");
+}
 
 require_once '../Includes/db_conn.php';
 
-// checking if theere is id in url
+// checking if there is id in url
 if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
-    header("Location: add_show.php?msg=Invalid show ID&type=danger");
+    $_SESSION['error_message'] = "Invalid show ID.";
+    header("Location: add_show.php");
     exit();
 }
 
@@ -25,23 +36,24 @@ mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
 
 if (mysqli_num_rows($result) == 0) {
-    header("Location: add_show.php?msg=Show not found&type=danger");
+    $_SESSION['error_message'] = "Show not found.";
+    header("Location: add_show.php");
     exit();
 }
 
 $show = mysqli_fetch_assoc($result);
 
-// cheking if aleady cancelled 
+// checking if already cancelled 
 if ($show['show_status'] == 'CANCELLED') {
-
-    header("Location: add_show.php?msg=Show is already cancelled&type=warning");
+    $_SESSION['error_message'] = "Show is already cancelled.";
+    header("Location: add_show.php");
     exit();
 }
 
 // checking if already completed
 if ($show['show_status'] == 'COMPLETED') {
-
-    header("Location: add_show.php?msg=Completed shows cannot be cancelled&type=warning");
+    $_SESSION['error_message'] = "Completed shows cannot be cancelled.";
+    header("Location: add_show.php");
     exit();
 }
 
@@ -51,12 +63,12 @@ $showDateTime = strtotime(
 );
 
 if (time() >= $showDateTime) {
-
-    header("Location: add_show.php?msg=Show has already started&type=warning");
+    $_SESSION['error_message'] = "Show has already started.";
+    header("Location: add_show.php");
     exit();
 }
 
-//checkin if there exits booking for that particular shoeo
+//checking if there exist bookings for that particular show
 $stmt = mysqli_prepare($conn, "
 SELECT COUNT(*) AS total
 FROM bookings
@@ -71,8 +83,8 @@ $result = mysqli_stmt_get_result($stmt);
 $row = mysqli_fetch_assoc($result);
 
 if ($row['total'] > 0) {
-
-    header("Location: add_show.php?msg=Cannot cancel. Customers have already booked tickets.&type=danger");
+    $_SESSION['error_message'] = "Cannot cancel. Customers have already booked tickets.";
+    header("Location: add_show.php");
     exit();
 }
 
@@ -86,15 +98,13 @@ WHERE show_id=?
 mysqli_stmt_bind_param($stmt,"i",$show_id);
 
 if(mysqli_stmt_execute($stmt)){
-
-    header("Location:add_show.php?msg=Show cancelled successfully&type=success");
+    $_SESSION['success_message'] = "Show cancelled successfully.";
+    header("Location: add_show.php");
     exit();
-
 }else{
-
-    header("Location:add_show.php?msg=Unable to cancel show&type=danger");
+    $_SESSION['error_message'] = "Unable to cancel show.";
+    header("Location: add_show.php");
     exit();
-
 }
 
 ?>

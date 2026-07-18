@@ -1,5 +1,9 @@
-function confirmDelete(genreId) {
+function confirmDelete(genreId, csrfToken = '') {
     if (confirm("Are you sure you want to delete this genre? This action cannot be undone unless it's assigned to a movie.")) {
-        window.location.href = `manage_genres.php?action=delete&id=${genreId}`;
+        let url = `manage_genres.php?action=delete&id=${genreId}`;
+        if (csrfToken) {
+            url += `&csrf_token=${csrfToken}`;
+        }
+        window.location.href = url;
     }
 }

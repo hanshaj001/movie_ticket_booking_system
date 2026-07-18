@@ -1,0 +1,11 @@
+# Disable script execution
+<FilesMatch "\.(php|php3|php4|php5|phtml|pl|py|jsp|asp|htm|shtml|sh|cgi)$">
+    Require all denied
+</FilesMatch>
+
+# Force download if they bypass
+<IfModule mod_headers.c>
+    <FilesMatch "\.(php|php3|php4|php5|phtml|pl|py|jsp|asp|htm|shtml|sh|cgi)$">
+        Header set Content-Disposition attachment
+    </FilesMatch>
+</IfModule>
