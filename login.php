@@ -122,6 +122,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     </div>
                 <?php endif; ?>
 
+                <?php if (isset($_GET['reset_success']) && $_GET['reset_success'] == 1) : ?>
+                    <div class="alert alert-success" style="background-color: #d4edda; color: #155724; padding: 10px; border-radius: 5px; margin-bottom: 15px;">
+                        Password reset successfully! You can now login with your new password.
+                    </div>
+                <?php endif; ?>
+
                 <form method="POST" action="">
                     <div class="form-group">
                         <label for="email">Email Address</label>
@@ -133,6 +139,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <div class="password-box">
                             <input type="password" id="password" name="password" placeholder="Enter your password" required>
                             <i class="fa-solid fa-eye" id="togglePassword"></i>
+                        </div>
+                        <div style="text-align: right; margin-top: 5px;">
+                            <a href="forgot_password.php" style="font-size: 0.85em; color: #e74c3c; text-decoration: none;">Forgot Password?</a>
                         </div>
                     </div>
 
