@@ -29,15 +29,16 @@ function sendMail($to, $subject, $body, $isHtml = true) {
         $mail->SMTPAuth   = true;
         
         // --- CONFIGURE YOUR CREDENTIALS HERE ---
-        $mail->Username   = 'mtbs.hansh@gmail.com'; // e.g. mtbs.support@gmail.com
-        $mail->Password   = 'dhxymksmqfdydczz'; // The 16-character App Password
+        $env = parse_ini_file(__DIR__ . '/../.env');
+        $mail->Username   = $env['SMTP_USERNAME'] ?? 'mtbs.hansh@gmail.com'; 
+        $mail->Password   = $env['SMTP_PASSWORD'] ?? ''; 
         // ---------------------------------------
         
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; // Enable TLS encryption
-        $mail->Port       = 587; // TCP port to connect to
+        $mail->Port       = $env['SMTP_PORT'] ?? 587; // TCP port to connect to
 
         // Default Sender Name
-        $mail->setFrom('mtbs.hansh@gmail.com', 'MTBS Cinema');
+        $mail->setFrom($env['SMTP_FROM_EMAIL'] ?? 'mtbs.hansh@gmail.com', $env['SMTP_FROM_NAME'] ?? 'MTBS Cinema');
         $mail->addAddress($to);
 
         // Content

@@ -2,80 +2,53 @@
 document.addEventListener("DOMContentLoaded", function() {
     
     // ==========================================
-    // 1. Dynamic Hero Carousel Logic
+    // 1. Premium Showcase Slider
     // ==========================================
-    const slides = document.querySelectorAll(".carousel-slide");
-    const dots = document.querySelectorAll(".indicator-dot");
-    const prevBtn = document.getElementById("carousel-prev");
-    const nextBtn = document.getElementById("carousel-next");
+    const sSlides = document.querySelectorAll(".showcase-slide");
+    const sDots = document.querySelectorAll(".s-dot");
+    const sPrevBtn = document.getElementById("showcase-prev");
+    const sNextBtn = document.getElementById("showcase-next");
     
-    let currentSlide = 0;
-    let carouselInterval;
-    
-    function showSlide(index) {
-        if (slides.length === 0) return;
+    if (sSlides.length > 0) {
+        let currentSSlide = 0;
+        let sInterval;
         
-        // Boundaries checks
-        if (index >= slides.length) currentSlide = 0;
-        else if (index < 0) currentSlide = slides.length - 1;
-        else currentSlide = index;
-        
-        // Remove active states
-        slides.forEach(slide => slide.classList.remove("active-slide"));
-        dots.forEach(dot => dot.classList.remove("active-dot"));
-        
-        // Set active states
-        slides[currentSlide].classList.add("active-slide");
-        if (dots[currentSlide]) {
-            dots[currentSlide].classList.add("active-dot");
+        function updateShowcase(index) {
+            sSlides.forEach(slide => slide.classList.remove("active"));
+            sDots.forEach(dot => dot.classList.remove("active"));
+            
+            if (index >= sSlides.length) currentSSlide = 0;
+            else if (index < 0) currentSSlide = sSlides.length - 1;
+            else currentSSlide = index;
+            
+            sSlides[currentSSlide].classList.add("active");
+            if(sDots[currentSSlide]) sDots[currentSSlide].classList.add("active");
         }
-    }
-    
-    function nextSlide() {
-        showSlide(currentSlide + 1);
-    }
-    
-    function prevSlide() {
-        showSlide(currentSlide - 1);
-    }
-    
-    // Start automated cycle
-    function startCarousel() {
-        if (slides.length > 1) {
-            carouselInterval = setInterval(nextSlide, 5000);
+        
+        function sNext() { updateShowcase(currentSSlide + 1); }
+        function sPrev() { updateShowcase(currentSSlide - 1); }
+        
+        function startSTimer() {
+            if(sSlides.length > 1) sInterval = setInterval(sNext, 5000);
         }
-    }
-    
-    function resetCarouselTimer() {
-        clearInterval(carouselInterval);
-        startCarousel();
-    }
-    
-    // Event listeners for controls
-    if (nextBtn) {
-        nextBtn.addEventListener("click", () => {
-            nextSlide();
-            resetCarouselTimer();
+        function resetSTimer() {
+            clearInterval(sInterval);
+            startSTimer();
+        }
+        
+        if (sNextBtn) sNextBtn.addEventListener("click", () => { sNext(); resetSTimer(); });
+        if (sPrevBtn) sPrevBtn.addEventListener("click", () => { sPrev(); resetSTimer(); });
+        
+        sDots.forEach((dot, idx) => {
+            dot.addEventListener("click", () => {
+                updateShowcase(idx);
+                resetSTimer();
+            });
         });
+        
+        startSTimer();
     }
     
-    if (prevBtn) {
-        prevBtn.addEventListener("click", () => {
-            prevSlide();
-            resetCarouselTimer();
-        });
-    }
-    
-    // Dot indicators clicks
-    dots.forEach((dot, idx) => {
-        dot.addEventListener("click", () => {
-            showSlide(idx);
-            resetCarouselTimer();
-        });
-    });
-    
-    startCarousel();
-
     // ==========================================
     // 2. Click behavior for CTA Button (Smooth scroll)
     // ==========================================
