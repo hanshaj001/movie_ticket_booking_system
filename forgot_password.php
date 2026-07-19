@@ -26,11 +26,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             } else {
                 // Generate 6-digit OTP
                 $otp = sprintf("%06d", mt_rand(1, 999999));
-                $expires_at = date('Y-m-d H:i:s', strtotime('+15 minutes'));
+                $expires_at = date('Y-m-d H:i:s', strtotime('+5 minutes'));
                 
                 // Store OTP
-                $ins_stmt = $conn->prepare("INSERT INTO password_resets (email, otp, expires_at) VALUES (?, ?, ?)");
-                $ins_stmt->bind_param("sss", $email, $otp, $expires_at);
+                $ins_stmt = $conn->prepare("INSERT INTO password_resets (user_id, otp_code, expires_at) VALUES (?, ?, ?)");
+                $ins_stmt->bind_param("iss", $user['user_id'], $otp, $expires_at);
                 
                 if ($ins_stmt->execute()) {
                     // Send Email

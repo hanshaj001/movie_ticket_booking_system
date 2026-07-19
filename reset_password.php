@@ -31,8 +31,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->bind_param("ss", $hashed_password, $email);
         
         if ($stmt->execute()) {
-            // Delete all OTPs for this email to prevent reuse
-            $del_stmt = $conn->prepare("DELETE FROM password_resets WHERE email = ?");
+            // Delete all OTPs for this user to prevent reuse
+            $del_stmt = $conn->prepare("DELETE FROM password_resets WHERE user_id = (SELECT user_id FROM users WHERE email = ?)");
             $del_stmt->bind_param("s", $email);
             $del_stmt->execute();
             

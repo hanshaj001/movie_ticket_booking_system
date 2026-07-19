@@ -31,79 +31,75 @@ for ($i = 0; $i < 7; $i++) {
     ];
 }
 
-// Fetch Carousel Movies
+// Fetch Premium Showcase Movies
 $carousel_movies = [];
-$carousel_sql = "SELECT DISTINCT m.movie_id, m.title, m.banner_url, m.poster_url, m.description, m.movie_format, m.language, m.duration_minutes 
-                 FROM movies m
-                 JOIN shows s ON m.movie_id = s.movie_id
-                 WHERE m.status = 'ACTIVE' 
-                   AND s.show_status = 'ACTIVE'
-                   AND (s.show_date > CURDATE() OR (s.show_date = CURDATE() AND s.show_time > CURTIME()))
-                 ORDER BY m.movie_id DESC LIMIT 5";
+$carousel_sql = "
+    SELECT m.movie_id, m.title, m.banner_url, m.poster_url, m.description, 
+           m.movie_format, m.language, m.duration_minutes,
+           GROUP_CONCAT(DISTINCT g.genre_name SEPARATOR ', ') AS genres
+    FROM movies m
+    JOIN shows s ON m.movie_id = s.movie_id
+    LEFT JOIN movie_genres mg ON m.movie_id = mg.movie_id
+    LEFT JOIN genres g ON mg.genre_id = g.genre_id
+    WHERE m.status = 'ACTIVE' 
+      AND s.show_status = 'ACTIVE'
+      AND (s.show_date > CURDATE() OR (s.show_date = CURDATE() AND s.show_time > CURTIME()))
+    GROUP BY m.movie_id
+    ORDER BY m.movie_id DESC 
+    LIMIT 5
+";
 $carousel_res = mysqli_query($conn, $carousel_sql);
 if ($carousel_res && mysqli_num_rows($carousel_res) > 0) {
     while ($row = mysqli_fetch_assoc($carousel_res)) {
         $banner_path = '';
         if (!empty($row['banner_url'])) {
-            $banner_file = basename($row['banner_url']);
-            $bp = 'Assets/uploads/movie_banners/' . $banner_file;
-            if (file_exists($bp)) $banner_path = $bp;
+            $bp = 'Assets/uploads/movie_banners/' . basename($row['banner_url']);
+            if (file_exists(__DIR__ . '/' . $bp)) $banner_path = $bp;
         }
         if (empty($banner_path) && !empty($row['poster_url'])) {
-            $poster_file = basename($row['poster_url']);
-            $pp = 'Assets/uploads/movie_posters/' . $poster_file;
-            if (file_exists($pp)) $banner_path = $pp;
+            $pp = 'Assets/uploads/movie_posters/' . basename($row['poster_url']);
+            if (file_exists(__DIR__ . '/' . $pp)) $banner_path = $pp;
         }
         if (!empty($banner_path)) {
             $row['banner_url'] = $banner_path;
             $carousel_movies[] = $row;
-            break; // We only need 1 banner for the static hero section
         }
     }
 }
 
-// Fallback banner
+// Fallback logic
 if (empty($carousel_movies)) {
-    // Attempt to find any active movie with a valid banner to display
-    $fallback_sql = "SELECT movie_id, title, banner_url, poster_url, description, movie_format, language, duration_minutes 
-                     FROM movies 
-                     WHERE status = 'ACTIVE' 
-                     ORDER BY movie_id DESC";
+    $fallback_sql = "
+        SELECT m.movie_id, m.title, m.banner_url, m.poster_url, m.description, 
+               m.movie_format, m.language, m.duration_minutes,
+               GROUP_CONCAT(DISTINCT g.genre_name SEPARATOR ', ') AS genres
+        FROM movies m
+        LEFT JOIN movie_genres mg ON m.movie_id = mg.movie_id
+        LEFT JOIN genres g ON mg.genre_id = g.genre_id
+        WHERE m.status = 'ACTIVE' 
+        GROUP BY m.movie_id
+        ORDER BY m.movie_id DESC LIMIT 5
+    ";
     $fallback_res = mysqli_query($conn, $fallback_sql);
     if ($fallback_res && mysqli_num_rows($fallback_res) > 0) {
         while ($row = mysqli_fetch_assoc($fallback_res)) {
             $banner_path = '';
             if (!empty($row['banner_url'])) {
-                $banner_file = basename($row['banner_url']);
-                $bp = 'Assets/uploads/movie_banners/' . $banner_file;
-                if (file_exists($bp)) $banner_path = $bp;
+                $bp = 'Assets/uploads/movie_banners/' . basename($row['banner_url']);
+                if (file_exists(__DIR__ . '/' . $bp)) $banner_path = $bp;
             }
             if (empty($banner_path) && !empty($row['poster_url'])) {
-                $poster_file = basename($row['poster_url']);
-                $pp = 'Assets/uploads/movie_posters/' . $poster_file;
-                if (file_exists($pp)) $banner_path = $pp;
+                $pp = 'Assets/uploads/movie_posters/' . basename($row['poster_url']);
+                if (file_exists(__DIR__ . '/' . $pp)) $banner_path = $pp;
             }
             if (!empty($banner_path)) {
                 $row['banner_url'] = $banner_path;
                 $carousel_movies[] = $row;
-                break;
             }
         }
     }
-    
-    // Hard fallback if no active movies have banners
-    if (empty($carousel_movies)) {
-        $carousel_movies[] = [
-            'movie_id' => 1,
-            'title' => "Experience the Magic of Cinema",
-            'description' => "Browse the latest movies and reserve your favorite seats.",
-            'banner_url' => "",
-            'movie_format' => "2D",
-            'language' => "English",
-            'duration_minutes' => 120
-        ];
-    }
 }
+
 
 // Fetch Currently Showing Movies
 $movies_sql = "
@@ -178,7 +174,7 @@ function renderCard($movie, $selected_date, $isUpcoming = false, $svg_placeholde
     $poster = $movie['poster_url'] ?? '';
     $poster_file = basename($poster);
     $poster_path = 'Assets/uploads/movie_posters/' . $poster_file;
-    if (empty($poster) || !file_exists($poster_path)) {
+    if (empty($poster) || !file_exists(__DIR__ . '/' . $poster_path)) {
         $poster_img_src = $svg_placeholder;
     } else {
         $poster_img_src = $poster_path;
@@ -239,30 +235,72 @@ function renderCard($movie, $selected_date, $isUpcoming = false, $svg_placeholde
 
     <?php include 'Customer/components/navbar.php'; ?>
 
-    <!-- Hero Banner (Carousel emulation) -->
-    <header class="ta-hBanner">
-        <?php $hero = $carousel_movies[0]; ?>
-        <div class="ta-hBanner-wrapper" style="background-image: url('<?= htmlspecialchars(!empty($hero['banner_url']) ? $hero['banner_url'] : $svg_placeholder) ?>');">
-            <div class="ta-fBanner-item-wrapper">
-                
-                <div class="ta-overlay"></div>
-                
-                <ul class="ta-bbody">
-                    <li class="ta-bname">
-                        <a href="#currently-showing"><?= htmlspecialchars($hero['title']) ?></a>
-                    </li>
-                    <li>
-                        <ul class="ta-bbody-f">
-                            <li class="ta-hdetail">
-                                <a href="#currently-showing" class="movie-card-btn"><i class="fa-solid fa-ticket"></i> Buy Tickets</a>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
+    <!-- Premium Hero Showcase -->
+    <?php if(!empty($carousel_movies)): ?>
+    <section class="premium-hero-showcase">
+        <div class="showcase-slider">
+            <?php foreach($carousel_movies as $index => $hero): ?>
+            <div class="showcase-slide <?= $index === 0 ? 'active' : '' ?>">
+                <!-- Background Image -->
+                <div class="showcase-bg">
+                    <img src="<?= htmlspecialchars(!empty($hero['banner_url']) ? $hero['banner_url'] : $svg_placeholder) ?>" alt="<?= htmlspecialchars($hero['title']) ?>">
+                    <div class="showcase-vignette"></div>
+                </div>
 
+                <!-- Content Overlay -->
+                <div class="showcase-content container">
+                    <div class="showcase-info-glass">
+                        <div class="showcase-badges">
+                            <?php if(!empty($hero['movie_format'])): ?>
+                                <span class="s-badge format-badge"><?= htmlspecialchars($hero['movie_format']) ?></span>
+                            <?php endif; ?>
+                            <?php if(!empty($hero['language'])): ?>
+                                <span class="s-badge lang-badge"><?= htmlspecialchars($hero['language']) ?></span>
+                            <?php endif; ?>
+                        </div>
+                        
+                        <h1 class="showcase-title"><?= htmlspecialchars($hero['title']) ?></h1>
+                        
+                        <div class="showcase-meta">
+                            <?php if(!empty($hero['genres'])): ?>
+                                <span class="meta-item"><i class="fa-solid fa-film"></i> <?= htmlspecialchars($hero['genres']) ?></span>
+                            <?php endif; ?>
+                            <?php if(!empty($hero['duration_minutes'])): ?>
+                                <span class="meta-item"><i class="fa-solid fa-clock"></i> <?= $hero['duration_minutes'] ?> min</span>
+                            <?php endif; ?>
+                        </div>
+
+                        <div class="showcase-actions">
+                            <a href="Customer/movie_details.php?movie_id=<?= $hero['movie_id'] ?>" class="btn-showcase-primary">
+                                <i class="fa-solid fa-ticket"></i> Book Now
+                            </a>
+                            <a href="Customer/movie_details.php?movie_id=<?= $hero['movie_id'] ?>" class="btn-showcase-secondary">
+                                <i class="fa-solid fa-circle-info"></i> Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <?php endforeach; ?>
+        </div>
+
+        <?php if(count($carousel_movies) > 1): ?>
+        <!-- Custom Controls -->
+        <div class="showcase-controls container">
+            <div class="showcase-nav">
+                <button id="showcase-prev" class="s-nav-btn"><i class="fa-solid fa-arrow-left-long"></i></button>
+                <div class="showcase-pagination">
+                    <?php foreach($carousel_movies as $index => $hero): ?>
+                        <span class="s-dot <?= $index === 0 ? 'active' : '' ?>" data-index="<?= $index ?>"></span>
+                    <?php endforeach; ?>
+                </div>
+                <button id="showcase-next" class="s-nav-btn"><i class="fa-solid fa-arrow-right-long"></i></button>
             </div>
         </div>
-    </header>
+        <?php endif; ?>
+    </section>
+    <?php endif; ?>
+
 
     <!-- Main Content -->
     <main class="ta-container-template">
@@ -328,6 +366,6 @@ function renderCard($movie, $selected_date, $isUpcoming = false, $svg_placeholde
     </main>
 
     <?php include 'Customer/components/footer.php'; ?>
-
+    <script src="Assets/js/index.js"></script>
 </body>
 </html>

@@ -35,96 +35,244 @@ a {
     padding: 0 15px;
 }
 
-/* -----------------------------
-   Hero Banner Structure
-   ----------------------------- */
-.ta-hBanner {
+/* =========================================
+   PREMIUM HERO SHOWCASE
+   ========================================= */
+.premium-hero-showcase {
     position: relative;
     width: 100%;
+    height: 75vh;
+    min-height: 550px;
+    background-color: #050510;
     overflow: hidden;
+    margin-bottom: 40px;
 }
 
-.ta-hBanner-wrapper {
-    position: relative;
-    width: 100%;
-    height: 60vh;
-    min-height: 400px;
-    background-size: cover;
-    background-position: right 30%; /* Focus on the right side so it's not hidden by left text */
-    background-repeat: no-repeat;
-}
-
-.ta-fBanner-item-wrapper {
-    position: relative;
+.showcase-slider, .showcase-slide {
+    position: absolute;
     width: 100%;
     height: 100%;
-}
-
-.ta-overlay {
-    position: absolute;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
-    /* Fade out much quicker so the right side of the image is clearly visible */
-    background: linear-gradient(90deg, rgba(10,10,10,0.95) 0%, rgba(10,10,10,0.7) 25%, rgba(10,10,10,0.2) 50%, transparent 100%);
+}
+
+.showcase-slide {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.8s;
     z-index: 1;
 }
-
-.ta-bbody {
-    position: absolute;
-    top: 50%;
-    left: 5%;
-    transform: translateY(-50%);
+.showcase-slide.active {
+    opacity: 1;
+    visibility: visible;
     z-index: 2;
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    max-width: 600px;
 }
 
-.ta-bname a {
-    color: #fff;
-    font-size: 3.5rem;
+/* Background & Vignette */
+.showcase-bg {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0; left: 0;
+}
+.showcase-bg img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 20%;
+    transform: scale(1.1);
+    transition: transform 6s ease-out;
+}
+.showcase-slide.active .showcase-bg img {
+    transform: scale(1);
+}
+.showcase-vignette {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0; left: 0;
+    /* Dark gradient on left, fading to right, and dark on bottom */
+    background: linear-gradient(90deg, rgba(5,5,16,1) 0%, rgba(5,5,16,0.85) 35%, rgba(5,5,16,0.1) 100%),
+                linear-gradient(0deg, rgba(5,5,16,1) 0%, transparent 40%);
+}
+
+/* Content Container */
+.showcase-content {
+    position: relative;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    z-index: 3;
+    padding-top: 60px; /* Accounts for navbar */
+}
+
+/* Glassmorphism Info Panel */
+.showcase-info-glass {
+    max-width: 550px;
+    padding: 40px;
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    transform: translateY(30px);
+    opacity: 0;
+    transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) 0.3s, opacity 0.8s ease 0.3s;
+}
+.showcase-slide.active .showcase-info-glass {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+/* Badges */
+.showcase-badges {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+.s-badge {
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 11px;
     font-weight: 800;
-    line-height: 1.2;
+    letter-spacing: 1px;
     text-transform: uppercase;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-    margin-bottom: 20px;
-    display: block;
 }
-
-.ta-bname a:hover {
-    color: var(--accent);
-}
-
-.ta-bbody-f {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
-.ta-hdetail a {
-    background: var(--accent-gradient);
+.format-badge {
+    background: var(--accent);
     color: #fff;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 12px 24px;
-    border-radius: 12px;
-    border: none;
-    transition: all 0.3s;
-    box-shadow: 0 6px 20px rgba(255, 77, 45, 0.25);
+    box-shadow: 0 4px 10px rgba(255,77,45,0.4);
+}
+.lang-badge {
+    background: rgba(255,255,255,0.1);
+    color: #e0e0e0;
+    border: 1px solid rgba(255,255,255,0.2);
 }
 
-.ta-hdetail a:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-hover);
+/* Title & Text */
+.showcase-title {
+    font-size: 3.5rem;
+    font-weight: 900;
+    line-height: 1.1;
+    color: #ffffff;
+    margin: 0 0 16px 0;
+    text-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    background: linear-gradient(135deg, #fff 0%, #b0b0c0 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
+.showcase-meta {
+    display: flex;
+    gap: 20px;
+    font-size: 13px;
+    color: #b0b0c0;
+    margin-bottom: 20px;
+    font-weight: 600;
+}
+.meta-item i {
+    color: var(--accent);
+    margin-right: 6px;
+}
+.showcase-desc {
+    font-size: 15px;
+    line-height: 1.6;
+    color: #d0d0e0;
+    margin-bottom: 30px;
+}
+
+/* Actions */
+.showcase-actions {
+    display: flex;
+    gap: 16px;
+}
+.btn-showcase-primary, .btn-showcase-secondary {
+    padding: 14px 28px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 14px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+.btn-showcase-primary {
+    background: var(--gradient-primary);
+    color: #fff;
+    box-shadow: 0 8px 25px rgba(255,77,45,0.3);
+}
+.btn-showcase-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(255,77,45,0.5);
+}
+.btn-showcase-secondary {
+    background: rgba(255,255,255,0.05);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+.btn-showcase-secondary:hover {
+    background: rgba(255,255,255,0.1);
+    transform: translateY(-3px);
+}
+
+/* Controls */
+.showcase-controls {
+    position: absolute;
+    bottom: 40px;
+    left: 0; right: 0;
+    z-index: 5;
+}
+.showcase-nav {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+.s-nav-btn {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #fff;
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(4px);
+}
+.s-nav-btn:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    transform: scale(1.1);
+}
+.showcase-pagination {
+    display: flex;
+    gap: 12px;
+}
+.s-dot {
+    width: 30px; height: 4px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.s-dot.active {
+    background: var(--accent);
+    width: 50px;
+    box-shadow: 0 0 10px var(--accent);
+}
+
+/* Mobile Adjustments */
+@media (max-width: 768px) {
+    .premium-hero-showcase { height: 85vh; }
+    .showcase-title { font-size: 2.5rem; }
+    .showcase-info-glass { padding: 24px; background: rgba(5,5,16,0.6); margin: 0 15px; }
+    .showcase-vignette { background: linear-gradient(180deg, transparent 0%, rgba(5,5,16,1) 90%); }
+    .showcase-content { align-items: flex-end; padding-bottom: 100px; }
+    .showcase-actions { flex-direction: column; }
+    .showcase-controls { justify-content: center; display: flex; }
+}
+
 
 
 /* -----------------------------

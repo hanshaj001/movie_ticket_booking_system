@@ -19,7 +19,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $error = "Please enter the 6-digit OTP.";
     } else {
         // Verify OTP from database
-        $stmt = $conn->prepare("SELECT reset_id, expires_at FROM password_resets WHERE email = ? AND otp = ? ORDER BY created_at DESC LIMIT 1");
+        $stmt = $conn->prepare("SELECT pr.reset_id, pr.expires_at, pr.is_used FROM password_resets pr JOIN users u ON pr.user_id = u.user_id WHERE u.email = ? AND pr.otp_code = ? AND pr.is_used = 0 ORDER BY pr.created_at DESC LIMIT 1");
         $stmt->bind_param("ss", $email, $otp_input);
         $stmt->execute();
         $result = $stmt->get_result();
