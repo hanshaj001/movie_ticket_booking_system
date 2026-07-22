@@ -39,7 +39,8 @@ if (empty($seat_ids)) {
 
 // Verify booking exists
 $stmt = $conn->prepare("
-    SELECT b.booking_id, b.booking_status, b.show_id, s.movie_id
+    SELECT b.booking_id, b.booking_status, b.show_id, s.movie_id,
+           s.show_date, s.show_time
     FROM bookings b
     JOIN shows s ON b.show_id = s.show_id
     WHERE b.booking_id = ?
@@ -59,6 +60,14 @@ $stmt->close();
 // Check booking status
 if (!in_array($booking['booking_status'], ['CONFIRMED', 'PARTIALLY_CANCELLED'])) {
     echo json_encode(['success' => false, 'message' => 'This booking is already fully cancelled.']);
+    exit;
+}
+
+// Check if the show has already completed
+$show_datetime = $booking['show_date'] . ' ' . $booking['show_time'];
+$show_ts = strtotime($show_datetime);
+if ($show_ts <= time()) {
+    echo json_encode(['success' => false, 'message' => 'Cancellation failed. The show has already been completed.']);
     exit;
 }
 

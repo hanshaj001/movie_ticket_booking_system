@@ -2,7 +2,7 @@
 The Movie Ticket Booking System is a web-based application developed to manage movie scheduling, seat booking, and booking records for a single cinema with multiple movie screens. The system provides separate interfaces for customers and administrators using Role-Based Access Control (RBAC).
 Customers can create an account, log in, browse available movies, view show schedules, select available seats, confirm bookings, view booking history, and cancel eligible bookings (either fully or partially). A booking session is created when a customer selects the first available seat. The session remains active for five minutes. During the active session, selected seats are temporarily locked so that they cannot be selected by another customer. If the booking is confirmed before the session expires, the seats are marked as sold. If the session expires, the temporary seat locks are removed and the seats become available again.
 Administrators manage movies, genres, show schedules, ticket prices, and booking records through the administration panel. Administrators also have the elevated privilege to cancel any customer's full or partial booking at any time before a show starts. When a new show is created, the system automatically creates seat records for that show based on the seat layout of the selected screen.
-The application is developed using HTML, CSS, JavaScript, AJAX, PHP, and MySQL. The database follows a normalized relational design consisting of fourteen tables, including separate tables for users, roles, movies, genres, shows, bookings, booking sessions, and seat locks.
+The application is developed using HTML, CSS, JavaScript, AJAX, PHP, and MySQL. The database follows a normalized relational design consisting of seventeen tables, including separate tables for users, roles, movies, genres, shows, bookings, booking sessions, and seat locks.
 2. System Objectives
 Main Objective
 To develop a web-based movie ticket booking system that allows customers to book movie tickets and enables administrators to manage movies, shows, and bookings within a single cinema.
@@ -53,6 +53,7 @@ Select available seats.
 Confirm bookings.
 View booking history.
 Cancel eligible bookings (full or partial seat cancellations).
+Request password reset via OTP.
 Log out.
 Administrator
 Log in.
@@ -136,6 +137,8 @@ Allow user login.
 Validate user credentials.
 Assign system roles using Role-Based Access Control.
 Prevent blocked users from logging in.
+Allow users to request password reset via email OTP.
+Allow users to reset their forgotten passwords.
 Movie Management
 The system shall:
 Add movies.
@@ -191,9 +194,10 @@ Registration
 Login
 User authentication
 Role assignment
+Password recovery (OTP verification and reset)
 Customer Module
 Responsible for:
-Movie browsing
+Movie browsing (featuring a Premium Hero Showcase)
 Viewing movie details
 Viewing shows
 Seat selection
@@ -333,13 +337,13 @@ Validate privileges:
 If Customer: ensure > 30 minutes remain.
 If Administrator: ensure show has not yet started.
 Process the voided seats:
-Update the item_status in Booking_Details to CANCELLED for the selected seats.
+Update the seat_status in Booking_Details to CANCELLED for the selected seats.
 Update each associated seat in Show_Seats from SOLD to AVAILABLE.
 If all seats in the booking are cancelled:
 Update the master Bookings status to CANCELLED.
 Store the cancellation time.
 If only partial seats are cancelled (Partial Cancellation):
-Keep the master Bookings status as CONFIRMED.
+Change the master Bookings status to PARTIALLY_CANCELLED.
 Recalculate and update total_seats and total_amount in the Bookings table.
 Generate a negative transaction record in the Ledger for the refunded amount.
 11. Seat Booking Lifecycle
@@ -403,13 +407,15 @@ If conditions are not satisfied:
 The cancellation request is rejected.
 No database records are modified.
 15. Database Overview
-The Movie Ticket Booking System uses a normalized relational database consisting of fourteen tables.
+The Movie Ticket Booking System uses a normalized relational database consisting of seventeen tables.
 The tables are grouped according to their purpose.
-User Management: Roles, Users, User_Roles
+User Management: Roles, Users, User_Roles, Password_Resets
 Movie Management: Movies, Genres, Movie_Genres
 Screen Management: Screens, Seats
 Show Management: Shows, Show_Seats
 Booking Management: Booking_Sessions, Seat_Locks, Bookings, Booking_Details
+Financial Management: Ledger
+Customer Support: Contact_Messages
 The database separates static data from transactional data.
 Static data includes movie information, genres, screens, and seat layouts.
 Transactional data includes shows, booking sessions, seat locks, bookings, and booking details.
@@ -417,6 +423,7 @@ Transactional data includes shows, booking sessions, seat locks, bookings, and b
 Roles: Stores the available system roles (ADMIN, CUSTOMER).
 Users: Stores user account information (Full name, Email, Phone, Password hash, Account status, Last login).
 User_Roles: Associates users with system roles. A user may have one or more roles.
+Password_Resets: Stores temporary OTP codes and expiry times for user password recovery.
 Movies: Stores movie information (Title, Description, Duration, Language, Release date, Format, Poster, Banner, Status).
 Genres: Stores the available movie genres (Action, Comedy, Horror, Drama).
 Movie_Genres: Associates movies with genres (many-to-many).
@@ -427,7 +434,7 @@ Show_Seats: Stores the dynamic seat availability state for every show (AVAILABLE
 Booking_Sessions: Stores temporary booking sessions (User, Show, Start, Expiry, Status).
 Seat_Locks: Stores seats temporarily reserved during an active session. Links one session with one seat.
 Bookings: Stores confirmed and fully cancelled master bookings (Customer, Show, Total seats, Total amount, Booking time, Status, Cancellation time).
-Booking_Details: Stores individual seats associated with each booking. Includes item_status to track partial cancellations.
+Booking_Details: Stores individual seats associated with each booking. Includes seat_status and cancellation_time to support partial seat cancellation.
 Ledger: Tracks individual financial changes (BOOKING, CANCELLATION) to provide a complete audit trail.
 17. Database Relationships
 One role can be assigned to many users.
@@ -443,6 +450,10 @@ One booking session belongs to one show.
 One booking session can contain multiple seat locks.
 One booking contains multiple booking details.
 One show can have multiple bookings.
+One user can have multiple contact messages.
+One booking can have multiple ledger entries.
+One movie can have multiple ledger entries.
+One show can have multiple ledger entries.
 18. Conclusion
 The Movie Ticket Booking System provides a structured process for managing movies, show schedules, seat availability, and customer bookings for a single cinema.
 The application separates static seat layouts from show-specific seat availability, allowing the same screen layout to be reused for multiple shows. Temporary seat locking during booking sessions prevents multiple customers from confirming the same seat at the same time. Booking sessions automatically expire after five minutes if the booking is not completed, allowing temporarily reserved seats to become available again.
@@ -654,7 +665,6 @@ CREATE TABLE booking_details (
    booking_id INT NOT NULL,
    show_seat_id INT NOT NULL,
    ticket_price DECIMAL(10,2) NOT NULL,
-   item_status ENUM('CONFIRMED', 'CANCELLED') DEFAULT 'CONFIRMED',
    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
    FOREIGN KEY (booking_id) REFERENCES bookings(booking_id) ON DELETE CASCADE,
    FOREIGN KEY (show_seat_id) REFERENCES show_seats(show_seat_id) ON DELETE CASCADE,
@@ -695,8 +705,18 @@ ALTER TABLE booking_details
 ALTER TABLE booking_details 
   ADD COLUMN cancellation_time DATETIME NULL;
 
-
-
+-- =========================================================
+-- PASSWORD RESETS TABLE
+-- =========================================================
+CREATE TABLE password_resets (
+    reset_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    otp_code VARCHAR(6) NOT NULL,
+    expires_at DATETIME NOT NULL,
+    is_used TINYINT(1) DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
 
 CREATE TABLE contact_messages (
 
@@ -797,7 +817,7 @@ A booking (or specific seats within a booking) may be cancelled by a Customer on
 A booking (or specific seats within a booking) may be cancelled by an Administrator at any time before the scheduled show time.
 When a booking/seat is cancelled:
 If a full cancellation occurs, the master booking status changes to CANCELLED.
-If a partial cancellation occurs, the master booking status remains CONFIRMED, but the total_amount and total_seats are recalculated, and the specific cancelled line items in Booking_Details are marked as CANCELLED.
+If a partial cancellation occurs, the master booking status changes to PARTIALLY_CANCELLED, the total_amount and total_seats are recalculated, and the specific cancelled line items in Booking_Details are marked as CANCELLED.
 Previously booked/cancelled seats in the show layout change from SOLD to AVAILABLE.
 A corresponding entry is posted to the Ledger.
 BR-11 Seat Availability

@@ -3,3 +3,7 @@
 
 # Ignore composer dependencies
 /vendor/
+
+# Ignore uploaded user content (like movie posters)
+Assets/uploads/*
+!Assets/uploads/.gitkeep

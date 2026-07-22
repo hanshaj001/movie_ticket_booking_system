@@ -16,7 +16,8 @@ if (isset($_GET['booking_id']) && is_numeric($_GET['booking_id'])) {
     
     // Ensure the booking belongs to the logged-in user and fetch details
     $check_query = "
-        SELECT b.booking_status, b.show_id, b.total_amount, s.movie_id
+        SELECT b.booking_status, b.show_id, b.total_amount, s.movie_id,
+               s.show_date, s.show_time
         FROM bookings b
         JOIN shows s ON b.show_id = s.show_id
         WHERE b.booking_id = $booking_id AND b.user_id = $user_id
@@ -28,6 +29,14 @@ if (isset($_GET['booking_id']) && is_numeric($_GET['booking_id'])) {
         
         // Only cancel if it's currently CONFIRMED
         if ($booking['booking_status'] === 'CONFIRMED') {
+            // Check if the show has already completed
+            $show_datetime = $booking['show_date'] . ' ' . $booking['show_time'];
+            $show_ts = strtotime($show_datetime);
+            if ($show_ts <= time()) {
+                header("Location: booking_history.php?cancel=show_completed");
+                exit();
+            }
+
             mysqli_begin_transaction($conn);
             try {
                 $update_query = "

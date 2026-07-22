@@ -339,9 +339,9 @@ while ($row = @mysqli_fetch_assoc($movie_revenue_result)) {
                         <?php if(!empty($poster_url) && file_exists($poster_url)): ?>
                             <img src="<?= htmlspecialchars($poster_url) ?>" alt="<?= htmlspecialchars($show['title']) ?>">
                         <?php else: ?>
-                            <div class="movie-poster-fallback" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; background: #ff4d2d; color: #ffffff; font-size: 2.5rem; gap: 10px; border-radius: 8px;">
-                                <i class="fa-solid fa-clapperboard"></i>
-                                <span style="font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">No Poster</span>
+                            <div class="movie-poster-fallback" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; background: #f8f9fc; color: #9494a8; font-size: 2.5rem; gap: 10px; border-radius: 8px;">
+                                <i class="fa-solid fa-film"></i>
+                                <span style="font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">No Image Available</span>
                             </div>
                         <?php endif; ?>
                     </div>

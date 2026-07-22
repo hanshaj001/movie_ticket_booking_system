@@ -408,8 +408,9 @@ $qs = http_build_query($qs_array);
                 <div id="exportStepSetup">
                     <div class="form-group-modal">
                         <label for="exportLimitRows">How many rows would you like to export?</label>
-                        <input type="number" id="exportLimitRows" placeholder="e.g. 500 (Leave blank for all)" min="1">
-                        <p class="input-hint">Leave blank to export all matching records based on your active filters.</p>
+                        <input type="number" id="exportLimitRows" placeholder="e.g. 500 (Leave blank for all)" min="1" data-total="<?= $total_records ?>">
+                        <span id="exportLimitError" style="color: #dc2626; font-size: 12px; display: none; margin-top: 5px; font-weight: 500;"></span>
+                        <p class="input-hint">Leave blank to export all matching records based on your active filters (<?= $total_records ?> available).</p>
                     </div>
                 </div>
 
@@ -472,6 +473,9 @@ $qs = http_build_query($qs_array);
         // Close Modal
         function closeModal() {
             exportModal.style.display = "none";
+            const exportLimitError = document.getElementById("exportLimitError");
+            if(exportLimitError) exportLimitError.style.display = "none";
+            exportLimitRows.style.borderColor = "";
         }
         
         btnCloseExportModal.addEventListener("click", closeModal);
@@ -486,6 +490,43 @@ $qs = http_build_query($qs_array);
 
         // Confirm & Execute Export
         btnConfirmExport.addEventListener("click", function() {
+            const limitVal = exportLimitRows.value.trim();
+            const exportLimitError = document.getElementById("exportLimitError");
+            
+            // Reset error state
+            exportLimitError.style.display = "none";
+            exportLimitRows.style.borderColor = "";
+
+            if (limitVal !== "") {
+                const limitNum = Number(limitVal);
+                const totalAvailable = Number(exportLimitRows.getAttribute("data-total")) || 0;
+                
+                if (isNaN(limitNum)) {
+                    exportLimitError.textContent = "Please enter a valid numeric value.";
+                    exportLimitError.style.display = "block";
+                    exportLimitRows.style.borderColor = "#dc2626";
+                    return;
+                }
+                if (limitNum === 0) {
+                    exportLimitError.textContent = "0 record cannot be exported. Please select a positive number.";
+                    exportLimitError.style.display = "block";
+                    exportLimitRows.style.borderColor = "#dc2626";
+                    return;
+                }
+                if (limitNum < 0) {
+                    exportLimitError.textContent = "Negative numbers are not allowed. Please select a positive number.";
+                    exportLimitError.style.display = "block";
+                    exportLimitRows.style.borderColor = "#dc2626";
+                    return;
+                }
+                if (limitNum > totalAvailable) {
+                    exportLimitError.textContent = "Requested amount exceeds available records (" + totalAvailable + "). Please enter a valid number or leave blank.";
+                    exportLimitError.style.display = "block";
+                    exportLimitRows.style.borderColor = "#dc2626";
+                    return;
+                }
+            }
+
             const urlParams = new URLSearchParams();
             
             const movieSelect = document.getElementById("filter_movie");
@@ -505,8 +546,6 @@ $qs = http_build_query($qs_array);
             const sortSelect = document.querySelector("select[name='sort']");
             const sortVal = sortSelect.value;
             const sortText = sortSelect.options[sortSelect.selectedIndex].text;
-            
-            const limitVal = exportLimitRows.value.trim();
             
             if (movieVal) urlParams.set("movie_id", movieVal);
             if (showVal) urlParams.set("show_id", showVal);
@@ -548,6 +587,12 @@ $qs = http_build_query($qs_array);
                 .then(data => {
                     if (data.error) {
                         alert("Error: " + data.error);
+                        closeModal();
+                        return;
+                    }
+                    
+                    if (data.length === 0) {
+                        alert("No data available to export based on your selected filters.");
                         closeModal();
                         return;
                     }

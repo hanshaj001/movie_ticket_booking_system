@@ -165,8 +165,8 @@ while ($row = $up_res->fetch_assoc()) {
     $upcoming_movies[] = $row;
 }
 
-// Safe SVG Placeholder to prevent onerror loop
-$svg_placeholder = "data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22300%22%20height%3D%22450%22%3E%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20fill%3D%22%23ff4d2d%22%2F%3E%3Ctext%20fill%3D%22%23ffffff%22%20font-family%3D%22sans-serif%22%20font-size%3D%2224%22%20dy%3D%2210.5%22%20font-weight%3D%22bold%22%20x%3D%2250%25%22%20y%3D%2250%25%22%20text-anchor%3D%22middle%22%3ENo%20Poster%3C%2Ftext%3E%3C%2Fsvg%3E";
+// Safe SVG Placeholder (Image Icon)
+$svg_placeholder = "data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20512%20512%22%20width%3D%22300%22%20height%3D%22450%22%3E%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20fill%3D%22%23e0e0e0%22%2F%3E%3Cpath%20fill%3D%22%239e9e9e%22%20d%3D%22M448%2080c8.8%200%2016%207.2%2016%2016V415.8l-5-6.5-136-176c-4.5-5.9-11.6-9.3-19-9.3s-14.4%203.4-19%209.3L202%20340.7l-30.5-42.7C167%20291.7%20159.8%20288%20152%20288s-15%203.7-19.5%2010l-80%20112L48%20416V96c0-8.8%207.2-16%2016-16H448zM64%2032C28.7%2032%200%2060.7%200%2096V416c0%2035.3%2028.7%2064%2064%2064H448c35.3%200%2064-28.7%2064-64V96c0-35.3-28.7-64-64-64H64zm80%20192a48%2048%200%201%200%200-96%2048%2048%200%201%200%200%2096z%22%2F%3E%3C%2Fsvg%3E";
 
 function renderCard($movie, $selected_date, $isUpcoming = false, $svg_placeholder) {
     $details_url = "Customer/movie_details.php?movie_id=" . urlencode($movie['movie_id']) . "&date=" . urlencode($selected_date);
@@ -188,11 +188,19 @@ function renderCard($movie, $selected_date, $isUpcoming = false, $svg_placeholde
     <div class="ta-movie-item">
         <div class="ta-showing-img-wrapper">
             <div class="ta-imageWrapper">
-                <img src="<?= htmlspecialchars($poster_img_src) ?>" alt="<?= htmlspecialchars($title) ?>" onerror="this.onerror=null; this.src='<?= $svg_placeholder ?>';">
-                <span class="ta-movie-grade"><?= htmlspecialchars($rating_badge) ?></span>
-                <?php if ($isUpcoming): ?>
-                    <div class="movie-tag"><span>Advance Purchase</span></div>
+                <?php if (empty($poster) || !file_exists(__DIR__ . '/' . $poster_path)): ?>
+                    <div class="no-image-fallback" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #f0f0f5; color: #9494a8; gap: 8px;">
+                        <i class="fa-solid fa-film" style="font-size: 40px;"></i>
+                        <span style="font-size: 11px; font-weight: 600;">No Image Available</span>
+                    </div>
+                <?php else: ?>
+                    <img src="<?= htmlspecialchars($poster_img_src) ?>" alt="<?= htmlspecialchars($title) ?>" onerror="this.onerror=null; this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="no-image-fallback" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none; flex-direction: column; align-items: center; justify-content: center; background: #f0f0f5; color: #9494a8; gap: 8px;">
+                        <i class="fa-solid fa-film" style="font-size: 40px;"></i>
+                        <span style="font-size: 11px; font-weight: 600;">No Image Available</span>
+                    </div>
                 <?php endif; ?>
+                <span class="ta-movie-grade"><?= htmlspecialchars($rating_badge) ?></span>
             </div>
             <ul class="ta-overView">
                 <li class="ta-hview"><a href="<?= htmlspecialchars($details_url) ?>"><i class="fa-solid fa-play"></i> Play Trailer</a></li>
@@ -243,7 +251,18 @@ function renderCard($movie, $selected_date, $isUpcoming = false, $svg_placeholde
             <div class="showcase-slide <?= $index === 0 ? 'active' : '' ?>">
                 <!-- Background Image -->
                 <div class="showcase-bg">
-                    <img src="<?= htmlspecialchars(!empty($hero['banner_url']) ? $hero['banner_url'] : $svg_placeholder) ?>" alt="<?= htmlspecialchars($hero['title']) ?>">
+                    <?php if (empty($hero['banner_url']) || !file_exists('Assets/uploads/movie_banners/' . basename($hero['banner_url']))): ?>
+                        <div style="width:100%; height:100%; background: #f8f9fc; display:flex; flex-direction:column; align-items:center; justify-content:center; color: #9494a8;">
+                            <i class="fa-solid fa-film" style="font-size: 48px;"></i>
+                            <span style="margin-top:10px; font-weight:600; font-size: 18px;">No Image Available</span>
+                        </div>
+                    <?php else: ?>
+                        <img src="Assets/uploads/movie_banners/<?= htmlspecialchars(basename($hero['banner_url'])) ?>" alt="<?= htmlspecialchars($hero['title']) ?>" onerror="this.onerror=null; this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div style="display:none; width:100%; height:100%; background: #f8f9fc; flex-direction:column; align-items:center; justify-content:center; color: #9494a8;">
+                            <i class="fa-solid fa-film" style="font-size: 48px;"></i>
+                            <span style="margin-top:10px; font-weight:600; font-size: 18px;">No Image Available</span>
+                        </div>
+                    <?php endif; ?>
                     <div class="showcase-vignette"></div>
                 </div>
 

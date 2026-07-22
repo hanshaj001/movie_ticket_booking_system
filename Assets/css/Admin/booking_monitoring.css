@@ -250,7 +250,7 @@ td{
     inset: 0;
     background: rgba(0,0,0,0.5);
     backdrop-filter: blur(3px);
-    z-index: 1000;
+    z-index: 2500;
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.3s, visibility 0.3s;
@@ -269,11 +269,12 @@ td{
     background: #ffffff;
     border-radius: 16px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-    z-index: 1001;
+    z-index: 2501;
     width: 90%;
     max-width: 450px;
-    max-height: 80vh;
-    overflow-y: auto;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
     opacity: 0;
     visibility: hidden;
     transition: all 0.3s ease;
@@ -322,6 +323,8 @@ td{
 
 .modal-body {
     padding: 20px 24px 24px;
+    overflow-y: auto;
+    flex: 1;
 }
 
 .select-all-row {
@@ -429,7 +432,7 @@ td{
     border-radius: 8px;
     color: white;
     font-weight: 600;
-    z-index: 2000;
+    z-index: 3000;
     opacity: 0;
     transform: translateY(20px);
     transition: all 0.3s ease;

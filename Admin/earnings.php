@@ -225,8 +225,9 @@ $qs = http_build_query($qs_array);
                             ?>
                                 <img src="<?= htmlspecialchars("../Assets/uploads/movie_posters/" . $movie['poster_url']) ?>" alt="<?= htmlspecialchars($movie['title']) ?>">
                             <?php else: ?>
-                                <div class="poster-placeholder">
+                                <div class="poster-placeholder" style="display: flex; flex-direction: column; gap: 8px;">
                                     <i class="fas fa-film"></i>
+                                    <span style="font-size: 12px; font-weight: 600;">No Image Available</span>
                                 </div>
                             <?php endif; ?>
                             <span class="movie-status <?= strtolower($movie['status']) ?>"><?= htmlspecialchars($movie['status']) ?></span>

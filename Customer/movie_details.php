@@ -169,6 +169,14 @@ if ($shows_list_result && mysqli_num_rows($shows_list_result) > 0) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="icon" type="image/jpeg" href="../favicon.jpeg">
     <link rel="stylesheet" href="../Assets/css/Customer/movie_details.css?v=<?= time(); ?>">
+    <script>
+        // Image fallback: called from onerror on <img> tags
+        function showFallback(imgElement) {
+            imgElement.style.display = 'none';
+            const fallback = imgElement.nextElementSibling;
+            if (fallback) fallback.style.display = 'flex';
+        }
+    </script>
 </head>
 <body class="movie-details-body">
 
@@ -506,4 +514,4 @@ if ($shows_list_result && mysqli_num_rows($shows_list_result) > 0) {
     <script src="../Assets/js/Customer/movie_details.js"></script>
 </body>
 </html>
-<?php mysqli_close($conn); ?>   
+<?php mysqli_close($conn); ?>
