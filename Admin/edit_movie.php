@@ -215,9 +215,19 @@ $description = $form_data['description'] ?? $row['description'];
 
                 <?php if (!empty($row['poster_url'])) { ?>
                     <br>
-                    <img src="../Assets/uploads/movie_posters/<?php echo htmlspecialchars($row['poster_url']); ?>"
-                         width="120"
-                         alt="Movie Poster">
+                    <?php
+                    $poster_path = "../Assets/uploads/movie_posters/" . $row['poster_url'];
+                    if (file_exists($poster_path)):
+                    ?>
+                        <img src="<?= htmlspecialchars($poster_path) ?>"
+                             width="120"
+                             alt="Movie Poster">
+                    <?php else: ?>
+                        <div class="poster-placeholder" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 180px; width: 120px; background: #f8f9fc; color: #9494a8; gap: 8px;">
+                            <i class="fas fa-film" style="font-size: 2rem;"></i>
+                            <span style="font-size: 12px; font-weight: 600; text-transform: uppercase; text-align: center;">No Image</span>
+                        </div>
+                    <?php endif; ?>
                 <?php } ?>
             </div>
 

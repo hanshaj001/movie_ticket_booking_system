@@ -378,7 +378,17 @@ $movieQuery = $conn->query("
     <?php while ($movie = $movieQuery->fetch_assoc()) : ?>
         <div class="movie-card">
             <div class="movie-poster">
-                <img src="../Assets/uploads/movie_posters/<?= htmlspecialchars($movie['poster_url']); ?>" alt="<?= htmlspecialchars($movie['title']); ?>">
+                <?php
+                $poster_path = "../Assets/uploads/movie_posters/" . $movie['poster_url'];
+                if (!empty($movie['poster_url']) && file_exists($poster_path)): 
+                ?>
+                    <img src="<?= htmlspecialchars($poster_path) ?>" alt="<?= htmlspecialchars($movie['title']); ?>">
+                <?php else: ?>
+                    <div class="poster-placeholder" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; background: #f8f9fc; color: #9494a8; gap: 8px;">
+                        <i class="fas fa-film" style="font-size: 2rem;"></i>
+                        <span style="font-size: 12px; font-weight: 600; text-transform: uppercase;">No Image Available</span>
+                    </div>
+                <?php endif; ?>
             </div>
 
             <div class="movie-content">

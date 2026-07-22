@@ -73,6 +73,7 @@ while ($row = mysqli_fetch_assoc($result)) {
     $show_ts = strtotime($show_datetime);
     $remaining_minutes = ($show_ts - time()) / 60;
     $row['can_cancel'] = ($remaining_minutes > 30) ? 1 : 0;
+    $row['show_completed'] = ($show_ts <= time()) ? 1 : 0;
 
     // Count confirmed seats
     $confirmed_count = 0;
@@ -219,12 +220,21 @@ while ($row = mysqli_fetch_assoc($result)) {
                                     <td data-label="Action">
 
                                         <?php if ($booking['confirmed_count'] > 0 && in_array($status, ['CONFIRMED', 'PARTIALLY_CANCELLED'])): ?>
-                                            <button class="btn-cancel-seats"
-                                                    data-booking-id="<?php echo $booking['booking_id']; ?>"
-                                                    data-can-cancel="<?php echo $booking['can_cancel']; ?>">
-                                                <i class="fa-solid fa-xmark"></i>
-                                                Cancel Seats
-                                            </button>
+                                            <?php if ($booking['show_completed']): ?>
+                                                <button class="btn-cancel-seats" disabled
+                                                        style="opacity: 0.5; cursor: not-allowed;"
+                                                        title="Show has already completed">
+                                                    <i class="fa-solid fa-ban"></i>
+                                                    Show Completed
+                                                </button>
+                                            <?php else: ?>
+                                                <button class="btn-cancel-seats"
+                                                        data-booking-id="<?php echo $booking['booking_id']; ?>"
+                                                        data-can-cancel="<?php echo $booking['can_cancel']; ?>">
+                                                    <i class="fa-solid fa-xmark"></i>
+                                                    Cancel Seats
+                                                </button>
+                                            <?php endif; ?>
                                         <?php elseif ($status === 'CANCELLED'): ?>
                                             <span style="color: var(--text-muted); font-size: 0.85rem;">—</span>
                                         <?php endif; ?>

@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (shareBtn && shareMsg) {
         shareBtn.addEventListener('click', async () => {
             const url = window.location.href;
-            
+
             try {
                 if (navigator.clipboard && navigator.clipboard.writeText) {
                     await navigator.clipboard.writeText(url);
@@ -64,15 +64,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     document.execCommand('copy');
                     document.body.removeChild(tmp);
                 }
-                
+
                 // Show success message
                 shareMsg.style.display = 'inline-flex';
-                
+
                 // Hide message after 2.5 seconds
                 setTimeout(() => {
                     shareMsg.style.display = 'none';
                 }, 2500);
-                
+
             } catch (err) {
                 console.error('Failed to copy URL:', err);
                 alert('Failed to copy URL. Please try again.');

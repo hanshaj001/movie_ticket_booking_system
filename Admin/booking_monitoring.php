@@ -59,6 +59,8 @@ SELECT
     u.full_name,
     m.title,
     CONCAT(sh.show_date,' ',sh.show_time) show_time,
+    sh.show_date,
+    sh.show_time AS raw_show_time,
     b.booking_status,
     b.booking_time
 FROM bookings b
@@ -95,6 +97,12 @@ while ($row = mysqli_fetch_assoc($result)) {
     }
     $row['seats'] = $seats;
     $row['confirmed_count'] = $confirmed_count;
+
+    // Check if the show has already completed
+    $show_datetime = $row['show_date'] . ' ' . $row['raw_show_time'];
+    $show_ts = strtotime($show_datetime);
+    $row['show_completed'] = ($show_ts <= time()) ? 1 : 0;
+
     $bookings[] = $row;
 }
 
@@ -109,6 +117,7 @@ WHERE status='ACTIVE'
 <html>
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Booking Monitoring</title>
     <link rel="stylesheet" href="../Assets/css/Admin/booking_monitoring.css?v=<?= time() ?>"/>
     <link rel="stylesheet" href="../Assets/css/Admin/sidebar.css">
@@ -188,10 +197,16 @@ WHERE status='ACTIVE'
                             ?>
                         </td>
                         <td>
-                            <button class="action-btn view-btn" onclick="viewBooking(<?php echo $row['booking_id']; ?>)">View</button>
-                            <?php if ($row['confirmed_count'] > 0 && in_array($row['booking_status'], ['CONFIRMED', 'PARTIALLY_CANCELLED'])): ?>
-                                <button class="action-btn cancel-btn btn-cancel-seats-admin" data-booking-id="<?php echo $row['booking_id']; ?>">Cancel Seats</button>
-                            <?php endif; ?>
+                            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                                <button class="action-btn view-btn" onclick="viewBooking(<?php echo $row['booking_id']; ?>)"><i class="fa-solid fa-eye"></i> View</button>
+                                <?php if ($row['confirmed_count'] > 0 && in_array($row['booking_status'], ['CONFIRMED', 'PARTIALLY_CANCELLED'])): ?>
+                                    <?php if ($row['show_completed']): ?>
+                                        <button class="action-btn cancel-btn" disabled style="opacity: 0.5; cursor: not-allowed;" title="Show has already completed"><i class="fa-solid fa-ban"></i> Cancel Seats</button>
+                                    <?php else: ?>
+                                        <button class="action-btn cancel-btn btn-cancel-seats-admin" data-booking-id="<?php echo $row['booking_id']; ?>"><i class="fa-solid fa-xmark"></i> Cancel Seats</button>
+                                    <?php endif; ?>
+                                <?php endif; ?>
+                            </div>
                         </td>
                     </tr>
                     <?php endforeach; ?>

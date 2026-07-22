@@ -25,10 +25,10 @@ $current_datetime = date('Y-m-d H:i:s');
 $user_id = isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : 0;
 
 // Secure CSRF Token Layer
-if (empty($_SESSION['_csrf_token'])) {
-    $_SESSION['_csrf_token'] = bin2hex(random_bytes(32));
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
-$csrf_token = $_SESSION['_csrf_token'];
+$csrf_token = $_SESSION['csrf_token'];
 
 // Automated garbage collection: Clean expired sessions using correct local PHP timezone variable
 mysqli_query($conn, "
@@ -290,7 +290,7 @@ $message = '';
 $message_type = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_booking'])) {
-    if (!isset($_POST['csrf_token']) || !hash_equals($_SESSION['_csrf_token'], $_POST['csrf_token'])) {
+    if (!isset($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
         $message = "Security authorization validation expired.";
         $message_type = 'error';
     } else {

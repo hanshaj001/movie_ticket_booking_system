@@ -14,7 +14,7 @@ if(!isset($_GET['id']))
 $booking_id = intval($_GET['id']);
 
 $booking = mysqli_query($conn,"
-    SELECT b.*, s.movie_id 
+    SELECT b.*, s.movie_id, s.show_date, s.show_time
     FROM bookings b
     JOIN shows s ON b.show_id = s.show_id
     WHERE b.booking_id='$booking_id'
@@ -28,6 +28,13 @@ if(!$data)
 }
 
 if ($data['booking_status'] === 'CONFIRMED') {
+    // Check if the show has already completed
+    $show_datetime = $data['show_date'] . ' ' . $data['show_time'];
+    $show_ts = strtotime($show_datetime);
+    if ($show_ts <= time()) {
+        die("Cancellation failed. The show has already been completed.");
+    }
+
     mysqli_begin_transaction($conn);
     try {
         /* Update Booking Status */
