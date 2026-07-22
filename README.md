@@ -637,7 +637,7 @@ CREATE TABLE seat_locks (
    FOREIGN KEY (session_id) REFERENCES booking_sessions(session_id) ON DELETE CASCADE,
    FOREIGN KEY (show_seat_id) REFERENCES show_seats(show_seat_id) ON DELETE CASCADE,
    UNIQUE(show_seat_id)
-);
+);    
 
 -- =========================================================
 -- BOOKINGS TABLE
