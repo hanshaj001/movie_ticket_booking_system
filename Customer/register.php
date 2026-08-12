@@ -45,6 +45,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Validation checks
     if (empty($full_name)) {
         $errors['full_name'] = "Full Name is required.";
+    }elseif(strlen($full_name)<3){
+        $errors['full_name'] = 'Name required at least 3 characters.';
     }
     
     if (empty($email)) {
